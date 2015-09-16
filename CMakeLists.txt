@@ -79,6 +79,22 @@ include_directories(${CMAKE_SOURCE_DIR}/src) #this makes src root dir
 ##############################################################################################################################
 ##############################################################################################################################
 
+# ENCODERS
+
+set(ENCODERS_HDRS
+  src/encoders/encoder.h
+  src/encoders/hamming_encoder.h
+  src/encoders/lsb_encoder.h
+  src/encoders/encoder_factory.h
+)
+
+set(ENCODERS_SRCS
+  src/encoders/encoder.cc
+  src/encoders/hamming_encoder.cc
+  src/encoders/lsb_encoder.cc
+  src/encoders/encoder_factory.cc
+)
+
 # HASH
 
 set(HASH_HDRS
@@ -162,6 +178,7 @@ set(UTILS_SRCS
 
 ## STEGODISK_LIBRARY ##
 set(STEGODISK_HDRS
+  ${ENCODERS_HDRS}
   ${HASH_HDRS}
   ${KEYS_HDRS}
   ${LOGGING_HDRS}
@@ -170,6 +187,7 @@ set(STEGODISK_HDRS
 )
 
 set(STEGODISK_SRCS
+  ${ENCODERS_SRCS}
   ${HASH_SRCS}
   ${KEYS_SRCS}
   ${LOGGING_SRCS}
