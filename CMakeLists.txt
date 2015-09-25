@@ -193,6 +193,18 @@ set(UTILS_SRCS
   src/utils/keccak/keccak.cc
 )
 
+# VIRTUAL_STORAGE
+
+set(VIRTUAL_STORAGE_HDRS
+  src/virtual_storage/encrypted_virtual_storage.h
+  src/virtual_storage/virtual_storage.h
+)
+
+set(VIRTUAL_STORAGE_SRCS
+  src/virtual_storage/encrypted_virtual_storage.cc
+  src/virtual_storage/virtual_storage.cc
+)
+
 ## STEGODISK_LIBRARY ##
 set(STEGODISK_HDRS
   ${ENCODERS_HDRS}
@@ -202,6 +214,7 @@ set(STEGODISK_HDRS
   ${PERMUTATIONS_HDRS}
   ${UTILS_HDRS}
   ${CARRIER_FILES_HDRS}
+  ${VIRTUAL_STORAGE_HDRS}
 )
 
 set(STEGODISK_SRCS
@@ -212,6 +225,7 @@ set(STEGODISK_SRCS
   ${PERMUTATIONS_SRCS}
   ${UTILS_SRCS} 
   ${CARRIER_FILES_SRCS}
+  ${VIRTUAL_STORAGE_SRCS}
 )
 
 #set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${LOG4CPLUS_LIBRARIES} ${SQLITE_LIBRARIES} ${ZLIB_LIBRARIES})

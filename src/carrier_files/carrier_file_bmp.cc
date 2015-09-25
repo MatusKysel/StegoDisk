@@ -149,14 +149,14 @@ int CarrierFileBMP::SaveFile() {
   }
   // copy LSB data to content buffer
 
-  for (int i = 0; i < bits_to_modify; ++i) {
+  for (uint64 i = 0; i < bits_to_modify; ++i) {
     if (bitmap_buffer[i] & 0x01) SetBitInBufferPermuted(i);
   }
 
   EmbedBufferUsingEncoder();
 
   uint8 tmp_lsb = 0;
-  for (int i = 0; i < bits_to_modify ; ++i) {
+  for (uint64 i = 0; i < bits_to_modify ; ++i) {
     tmp_lsb = GetBitInBufferPermuted(i);
     bitmap_buffer[i] = (bitmap_buffer[i] & 0xFE) | tmp_lsb;
   }

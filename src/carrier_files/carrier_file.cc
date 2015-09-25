@@ -34,7 +34,7 @@ CarrierFile::CarrierFile(File file, std::shared_ptr<Encoder> encoder)
     encoder_(encoder) {
 
   virtual_storage_ = VirtualStoragePtr(nullptr);
-  virtual_storage_offSet_ = 0;
+  virtual_storage_offset_ = 0;
 
   permutation_ = PermutationFactory::GetDefaultPermutation();
 
