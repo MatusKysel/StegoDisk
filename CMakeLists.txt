@@ -124,6 +124,18 @@ set(FILE_MANAGEMENT_SRCS
   src/file_management/carrier_files_manager.cc
 )
 
+# FUSE
+
+set(FUSE_HDRS
+  src/fuse/fuse_service_delegate.h
+  src/fuse/fuse_service.h
+)
+
+set(FUSE_SRCS
+  src/fuse/fuse_service_delegate.cc
+  src/fuse/fuse_service.cc
+)
+
 # HASH
 
 set(HASH_HDRS
@@ -219,6 +231,7 @@ set(VIRTUAL_STORAGE_SRCS
 
 ## STEGODISK_LIBRARY ##
 set(STEGODISK_HDRS
+  src/stego_storage.h
   ${ENCODERS_HDRS}
   ${HASH_HDRS}
   ${KEYS_HDRS}
@@ -228,9 +241,11 @@ set(STEGODISK_HDRS
   ${CARRIER_FILES_HDRS}
   ${VIRTUAL_STORAGE_HDRS}
   ${FILE_MANAGEMENT_HDRS}
+  ${FUSE_HDRS}
 )
 
 set(STEGODISK_SRCS
+  src/stego_storage.cc
   ${ENCODERS_SRCS}
   ${HASH_SRCS}
   ${KEYS_SRCS}
@@ -240,6 +255,7 @@ set(STEGODISK_SRCS
   ${CARRIER_FILES_SRCS}
   ${VIRTUAL_STORAGE_SRCS}
   ${FILE_MANAGEMENT_SRCS}
+  ${FUSE_SRCS}
 )
 
 #set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${LOG4CPLUS_LIBRARIES} ${SQLITE_LIBRARIES} ${ZLIB_LIBRARIES})
