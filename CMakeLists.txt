@@ -79,6 +79,23 @@ include_directories(${CMAKE_SOURCE_DIR}/src) #this makes src root dir
 ##############################################################################################################################
 ##############################################################################################################################
 
+
+# CARRIER_FILES
+
+set(CARRIER_FILES_HDRS
+  src/carrier_files/carrier_file_bmp.h
+  src/carrier_files/carrier_file.h
+  src/carrier_files/carrier_file_factory.h
+  src/carrier_files/carrier_file_jpeg.h
+)
+
+set(CARRIER_FILES_SRCS
+  src/carrier_files/carrier_file_bmp.cc
+  src/carrier_files/carrier_file.cc
+  src/carrier_files/carrier_file_factory.cc
+  src/carrier_files/carrier_file_jpeg.cc
+)
+
 # ENCODERS
 
 set(ENCODERS_HDRS
@@ -184,6 +201,7 @@ set(STEGODISK_HDRS
   ${LOGGING_HDRS}
   ${PERMUTATIONS_HDRS}
   ${UTILS_HDRS}
+  ${CARRIER_FILES_HDRS}
 )
 
 set(STEGODISK_SRCS
@@ -193,6 +211,7 @@ set(STEGODISK_SRCS
   ${LOGGING_SRCS}
   ${PERMUTATIONS_SRCS}
   ${UTILS_SRCS} 
+  ${CARRIER_FILES_SRCS}
 )
 
 #set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${LOG4CPLUS_LIBRARIES} ${SQLITE_LIBRARIES} ${ZLIB_LIBRARIES})
