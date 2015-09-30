@@ -61,10 +61,15 @@ if(QT_CREATOR_PROJECT_SHOW)
   add_custom_target(DummyHeaderShow SOURCES ${SRCS} ${HDRS})
 endif()
 
+#if(NOT CMAKE_BUILD_TYPE)
+#  set(CMAKE_BUILD_TYPE Release)
+#endif()
+
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+set(warnings "-Wall -Wextra") #-Werror
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${warnings}")
 
 if(WIN32)
 	if (BUILD_SHARED_LIBS)
@@ -72,6 +77,16 @@ if(WIN32)
 	endif()
 endif()
 ################ CXX FLAGS ##################
+
+################ LIBJPEGTURBO ##################
+option(ENABLE_SHARED OFF)
+option(WITH_SIMD OFF)
+option(WITH_TURBOJPEG OFF)
+add_subdirectory(lib/libjpeg-turbo)
+set(LIBJPEGTURBO_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
+include_directories(${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo)
+include_directories(${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
+################ LIBJPEGTURBO ##################
 
 include_directories(${CMAKE_SOURCE_DIR}/src) #this makes src root dir
 
@@ -241,7 +256,7 @@ set(STEGODISK_HDRS
   ${CARRIER_FILES_HDRS}
   ${VIRTUAL_STORAGE_HDRS}
   ${FILE_MANAGEMENT_HDRS}
-  ${FUSE_HDRS}
+  #${FUSE_HDRS}
 )
 
 set(STEGODISK_SRCS
@@ -255,10 +270,14 @@ set(STEGODISK_SRCS
   ${CARRIER_FILES_SRCS}
   ${VIRTUAL_STORAGE_SRCS}
   ${FILE_MANAGEMENT_SRCS}
-  ${FUSE_SRCS}
+  #${FUSE_SRCS}
 )
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-#set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${LOG4CPLUS_LIBRARIES} ${SQLITE_LIBRARIES} ${ZLIB_LIBRARIES})
+set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
 
 if(APPLE)
    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -274,7 +293,7 @@ endif()
 add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS})
 
 if(REQUIRE_LIB_SYMBOL)
-  target_link_libraries(${STEGODISK_LIBRARY} ${PLATFORM_LIBS} ${THIRD_LIBRARIES})
+  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
 endif()
 
 

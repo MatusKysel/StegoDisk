@@ -26,9 +26,9 @@ CarrierFilePtr CarrierFileFactory::CreateCarrierFile(const File& file) {
   // get ext
   string ext = file.GetExtension();
   if (ext.compare(".bmp") == 0) {
-    carrier_file = make_shared<CarrierFileBMP>((file, encoder));
+    carrier_file = make_shared<CarrierFileBMP>(file, encoder);
   } else if (ext.compare(".jpg") == 0) {
-    carrier_file = make_shared<CarrierFileJPEG>((file, encoder));
+    carrier_file = make_shared<CarrierFileJPEG>(file, encoder);
   }
 
   if (carrier_file) {
