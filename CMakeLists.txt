@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(StegoDisk)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
+option(WITH_FUSE "Build this library with FUSE" OFF)
 
 cmake_policy(SET CMP0009 NEW)
 
@@ -30,6 +31,10 @@ math(EXPR STEGODISK_VERSION_NUMBER "${STEGODISK_MAJOR_VERSION} * 1000000 + ${STE
 
 configure_file(${CMAKE_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
+
+
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
 if(ADD_CMAKE_MODULE_PATH)
   set(CMAKE_MODULE_PATH ${ADD_CMAKE_MODULE_PATH})
@@ -87,6 +92,20 @@ set(LIBJPEGTURBO_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
 include_directories(${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo)
 include_directories(${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
 ################ LIBJPEGTURBO ##################
+
+################ FUSE ##################
+if(WITH_FUSE)
+  find_package(FUSE)
+  if(NOT FUSE_FOUND)
+    message (STATUS "Unable to find fuse.h")
+  else()
+    include_directories(${FUSE_INCLUDE_DIRS})
+  endif()
+else()
+  message (STATUS "Build this library without FUSE")
+ set(FUSE_FOUND FALSE)
+endif()
+################ FUSE ##################
 
 include_directories(${CMAKE_SOURCE_DIR}/src) #this makes src root dir
 
@@ -256,7 +275,6 @@ set(STEGODISK_HDRS
   ${CARRIER_FILES_HDRS}
   ${VIRTUAL_STORAGE_HDRS}
   ${FILE_MANAGEMENT_HDRS}
-  #${FUSE_HDRS}
 )
 
 set(STEGODISK_SRCS
@@ -270,14 +288,24 @@ set(STEGODISK_SRCS
   ${CARRIER_FILES_SRCS}
   ${VIRTUAL_STORAGE_SRCS}
   ${FILE_MANAGEMENT_SRCS}
-  #${FUSE_SRCS}
 )
+
+if(FUSE_FOUND)
+  set(STEGODISK_HDRS ${STEGODISK_HDRS} ${FUSE_HDRS})
+  set(STEGODISK_SRCS ${STEGODISK_SRCS} ${FUSE_SRCS})
+endif()
+
 ##############################################################################################################################
 ##############################################################################################################################
 ##############################################################################################################################
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
+if(FUSE_FOUND)
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${FUSE_LIBRARIES})
+else()
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
+endif()
+
 
 if(APPLE)
    find_library(COREFOUNDATION_LIBRARY CoreFoundation)

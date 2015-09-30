@@ -12,9 +12,8 @@
 #include <fuse.h>
 #endif
 
-
-#include "fuse_service_delegate_.h"
-#include "logging/log.h"
+#include "fuse_service_delegate.h"
+#include "logging/logger.h"
 #include "virtual_storage/virtual_storage.h"
 
 #define _FILE_OFFSET_BITS 64
