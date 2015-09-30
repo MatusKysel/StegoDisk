@@ -37,16 +37,13 @@ using namespace std;
 
 namespace stego_disk {
 
-CarrierFilesManager::CarrierFilesManager() {
-  capacity_ = 0;
-  files_in_directory_ = 0;
-  loading_progress_ = 0;
-  virtual_storage_ = VirtualStoragePtr(nullptr);
-  encoder_ = std::shared_ptr<Encoder>(nullptr);
-  is_active_encoder_ = false;
-  //_progressCallback = NULL;
-  //    _delegate = NULL;
-}
+CarrierFilesManager::CarrierFilesManager() :
+  capacity_(0),
+  files_in_directory_(0),
+  loading_progress_(0),
+  virtual_storage_(VirtualStoragePtr(nullptr)),
+  encoder_(std::shared_ptr<Encoder>(nullptr)),
+  is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
   carrier_files_.clear();

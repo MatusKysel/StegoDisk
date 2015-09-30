@@ -6,7 +6,7 @@
 #define STEGODISK_UTILS_CPP11COMPAT_H_
 
 // all Visual Studios up to VS2010
-#if _MSC_VER <= 1600
+#if _MSC_VER <= 1600 && defined(_MSC_VER)
 
 #define		KEYWORD_FINAL
 #define		FOREACH(_T_, _V_, _E_)	for (vector<_T_>::iterator (_E_) = (_V_).begin(); (_E_) != (_V_).end(); (_E_)++)

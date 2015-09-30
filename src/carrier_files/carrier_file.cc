@@ -23,20 +23,18 @@
 namespace stego_disk {
 
 CarrierFile::CarrierFile(File file, std::shared_ptr<Encoder> encoder)
-  : raw_capacity_(0),
-    capacity_(0),
+  : codeword_block_size_(0),
     data_block_size_(0),
-    blocks_used_(0),
     block_count_(0),
-    file_(file),
+    capacity_(0),
+    raw_capacity_(0),
+    blocks_used_(0),
+    virtual_storage_offset_(0),
     file_loaded_(false),
-    codeword_block_size_(0),
-    encoder_(encoder) {
-
-  virtual_storage_ = VirtualStoragePtr(nullptr);
-  virtual_storage_offset_ = 0;
-
-  permutation_ = PermutationFactory::GetDefaultPermutation();
+    file_(file),
+    encoder_(encoder),
+    permutation_(PermutationFactory::GetDefaultPermutation()),
+    virtual_storage_(VirtualStoragePtr(nullptr)) {
 
   if (encoder)  {
     data_block_size_ = encoder->GetDataBlockSize();

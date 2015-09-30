@@ -18,7 +18,7 @@ class Affine64Permutation : public AffinePermutation {
 public:
   virtual void Init(PermElem requested_size, Key key);
   virtual PermElem Permute(PermElem index) const;
-  //virtual PermElem getSizeUsingParams(PermElem requestedSize, Key key);
+  //virtual PermElem GetSizeUsingParams(PermElem requestedSize, Key key);
 
   virtual const std::string GetNameInstance() const { return "Affine64"; }
 

@@ -74,6 +74,7 @@ static int AddFilesInDir(std::string base_path, std::string current_path, std::s
     // preto pouzijeme zistovanie info o samotnom objekte fs, nie o pripadnom cieli
     if ( lstat(new_path.c_str(), &sb) == -1 ) {
       fprintf( stderr, "Error: printDir: chyba zistovania info o objekte fs\n" );
+      closedir(dir);
       //TODO: throw exception
       return -1;
     }
