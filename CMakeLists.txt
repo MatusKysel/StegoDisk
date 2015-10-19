@@ -84,6 +84,12 @@ endif()
 ################ CXX FLAGS ##################
 
 ################ LIBJPEGTURBO ##################
+if(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
+   execute_process(COMMAND patch ${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET)
+else()
+   message(FATAL_ERROR "Unable to find 'libjpeg-turbo' library.")
+endif()
+
 option(ENABLE_SHARED OFF)
 option(WITH_SIMD OFF)
 option(WITH_TURBOJPEG OFF)
