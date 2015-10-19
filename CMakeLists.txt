@@ -85,7 +85,7 @@ endif()
 
 ################ LIBJPEGTURBO ##################
 if(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
-   execute_process(COMMAND patch ${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET)
+   execute_process(COMMAND patch ${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET OUTPUT_QUIET)
 else()
    message(FATAL_ERROR "Unable to find 'libjpeg-turbo' library.")
 endif()
