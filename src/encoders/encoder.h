@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 #include "utils/stego_types.h"
 

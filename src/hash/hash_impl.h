@@ -10,6 +10,7 @@
 #define STEGODISK_HASH_HASHIMPL_H_
 
 #include <memory>
+#include <stdexcept>
 
 #include "utils/stego_header.h"
 #include "utils/memory_buffer.h"
