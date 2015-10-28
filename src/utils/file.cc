@@ -2,7 +2,7 @@
 
 #if _WIN32
 #define PATH_SEPARATOR	'\\'
-#include "FileWin.cpp"
+#include "file_win.cc"
 #elif __unix__
 #define PATH_SEPARATOR	'/'
 //#include "file_unix.cc" //TODO(matus) toto je nejako divne previazane a triedu File
@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <fstream>
 
 #include "stego_header.h"
 
@@ -46,16 +47,10 @@ std::string File::NormalizePath(std::string platform_specific_path) {
   return platform_specific_path;
 }
 
-//TODO(Matus) toto je viac na linux asi treba prerobit
-//uint64 File::GetSize()
-//{
-//  struct stat file_stat;
-//  if (stat(GetAbsolutePath().c_str(), &file_stat) < 0) {
-//    //TODO: throw exception
-//    return 0;
-//  }
-//  return file_stat.st_size;
-//}
+uint64 File::GetSize() {
+  std::ifstream in(GetAbsolutePath(), std::ifstream::ate | std::ifstream::binary);
+  return static_cast<uint64>(in.tellg());
+}
 
 File::File(std::string base_path, std::string relative_path) {
   string base_path_safe = base_path;
@@ -117,24 +112,26 @@ std::string File::GetFileName() {
 FilePtr::FilePtr(const File& file) {
   int ret = 0;
 #ifdef STEGO_OS_WIN
-  fileHandle = nullptr;
-  ret = fopen_s(&fileHandle, file.getAbsolutePath().c_str(), "r+b");
+  file_handle_ = nullptr;
+  ret = fopen_s(&file_handle_, file.GetAbsolutePath.c_str(), "r+b");
 #else
   if ((file_handle_ = fopen(file.GetAbsolutePath().c_str(), "r+b")) == nullptr)
     ret = errno;
 #endif
-  if ( ret != 0 ) {
+  if (ret != 0) {
     LOG_ERROR("FilePtr::FilePtr: cannot open file '" <<
-              file.GetAbsolutePath() << "': " << strerror(errno));
+              file.GetAbsolutePath() << "': " << strerror(ret));
     throw std::runtime_error("FilePtr::FilePtr: cannot open file '" +
-                             file.GetAbsolutePath() + "': " + strerror(errno));
+                             file.GetAbsolutePath() + "': " + strerror(ret));
   }
 }
 
 FilePtr::~FilePtr() {
   if (file_handle_ != nullptr) {
-    fclose(file_handle_);
-    //TODO(matus) fflush a overenie??
+    if (fclose(file_handle_) != 0 ) {
+      LOG_ERROR("FilePtr::FilePtr: cannot close file " << strerror(errno));
+      throw std::runtime_error("FilePtr::FilePtr: cannot close file");
+    }
     file_handle_ = nullptr;
   }
 }

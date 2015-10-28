@@ -4,6 +4,16 @@ project(StegoDisk)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" OFF)
+option(BUILD_SHARED "Build this as shared library" OFF)
+
+
+if(BUILD_SHARED)
+  message (STATUS "Build this library as shared")
+  set(BUILD_SHARED_LIBS ON)
+else()
+  message (STATUS "Build this library as static")
+  set(BUILD_SHARED_LIBS OFF)
+endif()
 
 cmake_policy(SET CMP0009 NEW)
 
@@ -50,11 +60,6 @@ else()
 	endif()
 endif()
 
-if(NOT WIN32)
-	set(BUILD_SHARED_LIBS ON)
-else()
-	set(BUILD_SHARED_LIBS OFF)
-endif()
 
 if(NOT BUILD_DIR)
   set(BUILD_DIR ${CMAKE_INSTALL_PREFIX})
