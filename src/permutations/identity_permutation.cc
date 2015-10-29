@@ -19,11 +19,12 @@ void IdentityPermutation::Init(PermElem requested_size, Key key) {
   //    if (key.getSize() == 0)
   //        throw std::runtime_error("IdentityPermutatuion init: Invalid key (size=0)");
 
-  if (size_ == 0)
+  if (requested_size == 0)
     throw std::invalid_argument("IdentityPermutation: "
                                 "requestedSize cannot be 0");
 
   size_ = requested_size;
+  initialized_ = true;
 }
 
 PermElem IdentityPermutation::Permute(PermElem index) const {

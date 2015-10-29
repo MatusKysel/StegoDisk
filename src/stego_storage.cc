@@ -36,14 +36,15 @@ void StegoStorage::Load() {
   // Set encoder
   // TODO manager->SetPermutation for carrier files
   carrier_files_manager_->SetEncoder(
-        EncoderFactory::GetEncoderByName("hamming"));
-  //carrier_files_manager_.SetEncoder(EncoderFactory::GetEncoderByName("lsb"));
+        //        EncoderFactory::GetEncoderByName("hamming"));
+        EncoderFactory::GetEncoderByName("lsb"));
   //carrier_files_manager_.SetEncoderArgByName("blockSize","1");
   carrier_files_manager_->ApplyEncoder();
 
   virtual_storage_ = make_shared<VirtualStorage>();
   virtual_storage_->SetPermutation(
-        PermutationFactory::GetPermutationByName("MixedFeistel"));
+        //        PermutationFactory::GetPermutationByName("MixedFeistel"));
+        PermutationFactory::GetPermutationByName("Identity"));
   carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
 }
 
