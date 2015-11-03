@@ -17,7 +17,7 @@ class Logger {
 public:
   static void SetVerbosityLevel(LoggerVerbosityLevel verbosity_level,
                                 std::string out = "");
-  static void SetVerbosityLevel(char verbosity_level, std::string out = "");
+  static void SetVerbosityLevel(std::string &verbosity_level, std::string out = "");
   static bool ShouldPrint(LoggerVerbosityLevel verbosity_level);
   static void LoggerClose();
 

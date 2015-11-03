@@ -5,6 +5,7 @@ project(StegoDisk)
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" OFF)
 option(BUILD_SHARED "Build this as shared library" OFF)
+option(BUILD_TESTS "Whether to build automatic test suite" ON)
 
 
 if(BUILD_SHARED)
@@ -341,3 +342,23 @@ endif()
 #  ARCHIVE DESTINATION ${LIBDIR}
 #  LIBRARY DESTINATION ${LIBDIR}
 #  RUNTIME DESTINATION ${LIBDIR})
+
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+# TESTING
+
+if(BUILD_TESTS)
+  ################ ZLIB ##################
+
+  #option(ENABLE_SHARED OFF)
+  #option(WITH_SIMD OFF)
+  #option(WITH_TURBOJPEG OFF)
+  add_subdirectory(lib/zlib)
+  set(ZLIB_LIBRARIES ${CMAKE_BINARY_DIR}/lib/zlib)
+##  include_directories(${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo)
+  include_directories(${CMAKE_BINARY_DIR}/lib/zlib)
+  ################ ZLIB ##################
+
+  add_subdirectory(src/tests)
+endif()

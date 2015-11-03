@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 
 
@@ -31,28 +32,24 @@ void Logger::SetVerbosityLevel(LoggerVerbosityLevel verbosity_level, std::string
   }
 }
 
-void Logger::SetVerbosityLevel(char verbosity_level, std::string out) {
-  switch(toupper(verbosity_level)) {
-    case 'F':
-      Logger::SetVerbosityLevel(kLoggerVerbosityFatal);
-      break;
-    case 'E':
-      Logger::SetVerbosityLevel(kLoggerVerbosityError);
-      break;
-    case 'W':
-      Logger::SetVerbosityLevel(kLoggerVerbosityWarning);
-      break;
-    case 'I':
-      Logger::SetVerbosityLevel(kLoggerVerbosityInfo);
-      break;
-    case 'D':
-      Logger::SetVerbosityLevel(kLoggerVerbosityDebug);
-      break;
-    case 'T':
-      Logger::SetVerbosityLevel(kLoggerVerbosityTrace);
-      break;
-    default:
-      Logger::SetVerbosityLevel(kLoggerVerbosityDisabled);
+void Logger::SetVerbosityLevel(std::string &verbosity_level, std::string out) {
+  std::transform(verbosity_level.begin(), verbosity_level.end(),
+                 verbosity_level.begin(), ::toupper);
+
+  if (verbosity_level == "FATAL") {
+    Logger::SetVerbosityLevel(kLoggerVerbosityFatal);
+  } else if (verbosity_level == "ERROR" ) {
+    Logger::SetVerbosityLevel(kLoggerVerbosityError);
+  } else if (verbosity_level == "WARN" ) {
+    Logger::SetVerbosityLevel(kLoggerVerbosityWarning);
+  } else if (verbosity_level == "INFO" ) {
+    Logger::SetVerbosityLevel(kLoggerVerbosityInfo);
+  } else if (verbosity_level == "DEBUG" ) {
+    Logger::SetVerbosityLevel(kLoggerVerbosityDebug);
+  } else if (verbosity_level == "TRACE" ) {
+    Logger::SetVerbosityLevel(kLoggerVerbosityTrace);
+  } else {
+    Logger::SetVerbosityLevel(kLoggerVerbosityDisabled);
   }
 
   if ( out.length() != 0 ) {

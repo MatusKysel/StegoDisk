@@ -72,10 +72,9 @@ void CarrierFile::SetEncoder(std::shared_ptr<Encoder> encoder) {
 }
 
 uint64 CarrierFile::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) {
-  if (!encoder) return 0;
-  if (!permutation_) return 0;
+  if (encoder && permutation_) return 0;
   uint64 block_count = ((permutation_->GetSizeUsingParams(
-                           raw_capacity_*8, subkey_) / 8)
+                           raw_capacity_ * 8, subkey_) / 8)
                         / encoder->GetCodewordBlockSize());
   return (block_count * encoder->GetDataBlockSize());
 }
@@ -116,7 +115,7 @@ int CarrierFile::AddToVirtualStorage(VirtualStoragePtr storage, uint64 offset,
   virtual_storage_offset_ = offset;
 
   if (bytes_used) {
-    blocks_used_ = static_cast<uint32>(((bytes_used-1) / data_block_size_) + 1);
+    blocks_used_ = static_cast<uint32>(((bytes_used - 1) / data_block_size_) + 1);
   } else {
     blocks_used_ = 0;
   }
