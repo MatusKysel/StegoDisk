@@ -24,7 +24,10 @@ void Logger::LoggerClose() {
 void Logger::SetVerbosityLevel(LoggerVerbosityLevel verbosity_level, std::string out) {
   verbosity_level_ = verbosity_level;
   if ( out.length() != 0 ) {
-    ofs_ = new std::ofstream( out, std::ios::out );
+
+    if (out == "stdout" || out == "cout") ofs_ = &std::cout;
+    else ofs_ = new std::ofstream( out, std::ios::out );
+
     if ( ((std::ofstream*)ofs_)->is_open() ) {
       *ofs_ << "Log started" << std::endl;
     } else
@@ -53,7 +56,10 @@ void Logger::SetVerbosityLevel(std::string &verbosity_level, std::string out) {
   }
 
   if ( out.length() != 0 ) {
-    ofs_ = new std::ofstream( out, std::ios::out );
+
+    if (out == "stdout" || out == "cout") ofs_ = &std::cout;
+    else ofs_ = new std::ofstream( out, std::ios::out );
+
     if ( ((std::ofstream*)ofs_)->is_open() ) {
       *ofs_ << "Log started" << std::endl;
     } else {

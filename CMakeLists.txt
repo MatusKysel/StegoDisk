@@ -90,10 +90,12 @@ endif()
 ################ CXX FLAGS ##################
 
 ################ LIBJPEGTURBO ##################
-if(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
-   execute_process(COMMAND patch ${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET OUTPUT_QUIET)
+if(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt.orig")
+  message(STATUS "Library 'libjpeg-turbo' already patched.")
+elseif(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
+  execute_process(COMMAND patch ${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET OUTPUT_QUIET)
 else()
-   message(FATAL_ERROR "Unable to find 'libjpeg-turbo' library.")
+  message(FATAL_ERROR "Unable to find 'libjpeg-turbo' library.")
 endif()
 
 option(ENABLE_SHARED OFF)
@@ -349,16 +351,5 @@ endif()
 # TESTING
 
 if(BUILD_TESTS)
-  ################ ZLIB ##################
-
-  #option(ENABLE_SHARED OFF)
-  #option(WITH_SIMD OFF)
-  #option(WITH_TURBOJPEG OFF)
-  add_subdirectory(lib/zlib)
-  set(ZLIB_LIBRARIES ${CMAKE_BINARY_DIR}/lib/zlib)
-##  include_directories(${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo)
-  include_directories(${CMAKE_BINARY_DIR}/lib/zlib)
-  ################ ZLIB ##################
-
   add_subdirectory(src/tests)
 endif()

@@ -1,0 +1,8 @@
+#ifndef TEST_CONFIG_H_IN
+#define TEST_CONFIG_H_IN
+
+#cmakedefine SRC_DIRECTORY "@SRC_DIRECTORY@"
+#cmakedefine DST_DIRECTORY "@DST_DIRECTORY@"
+#cmakedefine PASSWORD "@PASSWORD@"
+
+#endif // TEST_CONFIG_H_IN
