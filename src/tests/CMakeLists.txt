@@ -17,8 +17,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_config.h.in ${CMAKE_CURRENT_BINA
 
 message(STATUS "TEST_PATH_PREFIX: ${DST_DIRECTORY}")
 
-add_stego_test(LsbMixFeistelWPassword "LSB" "MixFeistel" 1)
-add_stego_test(HammingMixFeistelWPassword1 "Hamming" "MixFeistel" 1)
+add_stego_test(LsbMixedFeistelWPassword "LSB" "MixedFeistel" 1)
+add_stego_test(LsbIdentityWPassword "LSB" "Identity" 1)
+add_stego_test(LsbAffine64WPassword "LSB" "Affine64" 1)
+add_stego_test(LsbAffineWPassword "LSB" "Affine" 1)
+add_stego_test(LsbNumericFeistelWPassword "LSB" "NumericFeistel" 1)
+add_stego_test(HammingMixedFeistelWPassword "Hamming" "MixedFeistel" 1)
+add_stego_test(HammingIdentityWPassword "Hamming" "Identity" 1)
+add_stego_test(HammingAffine64WPassword "Hamming" "Affine64" 1)
+add_stego_test(HammingAffineWPassword "Hamming" "Affine" 1)
+add_stego_test(HammingNumericFeistelWPassword "Hamming" "NumericFeistel" 1)
 
 ###################################################################################################################################
 ###################################################################################################################################

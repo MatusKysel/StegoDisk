@@ -29,7 +29,7 @@ void StegoStorage::Open(std::string storage_base_path, std::string password) {
   opened_ = true;
 }
 
-void StegoStorage::Load() {
+void StegoStorage::Load(std::string encoder, std::string permutation) {
   if (!opened_)
     throw std::runtime_error("Storage must be opened_ before loading");
 
@@ -37,14 +37,14 @@ void StegoStorage::Load() {
   // TODO manager->SetPermutation for carrier files
   carrier_files_manager_->SetEncoder(
         //        EncoderFactory::GetEncoderByName("hamming"));
-        EncoderFactory::GetEncoderByName("lsb"));
+        EncoderFactory::GetEncoderByName(encoder));
   //carrier_files_manager_.SetEncoderArgByName("blockSize","1");
   carrier_files_manager_->ApplyEncoder();
 
   virtual_storage_ = make_shared<VirtualStorage>();
   virtual_storage_->SetPermutation(
         //        PermutationFactory::GetPermutationByName("MixedFeistel"));
-        PermutationFactory::GetPermutationByName("Identity"));
+        PermutationFactory::GetPermutationByName(permutation));
   carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
 }
 

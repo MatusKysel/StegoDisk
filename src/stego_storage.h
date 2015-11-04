@@ -25,7 +25,7 @@ public:
   ~StegoStorage();
 
   void Open(std::string storage_base_path, std::string password);
-  void Load();
+  void Load(std::string encoder = "Lsb", std::string permutation = "MixedFeistel");
   void Save();
 
   void Read(void* destination, std::size_t offset, std::size_t length) const;
