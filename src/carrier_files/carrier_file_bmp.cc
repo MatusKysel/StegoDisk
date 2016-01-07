@@ -42,7 +42,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder) :
   }
 
   bmp_offset_ = *((uint32_t*)&bmp_header[10]); // should be = 54
-  uint16_t bmp_resolution = *((uint16_t*)&bmp_info[14]); // 24
+  uint16_t bmp_bits_per_pixel = *((uint16_t*)&bmp_info[14]); // 24
   uint32_t bmp_compression = *((uint32_t*)&bmp_info[16]); // should be 0
 
   if (bmp_compression != 0) {
@@ -50,17 +50,18 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder) :
     return;
   }
 
-  if (bmp_resolution != 24) {
-    //TODO: throw exception
-    return;
-  }
+//  if (bmp_bits_per_pixel != 24) {
+//    //TODO: throw exception
+//    return;
+//  } TODO(Matus) podpora inych hlbok
 
   //bmp_size_ = *((uint32_t*)&bmp_info[20]); // byva = 0 pri vypnutej kompresii
 
   int32_t bmp_width = *((int32_t*)&bmp_info[4]);
   int32_t bmp_height = *((int32_t*)&bmp_info[8]);
 
-  bmp_size_ = (((24 * bmp_width + 31) / 32) * 4) * abs(bmp_height);
+  bmp_size_ = (((bmp_bits_per_pixel * bmp_width + 31) / 32) * 4) *
+              abs(bmp_height);
 
   if ((bmp_size_ + 54) > bmp_file_size) {
     //TODO: throw exception
@@ -86,10 +87,11 @@ int CarrierFileBMP::LoadFile() {
   buffer_.Resize(raw_capacity_);
   buffer_.Clear();
 
-  // TODO: rewrite using memory buffer & exceptions!
+//   TODO: rewrite using memory buffer & exceptions!
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
-  uint64 bits_to_modify = blocks_used_ * codeword_block_size_ * 8;
+  uint64 bits_to_modify = permutation_->GetSize();
+
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
   uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
@@ -108,7 +110,7 @@ int CarrierFileBMP::LoadFile() {
     if (bitmap_buffer[i] & 0x01) SetBitInBufferPermuted(i);
   }
 
-  //    bitmap_buffer.destroy();
+
 
   ExtractBufferUsingEncoder();
 
@@ -122,7 +124,9 @@ int CarrierFileBMP::LoadFile() {
 
 int CarrierFileBMP::SaveFile() {
   auto file_ptr = file_.Open();
-  //if (!file_loaded_) return SE_LOAD_FILE;
+
+//  if(!file_loaded_) return SE_LOAD_FILE;
+
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
 
@@ -135,7 +139,7 @@ int CarrierFileBMP::SaveFile() {
 
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
-  uint64 bits_to_modify = blocks_used_ * codeword_block_size_ * 8;
+  uint64 bits_to_modify = permutation_->GetSize();
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
   uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
@@ -155,12 +159,9 @@ int CarrierFileBMP::SaveFile() {
 
   EmbedBufferUsingEncoder();
 
-  uint8 tmp_lsb = 0;
   for (uint64 i = 0; i < bits_to_modify ; ++i) {
-    tmp_lsb = GetBitInBufferPermuted(i);
-    bitmap_buffer[i] = (bitmap_buffer[i] & 0xFE) | tmp_lsb;
+    bitmap_buffer[i] = (bitmap_buffer[i] & 0xFE) | GetBitInBufferPermuted(i);
   }
-
 
   // write data
 
@@ -168,8 +169,6 @@ int CarrierFileBMP::SaveFile() {
   uint32 write_cnt = static_cast<uint32>(fwrite(bitmap_buffer.GetRawPointer(),
                                                 1, raw_capacity_ * 8,
                                                 file_ptr.Get()));
-
-  //    bitmap_buffer.destroy();
 
   if (write_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Writing content to file failed.");

@@ -25,7 +25,7 @@ public:
   virtual PermElem Permute(PermElem index) const;
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key key);
 
-  virtual const std::string GetNameInstance() const { return "MixedFeistel"; }
+  const std::string GetNameInstance() const { return "MixedFeistel"; }
 
   //    const string getNameInstance() const;
   //    static const string getName();

@@ -88,6 +88,7 @@ int CarrierFileJPEG::LoadFile() {
   if (file_loaded_) return STEGO_NO_ERROR;
 
   auto file_ptr = file_.Open();
+//  if(!file_loaded_) return SE_LOAD_FILE;
 
   //LOG_TRACE("CarrierFileJPEG::loadFile: Loading file " << file_.GetRelativePath());
 
@@ -179,12 +180,11 @@ int CarrierFileJPEG::LoadFile() {
 int CarrierFileJPEG::SaveFile() {
 
   auto file_ptr = file_.Open();
-  //if (!file_loaded_) return SE_LOAD_FILE;
 
   LOG_TRACE("Saving file " << file_.GetRelativePath());
 
   if (permutation_->GetSize() == 0) {
-    permutation_->Init(raw_capacity_*8, subkey_);
+    permutation_->Init(raw_capacity_ * 8, subkey_);
   }
 
   buffer_.Resize(raw_capacity_);

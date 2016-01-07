@@ -21,8 +21,8 @@
 #include <algorithm>
 
 #include "carrier_files/carrier_file_factory.h"
-//#include "carrier_files/carrier_file_bmp.h"
-#include "carrier_files/carrier_file_jpeg.h"
+#include "virtual_storage/virtual_storage.h"
+#include "carrier_files/carrier_file.h"
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
 #include "utils/config.h"

@@ -116,7 +116,6 @@ void MemoryBuffer::Resize(std::size_t new_size) {
   std::size_t original_size = size_;
 
   uint8* new_buffer = new uint8[new_size];
-  size_ = new_size;
 
   memset(new_buffer, 0, new_size);
   if (original_buffer != nullptr) {
@@ -124,7 +123,7 @@ void MemoryBuffer::Resize(std::size_t new_size) {
     Randomize();
     delete[] original_buffer;
   }
-
+  size_ = new_size;
   buffer_ = new_buffer;
 }
 
@@ -170,7 +169,7 @@ std::size_t MemoryBuffer::GetSize() const {
   return size_;
 }
 
-uint8* MemoryBuffer::GetRawPointer() {
+uint8* MemoryBuffer::GetRawPointer() const {
   return buffer_;
 }
 

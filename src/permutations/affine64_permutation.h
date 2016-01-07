@@ -16,11 +16,14 @@ namespace stego_disk {
 class Affine64Permutation : public AffinePermutation {
 
 public:
+  Affine64Permutation();
+  ~Affine64Permutation();
+
   virtual void Init(PermElem requested_size, Key key);
   virtual PermElem Permute(PermElem index) const;
   //virtual PermElem GetSizeUsingParams(PermElem requestedSize, Key key);
 
-  virtual const std::string GetNameInstance() const { return "Affine64"; }
+  const std::string GetNameInstance() const { return "Affine64"; }
 
   //    const string getNameInstance() const;
   //    static const string getName();

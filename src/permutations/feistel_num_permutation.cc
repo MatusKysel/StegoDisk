@@ -22,9 +22,15 @@
 
 namespace stego_disk {
 
-FeistelNumPermutation::FeistelNumPermutation() : modulus_(0) {}
+FeistelNumPermutation::FeistelNumPermutation() : modulus_(0) {
+  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
+            GetNameInstance());
+}
 
-FeistelNumPermutation::~FeistelNumPermutation() {}
+FeistelNumPermutation::~FeistelNumPermutation() {
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
+            GetNameInstance());
+}
 
 
 void FeistelNumPermutation::Init(PermElem requested_size, Key key) {

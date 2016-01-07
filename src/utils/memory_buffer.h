@@ -34,7 +34,7 @@ public:
 
   std::size_t GetSize() const;
   void Resize(std::size_t new_size);
-  uint8* GetRawPointer();
+  uint8* GetRawPointer() const;
   const uint8* GetConstRawPointer() const;
 
   void Clear(); // set content to zero

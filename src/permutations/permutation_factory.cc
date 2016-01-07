@@ -21,10 +21,7 @@ namespace stego_disk {
  * @return Instance of default permutation.
  */
 PermutationPtr PermutationFactory::GetDefaultPermutation() {
-  // TODO after testing set FeistelMixPermutation
-  //return make_shared<AffinePermutation>();
-//  return make_shared<FeistelMixPermutation>();
-  return make_shared<IdentityPermutation>();
+  return make_shared<FeistelMixPermutation>();
 }
 
 /**

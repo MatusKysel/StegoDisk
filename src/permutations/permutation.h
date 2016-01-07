@@ -15,12 +15,13 @@
 
 #include "utils/stego_types.h"
 #include "keys/key.h"
+#include "logging/logger.h"
 
 namespace stego_disk {
 
 typedef uint64 PermutationElement;
 typedef PermutationElement PermElem;
-typedef PermutationElement PermSize;
+typedef PermutationElement PermSize; //TODO(Matus) useless
 
 class Permutation {
 

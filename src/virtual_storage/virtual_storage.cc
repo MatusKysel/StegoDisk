@@ -302,7 +302,9 @@ void VirtualStorage::WriteChecksum() {
 
   data_.Write(usable_capacity_, checksum.GetState().GetConstRawPointer(),
               checksum.GetStateSize());
-  LOG_TRACE("VirtualStorage::isValidChecksum: data_ (raw Capacity = "
+  LOG_DEBUG("VirtualStorage::WriteChecksum: Computed CHECKSUM: "
+            << StegoMath::HexBufferToStr(checksum.GetState()));
+  LOG_TRACE("VirtualStorage::WriteChecksum: data_ (raw Capacity = "
             << raw_capacity_ << "): "
             << StegoMath::HexBufferToStr(&data_[0],
             static_cast<int>(raw_capacity_)));

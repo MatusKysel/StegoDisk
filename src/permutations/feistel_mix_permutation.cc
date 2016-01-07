@@ -27,7 +27,8 @@ FeistelMixPermutation::FeistelMixPermutation() :
   right_mask_(0),
   right_bits_(0) {
 
-  LOG_DEBUG("Permutation::Permutation: called for: " << GetNameInstance());
+  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
+            GetNameInstance());
 }
 
 FeistelMixPermutation::~FeistelMixPermutation() {

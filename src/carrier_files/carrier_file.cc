@@ -91,13 +91,13 @@ Key CarrierFile::GetPermKey() {
   //TODO: hashovat sa nesmie cesta ale iba nazov suboru! resp relativna cesta
 
   string buf = "";
-  char time_str_buf[40];
+//  char time_str_buf[40];
   buf.append(File::NormalizePath(file_.GetRelativePath()));
-#ifdef STEGO_OS_WIN
-  sprintf_s(time_str_buf, sizeof(time_str_buf), "%ld", stat_.st_mtime);
-#else
-  sprintf(time_str_buf, "%ld", stat_.st_mtime);
-#endif
+//#ifdef STEGO_OS_WIN
+//  sprintf_s(time_str_buf, sizeof(time_str_buf), "%ld", stat_.st_mtime);
+//#else
+//  sprintf(time_str_buf, "%40ld", stat_.st_mtime);
+//#endif
 
   //buf.append(time_str_buf);
   LOG_TRACE("CarrierFile::GetPermKeyHash: hashing file attributes: " << buf);
@@ -210,7 +210,6 @@ int CarrierFile::ExtractBufferUsingEncoder() {
 
   MemoryBuffer data_buffer(data_block_size_);
 
-  //for (uint64 b=0;b<block_count_;b++) {
   for (uint64 b = 0; b < blocks_used_; ++b) {
     encoder_->Extract(&buffer_[b * codeword_block_size_],
         data_buffer.GetRawPointer());
@@ -221,7 +220,7 @@ int CarrierFile::ExtractBufferUsingEncoder() {
         virtual_storage_->WriteByte(virtual_storage_offset_ +
                                     (b * data_block_size_) + i, data_buffer[i]);
       } catch (std::out_of_range& ex) {
-        LOG_TRACE("CarrierFile::extractBufferUsingEncoder: "
+        LOG_DEBUG("CarrierFile::extractBufferUsingEncoder: "
                   "virtualStorage->writeByte failed: block: " << (b + 1) << "/"
                   << blocks_used_ << ", byte: " << (i + 1) << "/" <<
                   data_block_size_);
@@ -255,7 +254,7 @@ int CarrierFile::EmbedBufferUsingEncoder() {
         data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
                                                     (b * data_block_size_) + i);
       } catch (std::out_of_range& ex) {
-        LOG_TRACE("CarrierFile::embedBufferUsingEncoder: virtualStorage->"
+        LOG_DEBUG("CarrierFile::embedBufferUsingEncoder: virtualStorage->"
                   "readByte failed: block: " << (b + 1) << "/" << blocks_used_
                   << ", byte: " << (i + 1) << "/" << data_block_size_);
         //TODO: poriesit ako zistit kedy je to error a kedy koniec uloziska -> to je ok

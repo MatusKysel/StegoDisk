@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -29,16 +28,16 @@ bool TransferEngineInit() {
 }
 
 static void PrintHelp(char *name) {
-  std::cerr << "Usage: " << name << " <option(s)>"
+  std::cerr << "Usage: " << name << " <option(s)> \n"
             << "Options:\n"
             << "\t-h,--help\t\tShow this help message\n"
-            << "\t-e,--encoder ENCODER\tSpecify the encoder"
-            << "\t-p,--permutation PERMUTATION\tSpecify the permutation"
-            << "\t-g,--gen_file_size GEN_SIZE\tSpecify size of generated data"
-            << "\t-d,--directory DIRECTORY\tSpecify the source directory"
+            << "\t-e,--encoder ENCODER\tSpecify the encoder\n"
+            << "\t-p,--permutation PERMUTATION\tSpecify the permutation\n"
+            << "\t-g,--gen_file_size GEN_SIZE\tSpecify size of generated data\n"
+            << "\t-d,--directory DIRECTORY\tSpecify the source directory\n"
             << "\t-t,--test_directory \tSpecify that this directory is only for"
-               " testing and it will create copy of it"
-            << "\t-p,--password \tSpecify if the password sould be used"
+               " testing and it will create copy of it\n"
+            << "\t-p,--password \tSpecify if the password sould be used\n"
             << std::endl;
 }
 
@@ -105,13 +104,16 @@ int main(int argc, char *argv[]) {
         return -1;
       }
     } else if ((arg == "-p") || (arg == "--password")) {
-      password = true;
+      if (++i < argc) {
+        password = argv[i];
+      } else {
+        LOG_ERROR("--password option requires one argument.");
+        return -1;
+      }
     } else {
       LOG_ERROR("Unknown argument: " << argv[i]);
     }
   }
-
-  if( gen_file_size == 0) gen_file_size = 5000;
 
   size_t size;
   std::unique_ptr<stego_disk::StegoStorage>
@@ -134,13 +136,14 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Loading storage");
   stego_storage->Load(encoder, permutation);
   size = stego_storage->GetSize();
-  std::cout << "size = " << size << "b" << std::endl;
+  std::cout << "Storage size = " << size << "B" << std::endl;
+  if( gen_file_size == 0) gen_file_size = size;
   std::string input;
   std::string output;
   LOG_DEBUG("Generating random string");
   GenerateRandomString(&input, gen_file_size);
   LOG_DEBUG("Writing to the storage");
-  stego_storage->Write(&input, 0, input.size());
+  stego_storage->Write(&(input[0]), 0, input.size());
   LOG_DEBUG("Saving storage");
   stego_storage->Save();
   LOG_DEBUG("Opening storage");
@@ -155,7 +158,7 @@ int main(int argc, char *argv[]) {
 
   if(test_directory) FileManager::RemoveDirecotry(dir);
 
-  if (input == output) {
+  if (input != output) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
               " output size: " << output.size());
     error = true;

@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <sstream>
+#include <iomanip>
+
 namespace stego_disk {
 
 uint64 StegoMath::Gcd(uint64 a, uint64 b) {
@@ -194,7 +197,8 @@ void StegoMath::PrintHexBuffer(const uint8 *buffer, std::size_t length) {
 
 
 string StegoMath::HexBufferToStr(const uint8 *buffer, std::size_t length) {
-  string buf = "";
+  std::stringstream buf;
+  buf << std::hex;
 
   if (buffer == nullptr)
     return "";
@@ -202,18 +206,12 @@ string StegoMath::HexBufferToStr(const uint8 *buffer, std::size_t length) {
   if (length == 0)
     return "";
 
-  char byte[4];
-  //TODO(Matus) zmenit na C++
+
   for (std::size_t i = 0; i < length; ++i) {
-#ifdef STEGO_OS_WIN
-    sprintf_s(byte, 4, "%02X ", buffer[i]);
-#else
-    sprintf(byte, "%02X ", buffer[i]);
-#endif
-    buf.append(byte);
+    buf << static_cast<int>(buffer[i]) << " ";
   }
 
-  return buf;
+  return buf.str();
 }
 
 

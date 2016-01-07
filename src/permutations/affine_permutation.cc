@@ -14,6 +14,16 @@
 
 namespace stego_disk {
 
+AffinePermutation::AffinePermutation() {
+  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
+            GetNameInstance());
+}
+
+AffinePermutation::~AffinePermutation() {
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
+            GetNameInstance());
+}
+
 PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key key,
                                                bool overwrite_members) {
   if (key.GetSize() == 0)
