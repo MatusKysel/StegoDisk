@@ -21,14 +21,8 @@ public:
 
   virtual void Init(PermElem requested_size, Key key);
   virtual PermElem Permute(PermElem index) const;
-  //virtual PermElem GetSizeUsingParams(PermElem requestedSize, Key key);
 
   const std::string GetNameInstance() const { return "Affine64"; }
-
-  //    const string getNameInstance() const;
-  //    static const string getName();
-  //    virtual shared_ptr<Permutation> getNewInstance();
-  //    static shared_ptr<Permutation> getNew();
 };
 
 } // stego_disk

@@ -24,12 +24,6 @@ public:
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key key);
 
   const std::string GetNameInstance() const { return "Identity"; }
-
-  //    const string getNameInstance() const;
-  //    static const string getName();
-  //    virtual shared_ptr<Permutation> getNewInstance();
-  //    static shared_ptr<Permutation> getNew();
-
 };
 
 } // stego_disk

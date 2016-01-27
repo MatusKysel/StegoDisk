@@ -24,12 +24,6 @@ public:
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key key);
 
   const std::string GetNameInstance() const { return "Affine"; }
-
-  //    const string getNameInstance() const;
-  //    static const string getName();
-  //    virtual shared_ptr<Permutation> getNewInstance();
-  //    static shared_ptr<Permutation> getNew();
-
 protected:
   PermElem GetSizeUsingParams(PermElem requested_size, Key key,
                               bool overwrite_members);

@@ -63,8 +63,8 @@ void FeistelNumPermutation::Init(PermElem requested_size, Key key) {
   for (uint32 t = 0; t < FNP_NUMROUNDS; ++t) {
     for (uint32 i = 0; i < max_hash; ++i) {
       hash.Process(key.GetData());
-      hash.Append((uint8*)&i, 4);
-      hash.Append((uint8*)&t, 4);
+      hash.Append((uint8*)&i, sizeof(uint32));
+      hash.Append((uint8*)&t, sizeof(uint32));
 
       //TODO: rewrite these lines - im sure there is a better way of writing this
 
@@ -86,19 +86,13 @@ PermElem FeistelNumPermutation::Permute(PermElem index) const {
   uint64 left = index / modulus_;
 
   // feistel rounds
-  for (std::size_t r=0; r<FNP_NUMROUNDS; r++) {
+  for (std::size_t r = 0; r < FNP_NUMROUNDS; ++r) {
     if (r % 2) {
       right = (right + hash_tables_[r][left]) % modulus_;
     } else {
       left = (left + hash_tables_[r][right]) % modulus_;
     }
   }
-
-  //    left = (left + hashTables[r++][right]) % modulus;
-  //    right = (right + hashTables[r++][left]) % modulus;
-  //    left = (left + hashTables[r++][right]) % modulus;
-  //    right = (right + hashTables[r++][left]) % modulus;
-  //    left = (left + hashTables[r++][right]) % modulus;
 
   uint64 permuted_index = (left * modulus_) + right;
 
@@ -117,26 +111,5 @@ PermElem FeistelNumPermutation::GetSizeUsingParams(PermElem requested_size,
   return static_cast<std::size_t>(static_cast<uint64>(mod) *
                                   static_cast<uint64>(mod));
 }
-
-
-//const string FeistelNumPermutation::getNameInstance() const
-//{
-//    return getName();
-//}
-//
-//const string FeistelNumPermutation::getName()
-//{
-//    return string("NumericFeistel");
-//}
-//
-//shared_ptr<Permutation> FeistelNumPermutation::getNew()
-//{
-//    return shared_ptr<Permutation>(new FeistelNumPermutation());
-//}
-//
-//shared_ptr<Permutation> FeistelNumPermutation::getNewInstance()
-//{
-//    return getNew();
-//}
 
 } // stego_disk

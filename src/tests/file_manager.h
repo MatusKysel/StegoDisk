@@ -24,7 +24,7 @@ public:
   inline static void CopyDirecotry(const std::string &src, const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
-   std::string cmd = "copy " + src + " " + dst;
+   std::string cmd = "xcopy " + src + " " + dst + " /s /e /h /i";
 #else
     std::string cmd = "cp -rf " + src + " " + dst;
 #endif

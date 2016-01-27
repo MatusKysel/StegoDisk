@@ -129,7 +129,7 @@ int CarrierFileJPEG::LoadFile() {
 
   bool should_read = true;
 
-  uint64 bits_to_modify = permutation_->GetSize();//blocks_used_*codeword_block_size_*8;
+  uint64 bits_to_modify = permutation_->GetSize();
 
   LOG_TRACE("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath() <<
             ", bits to modify: " << bits_to_modify);
@@ -204,9 +204,9 @@ int CarrierFileJPEG::SaveFile() {
   jpeg_stdio_src(&cinfo_decompress, file_ptr.Get());
 
   // save markers (exif data etc)
-  jpeg_save_markers (&cinfo_decompress, JPEG_COM, 0xffff);
+  jpeg_save_markers(&cinfo_decompress, JPEG_COM, 0xffff);
   for (int i = 0; i < 16; ++i) {
-    jpeg_save_markers (&cinfo_decompress, JPEG_APP0 + i, 0xffff);
+    jpeg_save_markers(&cinfo_decompress, JPEG_APP0 + i, 0xffff);
   }
   // Get all compression parameters.
   jpeg_read_header(&cinfo_decompress, TRUE);
@@ -226,11 +226,11 @@ int CarrierFileJPEG::SaveFile() {
 
   uint32 coeff_counter = 0;
 
-  boolean should_write = true;
-  boolean should_read = true;
+  bool should_write = true;
+  bool should_read = true;
 
 
-  uint32 bits_to_modify = static_cast<uint32>(permutation_->GetSize());//blocks_used_*codeword_block_size_*8;
+  uint32 bits_to_modify = static_cast<uint32>(permutation_->GetSize());
 
   // LOG_INFO(_relativePath << ", bits to modify: " << bits_to_modify);
 
@@ -276,7 +276,7 @@ int CarrierFileJPEG::SaveFile() {
   // write down permuted and encoded LSBs into DCT coefficients
 
   coeff_counter = 0;
-  uint8 tmp_lsb = 0;
+//  uint8 tmp_lsb = 0;
 
   for (ci = 0; ci < 3; ++ci){
     compptr = cinfo_decompress.comp_info + ci;
@@ -290,17 +290,14 @@ int CarrierFileJPEG::SaveFile() {
         {
           if (blockptr[bi] & 0xFFFE) { // ignore 0, 1 coeffs
 
+//            tmp_lsb = GetBitInBufferPermuted(coeff_counter);
 
-
-            tmp_lsb = GetBitInBufferPermuted(coeff_counter);
-
-            blockptr[bi] = blockptr[bi] & 0xFFFE;
-            blockptr[bi] |= (tmp_lsb & 0x01);
+            blockptr[bi] = (blockptr[bi] & 0xFFFE) |
+                           GetBitInBufferPermuted(coeff_counter);
+//            blockptr[bi] |= (tmp_lsb & 0x01);
 
             coeff_counter++;
             if (coeff_counter >= bits_to_modify) should_write = false;
-
-
           }
         }
       }

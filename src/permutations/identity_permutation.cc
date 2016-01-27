@@ -44,26 +44,4 @@ PermElem IdentityPermutation::GetSizeUsingParams(PermElem requested_size,
   return requested_size;
 }
 
-
-//const string IdentityPermutation::getNameInstance() const
-//{
-//    return getName();
-//}
-//
-//const string IdentityPermutation::getName()
-//{
-//    return string("Identity");
-//}
-//
-//shared_ptr<Permutation> IdentityPermutation::getNew()
-//{
-//    return shared_ptr<Permutation>(new IdentityPermutation());
-//}
-//
-//shared_ptr<Permutation> IdentityPermutation::getNewInstance()
-//{
-//    return getNew();
-//}
-
-
 } // stego_disk

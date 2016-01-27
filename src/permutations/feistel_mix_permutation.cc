@@ -54,28 +54,17 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key key) {
 
   initialized_ = false;
 
-  right_bits_ = bit_len / 2;
-  left_bits_ = bit_len - right_bits_;
+  left_bits_ = bit_len / 2;
+  right_bits_ = bit_len - left_bits_;
   left_mod_ = (requested_size >> right_bits_);
-  right_mask_ = ((static_cast<uint64>(1)) << right_bits_) - 1;
+  right_mask_ = (1 << right_bits_) - 1;
 
-  // we ensure that right_mask_ >= left_mod_
-  if ( right_mask_ < left_mod_ ) {
-    right_bits_++;
-    left_bits_--;
-    left_mod_ = (requested_size >> right_bits_);
-    right_mask_ = ((static_cast<uint64>(1)) << right_bits_) - 1;
-  }
+  size_ = left_mod_ << right_bits_;
 
-  size_ = (left_mod_) << right_bits_;
-
-  // precompute hash table
-
-  // right_mask_ is always >= left_mod_
-  uint32 max_hash = static_cast<uint32>(right_mask_);
+  uint32 max_hash = static_cast<uint32>(right_mask_ + 1);
 
   hash_tables_ = std::vector<std::vector<uint32> >(
-                   FMP_NUMROUNDS, std::vector<uint32>(max_hash + 1, 0));
+                   FMP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
 
   //TODO: hash could be initialized_ by key and then just append "i" in each iteration - or not?
   //      sth like: Hash hash(key.getData());
@@ -84,13 +73,12 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key key) {
   Hash hash;
 
   LOG_TRACE("FeistelMixPermutation::init: computing hash table (HT) containing "
-            << max_hash + 1 << " elements");
+            << max_hash << " elements");
 
   for (uint32 t = 0; t < FMP_NUMROUNDS; ++t) {
-    for (uint64 i = 0; i <= static_cast<uint64>(max_hash); ++i) {
-      uint32 index = static_cast<uint32>(i);
+    for (uint32 i = 0; i < max_hash; ++i) {
       hash.Process(key.GetData());
-      hash.Append((uint8*)&index, sizeof(uint32));
+      hash.Append((uint8*)&i, sizeof(uint32));
       hash.Append((uint8*)&t, sizeof(uint32));
 
       //TODO: rewrite these lines - im sure there is a better way of writing this
@@ -98,8 +86,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key key) {
       if (hash.GetStateSize() < 4)
         throw std::runtime_error("hash size is too small");
 
-      uint32 hash_val = *((uint32*)hash.GetState().GetConstRawPointer());
-      hash_tables_[t][index] = hash_val;
+      hash_tables_[t][i] = *((uint32*)hash.GetState().GetConstRawPointer()) % max_hash;
     }
   }
   LOG_TRACE("FeistelMixPermutation::init: HT ready; left_mod_ = "
@@ -114,16 +101,15 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
   uint64 right = index & right_mask_;
   uint64 left = index >> right_bits_;
 
-  // feistel rounds
   for (int r = 0; r < FMP_NUMROUNDS; ++r) {
     if (r % 2) {
       right = (right ^ (hash_tables_[r][left] & right_mask_));
     } else {
-      left = (left + hash_tables_[r][right]) % left_mod_;
+      left = (left + (hash_tables_[r][right] >> right_bits_)) % left_mod_;
     }
   }
 
-  uint64 permuted_index = (left << right_bits_) | right;
+  uint64 permuted_index = (left << right_bits_) + right;
 
   if (permuted_index >= size_)
     throw std::runtime_error("FeistelMixPermutation: "
@@ -141,30 +127,8 @@ PermElem FeistelMixPermutation::GetSizeUsingParams(PermElem requested_size,
   if (bit_len < 8)
     return 0;
 
-  uint8 right_bits = bit_len / 2;
-  uint64 left_mod = (requested_size >> right_bits);
-  return (left_mod) << right_bits;
+  uint8 right_bits = bit_len - bit_len / 2;
+  return (requested_size >> right_bits) << right_bits;
 }
-
-
-//const string FeistelMixPermutation::getNameInstance() const
-//{
-//    return getName();
-//}
-//
-//const string FeistelMixPermutation::getName()
-//{
-//    return string("MixedFeistel");
-//}
-//
-//shared_ptr<Permutation> FeistelMixPermutation::getNew()
-//{
-//    return shared_ptr<Permutation>(new FeistelMixPermutation());
-//}
-//
-//shared_ptr<Permutation> FeistelMixPermutation::getNewInstance()
-//{
-//    return getNew();
-//}
 
 } // stego_disk

@@ -108,25 +108,4 @@ PermElem AffinePermutation::Permute(PermElem index) const {
   return ((((index) * key_param_a_) % size_) + key_param_b_) % size_;
 }
 
-//
-//const string AffinePermutation::GetNameInstance() const
-//{
-//    return GetName();
-//}
-//
-//const string AffinePermutation::GetName()
-//{
-//    return string("Affine");
-//}
-//
-//shared_ptr<Permutation> AffinePermutation::GetNew()
-//{
-//    return shared_ptr<Permutation>(new AffinePermutation());
-//}
-//
-//shared_ptr<Permutation> AffinePermutation::GetNewInstance()
-//{
-//    return GetNew();
-//}
-
 } // stego_disk

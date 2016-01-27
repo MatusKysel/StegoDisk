@@ -63,7 +63,6 @@ void CarrierFile::SetEncoder(std::shared_ptr<Encoder> encoder) {
     encoder_ = encoder;
     data_block_size_ = encoder->GetDataBlockSize();
     codeword_block_size_ = encoder->GetCodewordBlockSize();
-    //block_count_ = (raw_capacity_ / _embedder->GetCodewordBlockSize());
     block_count_ = static_cast<uint32>((permutation_->GetSizeUsingParams(
                                           raw_capacity_ * 8, subkey_) / 8)
                                        / encoder->GetCodewordBlockSize());
@@ -91,13 +90,13 @@ Key CarrierFile::GetPermKey() {
   //TODO: hashovat sa nesmie cesta ale iba nazov suboru! resp relativna cesta
 
   string buf = "";
-//  char time_str_buf[40];
+  //  char time_str_buf[40];
   buf.append(File::NormalizePath(file_.GetRelativePath()));
-//#ifdef STEGO_OS_WIN
-//  sprintf_s(time_str_buf, sizeof(time_str_buf), "%ld", stat_.st_mtime);
-//#else
-//  sprintf(time_str_buf, "%40ld", stat_.st_mtime);
-//#endif
+  //#ifdef STEGO_OS_WIN
+  //  sprintf_s(time_str_buf, sizeof(time_str_buf), "%ld", stat_.st_mtime);
+  //#else
+  //  sprintf(time_str_buf, "%40ld", stat_.st_mtime);
+  //#endif
 
   //buf.append(time_str_buf);
   LOG_TRACE("CarrierFile::GetPermKeyHash: hashing file attributes: " << buf);
@@ -178,13 +177,10 @@ void CarrierFile::SetBitInBufferPermuted(uint64 index) {
 
   uint64 permuted_index = permutation_->Permute(index);
 
-  // TODO: this check only in debug mode?
-#ifdef _DEBUG
   if (permuted_index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: permuted index " << permuted_index << " is too big!");
     return;
   }
-#endif
 
   buffer_[permuted_index / 8] |= ( 1 << (permuted_index % 8));
 }
@@ -246,10 +242,10 @@ int CarrierFile::EmbedBufferUsingEncoder() {
 
   MemoryBuffer data_buffer(data_block_size_);
 
-  //for (uint64 b=0;b<block_count_;b++) {
   for (uint64 b = 0; b < blocks_used_; ++b) {
     for (uint64 i = 0; i < data_block_size_; ++i) {
       //TODO:            #warning doriesit try catch!
+      //TODO(Matus): poriesit iba na jeden cyklus
       try {
         data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
                                                     (b * data_block_size_) + i);

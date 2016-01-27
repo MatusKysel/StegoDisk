@@ -29,11 +29,6 @@ public:
 
   const std::string GetNameInstance() const { return "NumericFeistel"; }
 
-  //    const string getNameInstance() const;
-  //    static const string getName();
-  //    virtual shared_ptr<Permutation> getNewInstance();
-  //    static shared_ptr<Permutation> getNew();
-
 private:
   std::vector< std::vector<uint32> > hash_tables_;
 
