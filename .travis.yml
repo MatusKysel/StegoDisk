@@ -14,15 +14,19 @@ before_install:
   - brew outdated cmake || brew upgrade cmake  
   - brew outdated gcc || brew upgrade gcc 
   
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-5" CC="gcc-5"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+  
 addons:
   apt:
    sources:
     - llvm-toolchain-precise
     - ubuntu-toolchain-r-test
     packages:
-    - gcc
-    - g++
-    - clang
+    - gcc-5
+    - g++-5
+    - clang-3.7
     - cmake
 
 before_script:
@@ -35,4 +39,5 @@ script:
   - make check
 
 sudo: required
+
 dist: trusty
