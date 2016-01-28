@@ -4,21 +4,28 @@ compiler:
   - gcc
   - clang
   
-install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-
+os:
+  - linux
+  - osx  
+  
+before_install:
+  - brew update
+  - brew outdated clang || brew upgrade clang  
+  - brew outdated cmake || brew upgrade cmake  
+  - brew outdated gcc || brew upgrade gcc 
+  
 addons:
   apt:
-    sources:
+   sources:
+    - llvm-toolchain-precise
     - ubuntu-toolchain-r-test
     packages:
-    - gcc-4.8
-    - g++-4.8
+    - gcc
+    - g++
     - clang
+    - cmake
 
 before_script:
-  - wget http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.sh --no-check-certificate
-  - sudo sh cmake-3.4.3-Linux-x86_64.sh --skip-license --prefix=/usr
   - mkdir build
   - cd build
   - cmake ..
@@ -28,3 +35,4 @@ script:
   - make check
 
 sudo: required
+dist: trusty
