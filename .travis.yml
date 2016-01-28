@@ -4,7 +4,7 @@ compiler:
   - gcc
 
 before_script:
-  - wget https://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.sh
+  - wget http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.sh --no-check-certificate
   - sudo sh cmake-3.4.3-Linux-x86_64.sh --skip-license --prefix=/usr
   - mkdir build
   - cd build
