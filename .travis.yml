@@ -2,6 +2,19 @@ language: cpp
 
 compiler:
   - gcc
+  - clang
+  
+install:
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.8
+    - g++-4.8
+    - clang
 
 before_script:
   - wget http://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.sh --no-check-certificate
@@ -15,3 +28,5 @@ script:
   - make check
 
 sudo: true
+
+
