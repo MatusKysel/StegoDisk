@@ -13,3 +13,5 @@ before_script:
 script: 
   - make -j3
   - make check
+
+sudo: true
