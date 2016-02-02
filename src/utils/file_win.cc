@@ -23,7 +23,7 @@ using namespace std;
 namespace stego_disk {
 
   // <mask> must be in a form: "*", "*.jpg", "*.bmp" ...
-  static int addFilesInDir(std::string basePath, std::string currentPath, std::string mask, std::vector<File>& fileList)
+  static int AddFilesInDir(std::string basePath, std::string currentPath, std::string mask, std::vector<File>& fileList)
   {
     // basePathSafe contains / at the end of the string
     string basePathSafe = basePath;
@@ -78,7 +78,7 @@ namespace stego_disk {
       {
         //printf("  %s   <DIR>\n", ffd.cFileName);
         if ((string(ffd.cFileName) != ".") && (string(ffd.cFileName) != ".."))
-          addFilesInDir(basePath, newCurrentPath, mask, fileList);
+          AddFilesInDir(basePath, newCurrentPath, mask, fileList);
       }
       else
       {
@@ -155,11 +155,11 @@ namespace stego_disk {
   }
 
   // TODO: add wildcard parameter to specify supported file extensions (*.bmp, *.jpg ...)
-  std::vector<File> File::getFilesInDir(std::string path, std::string mask)
+  std::vector<File> File::GetFilesInDir(std::string path, std::string mask)
   {
     std::vector<File> fileList;
 
-    addFilesInDir(path, "", mask, fileList);
+    AddFilesInDir(path, "", mask, fileList);
 
     return fileList;
   }

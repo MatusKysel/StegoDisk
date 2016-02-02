@@ -113,7 +113,7 @@ FilePtr::FilePtr(const File& file) {
   int ret = 0;
 #ifdef STEGO_OS_WIN
   file_handle_ = nullptr;
-  ret = fopen_s(&file_handle_, file.GetAbsolutePath.c_str(), "r+b");
+  ret = fopen_s(&file_handle_, file.GetAbsolutePath().c_str(), "r+b");
 #else
   if ((file_handle_ = fopen(file.GetAbsolutePath().c_str(), "r+b")) == nullptr)
     ret = errno;

@@ -79,8 +79,10 @@ endif()
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
 
-set(warnings "-Wall -Wextra") #-Werror
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${warnings}")
+if(NOT WIN32)
+  set(warnings "-Wall -Wextra") #-Werror
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${warnings}")
+endif()
 
 if(WIN32)
 	if (BUILD_SHARED_LIBS)
@@ -99,7 +101,7 @@ else()
 endif()
 
 option(ENABLE_SHARED OFF)
-option(WITH_SIMD OFF)
+option(WITH_SIMD ON)
 option(WITH_TURBOJPEG OFF)
 add_subdirectory(lib/libjpeg-turbo)
 set(LIBJPEGTURBO_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)

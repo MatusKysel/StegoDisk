@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
       }
     } else if ((arg == "-p") || (arg == "--password")) {
       if (++i < argc) {
-        password = argv[i];
+		  password = (atoi(argv[i]) == 1) ? true : false;
       } else {
         LOG_ERROR("--password option requires one argument.");
         return -1;
@@ -162,10 +162,6 @@ int main(int argc, char *argv[]) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
               " output size: " << output.size());
     error = true;
-    for(int i = 0; i < input.size();++i){
-      if(input[i]!=output[i])
-        std::cout<< "index " << i <<" input " << (int)input[i] << " output " <<(int)output[i]<<std::endl;
-    }
   }
 
   return error;
