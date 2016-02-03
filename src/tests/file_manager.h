@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <string>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 
@@ -21,23 +22,31 @@ public:
     dst << src.rdbuf();
   }
 
+  inline static std::string GetWinPath(const std::string &input) {
+	  std::string out = input;
+	  std::replace(out.begin(), out.end(), '/', '\\');
+	  return out;
+  }
+
   inline static void CopyDirecotry(const std::string &src, const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
-   std::string cmd = "xcopy " + src + " " + dst + " /s /e /h /i";
+	  std::string cmd = "xcopy " + GetWinPath(src) + " " + GetWinPath(dst) + " /s /e /h /i";
 #else
     std::string cmd = "cp -rf " + src + " " + dst;
 #endif
+	std::cout << cmd << std::endl;
     system(cmd.c_str());
   }
 
   inline static void RemoveDirecotry(const std::string &path) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
-   std::string cmd = "rd /s /q " + path;
+	  std::string cmd = "rd /s /q " + GetWinPath(path);
 #else
     std::string cmd = "rm -rf " + path;
 #endif
+	std::cout << cmd << std::endl;
     system(cmd.c_str());
   }
 };

@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   }
 
   LOG_DEBUG("Opening storage");
-  stego_storage->Open(dir, PASSWORD);
+  stego_storage->Open(FileManager::GetWinPath(dir), PASSWORD);
   LOG_DEBUG("Loading storage");
   stego_storage->Load(encoder, permutation);
   size = stego_storage->GetSize();

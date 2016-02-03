@@ -46,9 +46,9 @@ namespace stego_disk {
 
     string path = basePathSafe;
     if (currentPathSafe.length() > 0)
-      path = path.append("\\"+currentPathSafe);
+      path = path.append("\\" + currentPathSafe);
 
-    path.append("\\"+mask);
+    path.append("\\" + mask);
 
     WIN32_FIND_DATAA ffd;
     LARGE_INTEGER filesize;
