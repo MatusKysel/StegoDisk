@@ -1,4 +1,4 @@
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 #include "file.h" //TODO(matus) cele zle
 
 #include <dirent.h>
@@ -121,4 +121,4 @@ std::vector<File> File::GetFilesInDir(std::string directory, std::string mask)
 
 } // stego_disk
 
-#endif // __unix__
+#endif // defined(__unix__) || defined(__APPLE__)

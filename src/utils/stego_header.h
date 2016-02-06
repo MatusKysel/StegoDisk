@@ -1,7 +1,7 @@
 #ifndef STEGODISK_UTILS_STEGOHEADER_H_
 #define STEGODISK_UTILS_STEGOHEADER_H_
 
-#if defined(unix) || defined(__APPLE__)
+#if defined(__unix__) || defined(__APPLE__)
 #define STEGO_OS_UNIX   1
 #ifdef __APPLE__
 #define STEGO_OS_MAC

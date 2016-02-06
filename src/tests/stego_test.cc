@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
       }
     } else if ((arg == "-p") || (arg == "--password")) {
       if (++i < argc) {
-		  password = (atoi(argv[i]) == 1) ? true : false;
+        password = (atoi(argv[i]) == 1) ? true : false;
       } else {
         LOG_ERROR("--password option requires one argument.");
         return -1;
@@ -132,7 +132,11 @@ int main(int argc, char *argv[]) {
   }
 
   LOG_DEBUG("Opening storage");
+#ifdef _WIN32
   stego_storage->Open(FileManager::GetWinPath(dir), PASSWORD);
+#else
+  stego_storage->Open(dir, PASSWORD);
+#endif
   LOG_DEBUG("Loading storage");
   stego_storage->Load(encoder, permutation);
   size = stego_storage->GetSize();
