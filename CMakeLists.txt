@@ -101,6 +101,7 @@ else()
 endif()
 
 option(ENABLE_SHARED OFF)
+option(WITH_SIMD OFF)
 option(WITH_TURBOJPEG OFF)
 add_subdirectory(lib/libjpeg-turbo)
 set(LIBJPEGTURBO_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
