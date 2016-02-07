@@ -81,7 +81,7 @@ endif()
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread ${warnings}")
 endif()
 
 if(WIN32)
@@ -101,7 +101,6 @@ else()
 endif()
 
 option(ENABLE_SHARED OFF)
-option(WITH_SIMD ON)
 option(WITH_TURBOJPEG OFF)
 add_subdirectory(lib/libjpeg-turbo)
 set(LIBJPEGTURBO_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
@@ -165,12 +164,12 @@ set(ENCODERS_SRCS
 # FILE_MANAGEMENT
 
 set(FILE_MANAGEMENT_HDRS
-  src/file_management/carrier_files_manager_delegate.h
+  #src/file_management/carrier_files_manager_delegate.h
   src/file_management/carrier_files_manager.h
 )
 
 set(FILE_MANAGEMENT_SRCS
-  src/file_management/carrier_files_manager_delegate.cc
+  #src/file_management/carrier_files_manager_delegate.cc
   src/file_management/carrier_files_manager.cc
 )
 
@@ -254,6 +253,7 @@ set(UTILS_HDRS
   src/utils/stego_math.h
   src/utils/stego_system_params.h
   src/utils/stego_types.h
+  src/utils/thread_pool.h
   src/utils/keccak/keccak.h
 )
 
@@ -270,12 +270,12 @@ set(UTILS_SRCS
 # VIRTUAL_STORAGE
 
 set(VIRTUAL_STORAGE_HDRS
-  src/virtual_storage/encrypted_virtual_storage.h
+  #src/virtual_storage/encrypted_virtual_storage.h
   src/virtual_storage/virtual_storage.h
 )
 
 set(VIRTUAL_STORAGE_SRCS
-  src/virtual_storage/encrypted_virtual_storage.cc
+  #src/virtual_storage/encrypted_virtual_storage.cc
   src/virtual_storage/virtual_storage.cc
 )
 

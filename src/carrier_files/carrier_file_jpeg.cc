@@ -75,7 +75,6 @@ int CarrierFileJPEG::ComputeCapacity() {
   }
 
   raw_capacity_ = (capacity_in_bits / 8);
-  //setencoder(encoder_); // sets block_count_ & capacity_ using encoder settings & raw_capacity_
 
   jpeg_finish_decompress(&cinfo_decompress);
   jpeg_destroy_decompress(&cinfo_decompress);

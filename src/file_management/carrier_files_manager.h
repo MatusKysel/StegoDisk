@@ -17,6 +17,7 @@
 //#include "carrier_files_manager_delegate"
 #include "hash/hash.h"
 #include "keys/key.h"
+#include "utils/thread_pool.h"
 
 namespace stego_disk {
 
@@ -47,9 +48,6 @@ public:
   bool LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage);
   int SaveVirtualStorage();
 
-  //    void SetDelegate(CarrierFilesManagerDelegate *delegate);
-
-
 private:
   void Init();
 
@@ -64,26 +62,16 @@ private:
   uint64 capacity_;
 
   uint64 files_in_directory_;
-  uint64 loading_progress_;
 
   Hash password_hash_;
   Key master_key_;
 
-  //    CarrierFilesManagerDelegate* _delegate;
   std::shared_ptr<VirtualStorage> virtual_storage_;
-
-  // TODO using of encoder in doc
-  // 1. SetEncoder (isActiveEnc = false)
-  // 2. SetEncoderArgs (isActiveEnc = false)
-  // 3. applyEncoder (only after applyEnc isActiveEnc = true)
-  // 4. ...
-  // 5. unSetEncoder (isActiveEnc = false)
   std::shared_ptr<Encoder> encoder_;
   bool is_active_encoder_;
 
-  //public slots:
-  //    void on_fileInitFinished();
-  //    void on_fileLoadFinished();
+  std::unique_ptr<ThreadPool> thread_pool_;
+
 };
 
 } // stego_disk

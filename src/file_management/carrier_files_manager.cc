@@ -12,8 +12,6 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <dirent.h>
-//#include <QtCore>
 
 #include <iostream>
 #include <vector>
@@ -30,8 +28,6 @@
 #include "utils/file.h"
 #include "utils/cpp11_compat.h"
 #include "logging/logger.h"
-//#include <QThreadPool>
-//#include <unistd.h>
 
 using namespace std;
 
@@ -40,43 +36,16 @@ namespace stego_disk {
 CarrierFilesManager::CarrierFilesManager() :
   capacity_(0),
   files_in_directory_(0),
-  loading_progress_(0),
   virtual_storage_(VirtualStoragePtr(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
+  thread_pool_(new ThreadPool(0)),
   is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
   carrier_files_.clear();
 }
 
-//void CarrierFilesManager::on_fileInitFinished()
-//{
-//    int loadingProgress;
-//    loading_progress_Mutex.lock();
-//    loadingProgress = ++loading_progress_;
-//    loading_progress_Mutex.unlock();
-
-//    if (_delegate) {
-//        _delegate->cfmProgressUpdated(loadingProgress, files_in_directory_, CountingCapacity);
-//    }
-//}
-
-
-//void CarrierFilesManager::on_fileLoadFinished()
-//{
-//    int loadingProgress;
-//    loading_progress_Mutex.lock();
-//    loadingProgress = ++loading_progress_;
-//    loading_progress_Mutex.unlock();
-
-//    if (_delegate) {
-//        _delegate->cfmProgressUpdated(loadingProgress, carrier_files_.size(), LoadingFiles);
-//    }
-//}
-
-
 int CarrierFilesManager::LoadDirectory(std::string directory) {
-  //    _loadingThreadPool.waitForDone();
 
   carrier_files_.clear();
   capacity_ = 0;
@@ -88,29 +57,26 @@ int CarrierFilesManager::LoadDirectory(std::string directory) {
 
   files_in_directory_ = files.size();
 
-
-
-  //LOG_TRACE("CarrierFilesManager::loadDirectory: dir enumeration results begin:");
   FOREACH( File, files, file ) {
     LOG_TRACE(FOREACH_ELM(file).GetBasePath() + " - " +
               FOREACH_ELM(file).GetRelativePath());
   }
-  //LOG_TRACE("CarrierFilesManager::loadDirectory: dir enumeration results end");
 
+  std::vector<std::future<CarrierFilePtr>> carrier_files;
 
+  for(auto &file: files) {
+    carrier_files.emplace_back(thread_pool_->enqueue(
+                                 &CarrierFileFactory::CreateCarrierFile,
+                                 file));
+  }
 
-  /*
-    CarrierFileInitTask *task = new CarrierFileInitTask(base_path_, QDir(base_path_).relativeFilePath(sFilePath), &carrier_files_, &_fileListMutex);
-    QObject::connect(task, SIGNAL(finished()), this, SLOT(on_fileInitFinished()));
-    _loadingThreadPool.start(task);
-*/
-  FOREACH( File, files, file ) {
-    CarrierFilePtr carrier_file =
-        CarrierFileFactory::CreateCarrierFile(FOREACH_ELM(file));
-    if (carrier_file != nullptr) {
-      carrier_files_.push_back(carrier_file);
+  for(auto &&file: carrier_files) {
+    auto result = file.get();
+    if (result != nullptr) {
+      carrier_files_.push_back(result);
     }
   }
+
 
   for (uint64 i = 0; i < carrier_files_.size(); ++i) {
     LOG_TRACE("CarrierFilesManager::loadDirectory: '" <<
@@ -137,10 +103,6 @@ bool CarrierFilesManager::LoadVirtualStorage(VirtualStoragePtr storage) {
     throw std::invalid_argument("CarrierFilesManager::loadVirtualStorage: "
                                 "encoder is not applied yet");
 
-  // mY moved to CFM::applyEnc, we need call CF::SetSubkey before CF::SetEnc
-  //    generateMasterKey();
-  //    deriveSubkeys();
-
   try { storage->ApplyPermutation(this->GetCapacity(), master_key_); }
   catch (...) { throw; }
 
@@ -149,9 +111,6 @@ bool CarrierFilesManager::LoadVirtualStorage(VirtualStoragePtr storage) {
   uint64 remaining_capacity = storage->GetRawCapacity();
 
   uint64 bytes_used;
-
-  //_loadingThreadPool.waitForDone();
-  loading_progress_ = 0;
 
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     if (remaining_capacity > carrier_files_[i]->GetCapacity()) {
@@ -163,27 +122,20 @@ bool CarrierFilesManager::LoadVirtualStorage(VirtualStoragePtr storage) {
     }
     carrier_files_[i]->AddToVirtualStorage(storage, offset, bytes_used);
     offset += carrier_files_[i]->GetCapacity();
-
-    /*
-        if (_progressCallback != NULL) {
-            _progressCallback(i+1, carrier_files_.size(), LoadingFiles);
-        }
-        */
-    /*
-        if (_delegate) {
-            _delegate->progressUpdated(i+1, carrier_files_.size(), LoadingFiles);
-        }
-        */
   }
+
+  std::vector<std::future<int>> load_results;
 
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    carrier_files_[i]->LoadFile();
-    //        CarrierFileLoadTask *task = new CarrierFileLoadTask(carrier_files_[i]);
-    //        QObject::connect(task, SIGNAL(finished()), this, SLOT(on_fileLoadFinished()));
-    //        _loadingThreadPool.start(task);
+    load_results.emplace_back(thread_pool_->enqueue(&CarrierFile::LoadFile,
+                                                    carrier_files_[i]));
   }
 
-  //    _loadingThreadPool.waitForDone();
+  for(auto &&result: load_results) {
+    if (result.get() != STEGO_NO_ERROR) {
+      //TODO(Matus) throw something
+    }
+  }
 
   virtual_storage_ = storage;
   try {
@@ -332,11 +284,17 @@ void CarrierFilesManager::DeriveSubkeys() {
 
 
 void CarrierFilesManager::SaveAllFiles() {
+  std::vector<std::future<int>> save_results;
+
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    carrier_files_[i]->SaveFile();
-    //        if (_delegate) {
-    ////            _delegate->cfmProgressUpdated(i+1, carrier_files_.size(), SavingFiles);
-    //        }
+    save_results.emplace_back(
+          thread_pool_->enqueue(&CarrierFile::SaveFile, carrier_files_[i]));
+  }
+
+  for(auto &&result: save_results) {
+    if (result.get() != STEGO_NO_ERROR) {
+      //TODO(Matus) throw something
+    }
   }
 }
 
@@ -358,19 +316,6 @@ uint64 CarrierFilesManager::GetRawCapacity() {
   }
   return capacity;
 }
-
-/*
-void CarrierFilesManager::SetProgressCallback(ProgressCallbackFunction progressCallback)
-{
-    _progressCallback = progressCallback;
-}
-*/
-
-//void CarrierFilesManager::SetDelegate(CarrierFilesManagerDelegate *delegate)
-//{
-//    _delegate = delegate;
-//}
-
 
 uint64 CarrierFilesManager::GetCapacityUsingEncoder(
     std::shared_ptr<Encoder> encoder) {
