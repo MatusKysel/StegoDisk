@@ -41,6 +41,32 @@ static void PrintHelp(char *name) {
             << std::endl;
 }
 
+stego_disk::EncoderFactory::EncoderType StrToEncoder(std::string &encoder){
+  std::transform(encoder.begin(), encoder.end(), encoder.begin(), ::tolower);
+
+  if(encoder == "lsb") {
+    return stego_disk::EncoderFactory::EncoderType::LSB;
+  } else {
+    return stego_disk::EncoderFactory::EncoderType::HAMMING;
+  }
+}
+
+stego_disk::PermutationFactory::PermutationType StrToPermutation(std::string &permutation){
+  std::transform(permutation.begin(), permutation.end(), permutation.begin(), ::tolower);
+
+  if(permutation == "identity") {
+    return stego_disk::PermutationFactory::PermutationType::IDENTITY;
+  } else if (permutation == "affine") {
+    return stego_disk::PermutationFactory::PermutationType::AFFINE;
+  } else if (permutation == "affine64") {
+    return stego_disk::PermutationFactory::PermutationType::AFFINE64;
+  } else if (permutation == "numericfeistel") {
+    return stego_disk::PermutationFactory::PermutationType::FEISTEL_NUM;
+  } else {
+    return stego_disk::PermutationFactory::PermutationType::FEISTEL_MIX;
+  }
+}
+
 int main(int argc, char *argv[]) {
   bool error = false;
 
@@ -138,7 +164,8 @@ int main(int argc, char *argv[]) {
   stego_storage->Open(dir, PASSWORD);
 #endif
   LOG_DEBUG("Loading storage");
-  stego_storage->Load(encoder, permutation);
+  stego_storage->Load(StrToEncoder(encoder), StrToPermutation(permutation),
+                      StrToPermutation(permutation));
   size = stego_storage->GetSize();
   std::cout << "Storage size = " << size << "B" << std::endl;
   if( gen_file_size == 0) gen_file_size = size;
@@ -153,7 +180,8 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Opening storage");
   stego_storage->Open(dir, PASSWORD);
   LOG_DEBUG("Loading storage");
-  stego_storage->Load(encoder, permutation);
+  stego_storage->Load(StrToEncoder(encoder), StrToPermutation(permutation),
+                      StrToPermutation(permutation));
   output.resize(input.size());
   LOG_DEBUG("Reading from the storage");
   stego_storage->Read(&(output[0]), 0, input.size());

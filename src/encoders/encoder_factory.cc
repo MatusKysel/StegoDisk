@@ -18,9 +18,7 @@ namespace stego_disk {
  * @return Instance of default encoder.
  */
 std::shared_ptr<Encoder> EncoderFactory::GetDefaultEncoder() {
-  // TODO after testing set HammingEncoder(5)
-  //return std::shared_ptr<Encoder>(new HammingEncoder(5));
-  return std::shared_ptr<Encoder>(new LsbEncoder(1));
+  return GetEncoder(kDefaultEncoder);
 }
 
 /**
@@ -64,7 +62,7 @@ vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
  *
  * @return A std::exception if some error occurs in encoder->setArgByName()
  */
-void EncoderFactory::SetEncoderArgByName(std::shared_ptr<Encoder> encoder,
+void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
                                          const string &param,
                                          const string &val) {
   if (!encoder)
@@ -120,44 +118,26 @@ vector<string> EncoderFactory::GetEncoderNames() {
 }
 
 /**
- * @brief Get instance of the encoder by the code name
+ * @brief Get instance of the encoder by type
  *
- * This method Get instance of the encoder by the encoder's code name.
+ * This method Get instance of the encoder by the encoder's type.
  * If those encoder exists, it is initialized with default parameters.
- * If there is no encoder with the 'encoder_name', throws an exception.
- * Exception is raised if 'encoder_name' has zero length, too.
+ * If there is no encoder with the encoder's type, returns a nullptr.
  *
- * @param[in] encoder_name Name of encoder to be created
- * @return On success instance of encoder, exception std::invalid_argument otherwise
+ * @param[in] encoder Type of encoder to be created
+ * @return On success instance of encoder, nullptr otherwise
  */
-std::shared_ptr<Encoder> EncoderFactory::GetEncoderByName(
-    const string &encoder_name) {
 
-  vector<std::shared_ptr<Encoder>> list;
-  std::shared_ptr<Encoder> encoder(nullptr);
-  string str, name;
+std::shared_ptr<Encoder> EncoderFactory::GetEncoder(const EncoderType encoder) {
 
-  if (encoder_name.length() == 0)
-    throw std::invalid_argument("EncoderFactory::GetEncoderByName: "
-                                "'encoder_name' is empty");
-  name = encoder_name;
-
-  std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-  list = GetEncoders();
-  for (unsigned int i = 0; i < list.size(); ++i) {
-    str = list[i]->GetNameInstance();
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    if (name.compare(str) == 0) {
-      encoder = list[i];
-      break;
-    }
+  switch(encoder) {
+    case EncoderType::LSB:
+      return std::make_shared<LsbEncoder>();
+    case EncoderType::HAMMING:
+      return std::make_shared<HammingEncoder>();
+    default:
+      return nullptr;
   }
-
-  if (encoder)
-    return encoder;
-  throw std::invalid_argument("EncoderFactory::GetEncoderByName: "
-                              "encoder with name '"
-                              + encoder_name + "' doesn't exist");
 }
 
 } // stego_disk

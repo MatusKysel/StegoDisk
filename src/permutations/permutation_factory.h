@@ -5,29 +5,37 @@
 #include <vector>
 
 #include "permutation.h"
-#include "utils/cpp11_compat.h"
 
 using namespace std;
 
 namespace stego_disk {
 
-#ifndef __SHARED_PTR_PERMUTATION__
-#define __SHARED_PTR_PERMUTATION__
-//class Permutation; // TODO (matus) aspon podla mna to tu nema byt, no mozno sa mylim
-typedef std::shared_ptr<Permutation> PermutationPtr;
-#endif // __SHARED_PTR_PERMUTATION__
-
-
-class PermutationFactory KEYWORD_FINAL {
+class PermutationFactory final {
 private:
   PermutationFactory();
 public:
+
+  enum class PermutationType {
+    IDENTITY,
+    AFFINE,
+    AFFINE64,
+    FEISTEL_NUM,
+    FEISTEL_MIX
+  };
+
   // get vector of all permutations (each permutation once)
-  static vector<PermutationPtr> GetPermutations();
+  static vector<std::shared_ptr<Permutation>> GetPermutations();
   // get instance of permutation based on the code name
-  static PermutationPtr GetPermutationByName(const string &permutation_name);
+  static std::shared_ptr<Permutation> GetPermutation(
+      const string &permutation_name);
+  // get instance of permutation based on type
+  static std::shared_ptr<Permutation> GetPermutation(
+      const PermutationType permutation);
   // get instance of the default permutation
-  static PermutationPtr GetDefaultPermutation();
+  static std::shared_ptr<Permutation> GetDefaultPermutation();
+
+private:
+  static const PermutationType kDefaultPermutation = PermutationType::FEISTEL_MIX;
 };
 
 } // stego_disk

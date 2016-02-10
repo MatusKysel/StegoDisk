@@ -165,12 +165,10 @@ set(ENCODERS_SRCS
 # FILE_MANAGEMENT
 
 set(FILE_MANAGEMENT_HDRS
-  #src/file_management/carrier_files_manager_delegate.h
   src/file_management/carrier_files_manager.h
 )
 
 set(FILE_MANAGEMENT_SRCS
-  #src/file_management/carrier_files_manager_delegate.cc
   src/file_management/carrier_files_manager.cc
 )
 
@@ -245,7 +243,6 @@ set(PERMUTATIONS_SRCS
 # UTILS
 
 set(UTILS_HDRS
-  src/utils/cpp11_compat.h
   src/utils/config.h
   src/utils/file.h
   src/utils/memory_buffer.h
@@ -271,12 +268,10 @@ set(UTILS_SRCS
 # VIRTUAL_STORAGE
 
 set(VIRTUAL_STORAGE_HDRS
-  #src/virtual_storage/encrypted_virtual_storage.h
   src/virtual_storage/virtual_storage.h
 )
 
 set(VIRTUAL_STORAGE_SRCS
-  #src/virtual_storage/encrypted_virtual_storage.cc
   src/virtual_storage/virtual_storage.cc
 )
 

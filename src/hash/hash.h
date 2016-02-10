@@ -14,11 +14,10 @@
 #include "hash_impl.h"
 #include "utils/stego_header.h"
 #include "utils/memory_buffer.h"
-#include "utils/cpp11_compat.h"
 
 namespace stego_disk {
 
-class Hash KEYWORD_FINAL {
+class Hash final {
 public:
   Hash();
   Hash(const std::string& data);

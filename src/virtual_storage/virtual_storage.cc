@@ -18,7 +18,7 @@ void VirtualStorage::Init() {
   raw_capacity_ = 0;
   usable_capacity_ = 0;
   is_set_global_permutation_ = false;
-  global_permutation_ = PermutationPtr(nullptr);
+  global_permutation_ = std::shared_ptr<Permutation>(nullptr);
 }
 
 VirtualStorage::VirtualStorage() {
@@ -41,7 +41,7 @@ VirtualStoragePtr VirtualStorage::GetNewInstance(string permutation) {
       shared_ptr<VirtualStorage>(new VirtualStorage());
   try {
     virtual_storage->SetPermutation(
-          PermutationFactory::GetPermutationByName(permutation));
+          PermutationFactory::GetPermutation(permutation));
   } catch (...) { throw; }
 
   return virtual_storage;
@@ -81,7 +81,7 @@ uint64 VirtualStorage::GetRawCapacity() {
   return raw_capacity_;
 }
 
-void VirtualStorage::SetPermutation(PermutationPtr permutation) {
+void VirtualStorage::SetPermutation(std::shared_ptr<Permutation> permutation) {
   if (!permutation)
     throw std::invalid_argument("VirtualStorage::SetPermutation: "
                                 "arg 'permutation' is nullptr");

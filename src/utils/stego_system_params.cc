@@ -5,7 +5,7 @@
 namespace stego_disk {
 
 StegoSystemParams::StegoSystemParams() {
-    permutation_ = PermutationPtr(nullptr);
+    permutation_ = std::shared_ptr<Permutation>(nullptr);
     encoder_ = std::shared_ptr<Encoder>(nullptr);
     capacity_ = 0;
 }
@@ -14,14 +14,14 @@ StegoSystemParams::~StegoSystemParams() {}
 
 void StegoSystemParams::DestroyContent() {
 
-    if (permutation_) permutation_ = PermutationPtr(nullptr);
+    if (permutation_) permutation_ = std::shared_ptr<Permutation>(nullptr);
     if (encoder_) encoder_ = std::shared_ptr<Encoder>(nullptr);
 }
 
 std::vector<StegoSystemParams*> StegoSystemParams::GetConfigurations(
     CarrierFilesManager *manager, Key key, uint64 minimal_capacity) {
 
-    std::vector<PermutationPtr> permutations =
+    std::vector<std::shared_ptr<Permutation>> permutations =
         PermutationFactory::GetPermutations();
     std::vector<std::shared_ptr<Encoder>> encoders =
         EncoderFactory::GetAllEncoders();

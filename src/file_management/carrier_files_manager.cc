@@ -26,7 +26,6 @@
 #include "utils/config.h"
 #include "utils/stego_math.h"
 #include "utils/file.h"
-#include "utils/cpp11_compat.h"
 #include "logging/logger.h"
 
 using namespace std;
@@ -38,7 +37,7 @@ CarrierFilesManager::CarrierFilesManager() :
   files_in_directory_(0),
   virtual_storage_(VirtualStoragePtr(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
-  thread_pool_(new ThreadPool(0)),
+  thread_pool_(new ThreadPool(0)), //std::make_unique<ThreadPool>(0) c++14
   is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
@@ -57,9 +56,8 @@ int CarrierFilesManager::LoadDirectory(std::string directory) {
 
   files_in_directory_ = files.size();
 
-  FOREACH( File, files, file ) {
-    LOG_TRACE(FOREACH_ELM(file).GetBasePath() + " - " +
-              FOREACH_ELM(file).GetRelativePath());
+  for(auto &file: files) {
+     LOG_TRACE(file.GetBasePath() + " - " + file.GetRelativePath());
   }
 
   std::vector<std::future<CarrierFilePtr>> carrier_files;
@@ -159,7 +157,7 @@ int CarrierFilesManager::SaveVirtualStorage() {
   return STEGO_NO_ERROR;
 }
 
-void CarrierFilesManager::SetEncoderArgByName(const string &param,
+void CarrierFilesManager::SetEncoderArg(const string &param,
                                               const string &val) {
   if (!encoder_)
     throw std::invalid_argument("CarrierFilesManager::SetEncoderArgByName: "
@@ -169,7 +167,7 @@ void CarrierFilesManager::SetEncoderArgByName(const string &param,
                                 "another encoder is active; please first unSet "
                                 "this encoder");
 
-  try { EncoderFactory::SetEncoderArgByName(encoder_,param,val); }
+  try { EncoderFactory::SetEncoderArg(encoder_,param,val); }
   catch (...) { throw; }
 }
 

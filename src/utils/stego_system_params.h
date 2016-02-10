@@ -20,7 +20,7 @@ public:
     static std::vector<StegoSystemParams*> GetConfigurations(
         CarrierFilesManager* manager, Key key, uint64 minimal_capacity);
 
-    PermutationPtr permutation_;
+    std::shared_ptr<Permutation> permutation_;
     std::shared_ptr<Encoder> encoder_;
     uint64 capacity_;
 };

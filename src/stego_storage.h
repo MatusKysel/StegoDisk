@@ -13,6 +13,9 @@
 #include <string>
 #include <stdexcept>
 
+#include "encoders/encoder_factory.h"
+#include "permutations/permutation_factory.h"
+
 namespace stego_disk {
 
 class CarrierFilesManager;
@@ -25,7 +28,10 @@ public:
   ~StegoStorage();
 
   void Open(std::string storage_base_path, std::string password);
-  void Load(std::string encoder = "Lsb", std::string permutation = "MixedFeistel");
+  void Load(EncoderFactory::EncoderType encoder,
+            PermutationFactory::PermutationType global_perm,
+            PermutationFactory::PermutationType local_perm);
+  void Load();
   void Save();
 
   void Read(void* destination, std::size_t offset, std::size_t length) const;

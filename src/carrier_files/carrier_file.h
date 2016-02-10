@@ -49,7 +49,7 @@ public:
 
   File GetFile();
 
-  void SetPermutation(PermutationPtr permutation);
+  void SetPermutation(std::shared_ptr<Permutation> permutation);
   void UnSetPermutation();
   void SetEncoder(std::shared_ptr<Encoder> encoder);
   void UnSetEncoder();
@@ -93,7 +93,7 @@ protected:
   Key subkey_;
   File file_;
   std::shared_ptr<Encoder> encoder_;
-  PermutationPtr permutation_;
+  std::shared_ptr<Permutation> permutation_;
   VirtualStoragePtr virtual_storage_;
 };
 

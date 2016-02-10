@@ -20,8 +20,8 @@ namespace stego_disk {
  *
  * @return Instance of default permutation.
  */
-PermutationPtr PermutationFactory::GetDefaultPermutation() {
-  return make_shared<FeistelMixPermutation>();
+std::shared_ptr<Permutation> PermutationFactory::GetDefaultPermutation() {
+  return GetPermutation(kDefaultPermutation);
 }
 
 /**
@@ -33,8 +33,8 @@ PermutationPtr PermutationFactory::GetDefaultPermutation() {
  *
  * @return Vector of supported permutations
  */
-vector<PermutationPtr> PermutationFactory::GetPermutations() {
-  vector<PermutationPtr> list;
+vector<std::shared_ptr<Permutation>> PermutationFactory::GetPermutations() {
+  vector<std::shared_ptr<Permutation>> list;
 
   list.push_back(make_shared<IdentityPermutation>());
   list.push_back(make_shared<AffinePermutation>());
@@ -56,11 +56,11 @@ vector<PermutationPtr> PermutationFactory::GetPermutations() {
  * @param[in] permutationName Name of permutation to be created
  * @return On success instance of permutation, exception std::invalid_argument otherwise
  */
-PermutationPtr PermutationFactory::GetPermutationByName(
+std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
     const string &permutation_name) {
 
-  vector<PermutationPtr> list;
-  PermutationPtr permutation(nullptr);
+  vector<std::shared_ptr<Permutation> > list;
+  std::shared_ptr<Permutation> permutation(nullptr);
   string str, name;
 
   if (permutation_name.length() == 0)
@@ -84,6 +84,26 @@ PermutationPtr PermutationFactory::GetPermutationByName(
   throw std::invalid_argument("PermutationFactory::getPermutationByName: "
                               "permutation with name '"
                               + permutation_name + "' doesn't exist");
+}
+
+
+std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
+    const PermutationType permutation){
+
+  switch(permutation) {
+    case PermutationType::IDENTITY:
+      return std::make_shared<IdentityPermutation>();
+    case PermutationType::AFFINE:
+      return std::make_shared<AffinePermutation>();
+    case PermutationType::AFFINE64:
+      return std::make_shared<Affine64Permutation>();
+    case PermutationType::FEISTEL_NUM:
+      return std::make_shared<FeistelNumPermutation>();
+    case PermutationType::FEISTEL_MIX:
+      return std::make_shared<FeistelMixPermutation>();
+    default:
+      return nullptr;
+  }
 }
 
 } // stego_disk

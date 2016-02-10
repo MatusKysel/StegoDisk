@@ -34,7 +34,7 @@ public:
   static VirtualStoragePtr GetNewInstance(string permutation);
 
   // Initialization of the VirtualStorage depends on permutation
-  void SetPermutation(PermutationPtr permutation);
+  void SetPermutation(std::shared_ptr<Permutation> permutation);
   void UnSetPermutation();
   void ApplyPermutation(uint64 requested_size, Key key);
 
@@ -57,7 +57,7 @@ public:
   void WriteChecksum();
 
 private:
-  PermutationPtr global_permutation_;
+  std::shared_ptr<Permutation> global_permutation_;
   bool   is_set_global_permutation_;
   uint64 raw_capacity_;                // raw capacity (hash + storage)
   uint64 usable_capacity_;             // usable capacity (storage only)
