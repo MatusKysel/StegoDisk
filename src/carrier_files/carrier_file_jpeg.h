@@ -33,7 +33,9 @@ private:
   int ComputeCapacity();
 
 public:
-  CarrierFileJPEG(File file, std::shared_ptr<Encoder> encoder);
+  CarrierFileJPEG(File file,
+                  std::shared_ptr<Encoder> encoder,
+                  std::shared_ptr<Permutation> permutation);
 
   int LoadFile();
   int SaveFile();

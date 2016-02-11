@@ -18,8 +18,9 @@
 
 namespace stego_disk {
 
-CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder) :
-  CarrierFile(file, encoder) {
+CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
+                               std::shared_ptr<Permutation> permutation) :
+  CarrierFile(file, encoder, permutation) {
 
   auto file_ptr = file.Open();
 

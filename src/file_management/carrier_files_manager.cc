@@ -44,7 +44,11 @@ CarrierFilesManager::~CarrierFilesManager() {
   carrier_files_.clear();
 }
 
-int CarrierFilesManager::LoadDirectory(std::string directory) {
+std::string CarrierFilesManager::GetPath() const {
+  return base_path_;
+}
+
+int CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   carrier_files_.clear();
   capacity_ = 0;
@@ -221,7 +225,7 @@ void CarrierFilesManager::ApplyEncoder() {
 }
 
 
-void CarrierFilesManager::SetPassword(std::string password) {
+void CarrierFilesManager::SetPassword(const std::string &password) {
   password_hash_.Process(password);
   LOG_DEBUG("CarrierFilesManager::SetPassword: Setting password: '"
             << password << "'");

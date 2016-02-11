@@ -22,16 +22,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_config.h.in ${CMAKE_CURRENT_BINA
 
 message(STATUS "TEST_PATH_PREFIX: ${DST_DIRECTORY}")
 
-add_stego_test(LsbMixedFeistelWPassword "LSB" "MixedFeistel" 1)
-add_stego_test(LsbIdentityWPassword "LSB" "Identity" 1)
-add_stego_test(LsbAffine64WPassword "LSB" "Affine64" 1)
-add_stego_test(LsbAffineWPassword "LSB" "Affine" 1)
-add_stego_test(LsbNumericFeistelWPassword "LSB" "NumericFeistel" 1)
-add_stego_test(HammingMixedFeistelWPassword "Hamming" "MixedFeistel" 1)
-add_stego_test(HammingIdentityWPassword "Hamming" "Identity" 1)
-add_stego_test(HammingAffine64WPassword "Hamming" "Affine64" 1)
-add_stego_test(HammingAffineWPassword "Hamming" "Affine" 1)
-add_stego_test(HammingNumericFeistelWPassword "Hamming" "NumericFeistel" 1)
+add_stego_test(LsbMixedFeistelWPassword "lsb" "mix_feistel" 1)
+add_stego_test(LsbIdentityWPassword "lsb" "identity" 1)
+add_stego_test(LsbAffine64WPassword "lsb" "affine64" 1)
+add_stego_test(LsbAffineWPassword "lsb" "affine" 1)
+add_stego_test(LsbNumericFeistelWPassword "lsb" "num_feistel" 1)
+add_stego_test(HammingMixedFeistelWPassword "hamming" "mix_feistel" 1)
+add_stego_test(HammingIdentityWPassword "hamming" "identity" 1)
+add_stego_test(HammingAffine64WPassword "hamming" "affine64" 1)
+add_stego_test(HammingAffineWPassword "hamming" "affine" 1)
+add_stego_test(HammingNumericFeistelWPassword "hamming" "num_feistel" 1)
 
 ###################################################################################################################################
 ###################################################################################################################################

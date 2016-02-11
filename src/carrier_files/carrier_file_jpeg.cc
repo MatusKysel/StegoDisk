@@ -22,8 +22,10 @@
 
 namespace stego_disk {
 
-CarrierFileJPEG::CarrierFileJPEG(File file, std::shared_ptr<Encoder> encoder) :
-  CarrierFile(file, encoder) {
+CarrierFileJPEG::CarrierFileJPEG(File file,
+                                 std::shared_ptr<Encoder> encoder,
+                                 std::shared_ptr<Permutation> permutation) :
+  CarrierFile(file, encoder, permutation) {
   ComputeCapacity();
 }
 

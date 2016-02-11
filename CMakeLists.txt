@@ -150,16 +150,16 @@ set(CARRIER_FILES_SRCS
 
 set(ENCODERS_HDRS
   src/encoders/encoder.h
-  src/encoders/hamming_encoder.h
-  src/encoders/lsb_encoder.h
   src/encoders/encoder_factory.h
+  src/encoders/hamming_encoder.h
+  src/encoders/lsb_encoder.h 
 )
 
 set(ENCODERS_SRCS
   src/encoders/encoder.cc
+  src/encoders/encoder_factory.cc
   src/encoders/hamming_encoder.cc
   src/encoders/lsb_encoder.cc
-  src/encoders/encoder_factory.cc
 )
 
 # FILE_MANAGEMENT
@@ -175,13 +175,13 @@ set(FILE_MANAGEMENT_SRCS
 # FUSE
 
 set(FUSE_HDRS
-  src/fuse/fuse_service_delegate.h
   src/fuse/fuse_service.h
+  src/fuse/fuse_service_delegate.h
 )
 
 set(FUSE_SRCS
-  src/fuse/fuse_service_delegate.cc
   src/fuse/fuse_service.cc
+  src/fuse/fuse_service_delegate.cc
 )
 
 # HASH
@@ -220,24 +220,24 @@ set(LOGGING_SRCS
 
 # PERMUTATIONS
 
-set(PERMUTATIONS_HDRS
-  src/permutations/permutation.h
-  src/permutations/permutation_factory.h
-  src/permutations/identity_permutation.h
+set(PERMUTATIONS_HDRS 
   src/permutations/affine_permutation.h
   src/permutations/affine64_permutation.h
-  src/permutations/feistel_num_permutation.h
   src/permutations/feistel_mix_permutation.h
+  src/permutations/feistel_num_permutation.h
+  src/permutations/identity_permutation.h
+  src/permutations/permutation.h
+  src/permutations/permutation_factory.h
 )
 
 set(PERMUTATIONS_SRCS
-  src/permutations/permutation.cc
-  src/permutations/permutation_factory.cc
-  src/permutations/identity_permutation.cc
   src/permutations/affine_permutation.cc
   src/permutations/affine64_permutation.cc
-  src/permutations/feistel_num_permutation.cc
   src/permutations/feistel_mix_permutation.cc
+  src/permutations/feistel_num_permutation.cc
+  src/permutations/identity_permutation.cc
+  src/permutations/permutation.cc
+  src/permutations/permutation_factory.cc
 )
 
 # UTILS
@@ -245,7 +245,10 @@ set(PERMUTATIONS_SRCS
 set(UTILS_HDRS
   src/utils/config.h
   src/utils/file.h
+  src/utils/json.h
+  src/utils/json_object.h
   src/utils/memory_buffer.h
+  src/utils/stego_config.h
   src/utils/stego_errors.h
   src/utils/stego_header.h
   src/utils/stego_math.h

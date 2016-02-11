@@ -36,6 +36,12 @@ public:
   // Get instance of the default encoder
   static std::shared_ptr<Encoder> GetDefaultEncoder();
 
+  static EncoderType GetDefaultEncoderType();
+
+  static EncoderType GetEncoderType(const std::string &encoder);
+
+  static const std::string GetEncoderName(const EncoderType encoder);
+
 private:
   static const EncoderType kDefaultEncoder = EncoderType::HAMMING;
 };

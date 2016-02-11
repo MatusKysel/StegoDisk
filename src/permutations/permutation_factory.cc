@@ -24,6 +24,10 @@ std::shared_ptr<Permutation> PermutationFactory::GetDefaultPermutation() {
   return GetPermutation(kDefaultPermutation);
 }
 
+PermutationFactory::PermutationType PermutationFactory::GetDefaultPermutationType() {
+  return kDefaultPermutation;
+}
+
 /**
  * @brief Get vector of instances of all the permutations
  *
@@ -106,4 +110,40 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
   }
 }
 
+PermutationFactory::PermutationType PermutationFactory::GetPermutationType(
+    const std::string &permutation) {
+
+  std::string l_perm;
+  std::transform(permutation.begin(), permutation.end(), l_perm.begin(), ::tolower);
+
+  if (l_perm == "identity") {
+    return PermutationType::IDENTITY;
+  } else if (l_perm == "affine") {
+    return PermutationType::AFFINE;
+  } else if (l_perm == "affine64") {
+    return PermutationType::AFFINE64;
+  } else if (l_perm == "num_feistel") {
+    return PermutationType::FEISTEL_NUM;
+  } else if (l_perm == "mix_feistel"){
+    return PermutationType::FEISTEL_MIX;
+  } else {
+    return GetDefaultPermutationType();
+  }
+}
+
+const std::string PermutationFactory::GetPermutationName(
+    const PermutationType permutation) {
+
+  if (permutation == PermutationType::IDENTITY) {
+    return "identity";
+  } else if (permutation == PermutationType::AFFINE) {
+    return "affine";
+  } else if (permutation == PermutationType::AFFINE64) {
+    return "affine64";
+  } else if (permutation == PermutationType::FEISTEL_NUM) {
+    return "num_feistel";
+  } else {
+    return "mix_feistel";
+  }
+}
 } // stego_disk

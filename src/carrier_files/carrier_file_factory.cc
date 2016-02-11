@@ -13,6 +13,8 @@
 #include "carrier_file_bmp.h"
 #include "carrier_file_jpeg.h"
 #include "encoders/encoder_factory.h"
+#include "permutations/permutation_factory.h"
+#include "utils/stego_config.h"
 
 using namespace std;
 
@@ -26,9 +28,13 @@ CarrierFilePtr CarrierFileFactory::CreateCarrierFile(const File& file) {
   // get ext
   string ext = file.GetExtension();
   if (ext.compare(".bmp") == 0) {
-    carrier_file = make_shared<CarrierFileBMP>(file, encoder);
+    carrier_file = make_shared<CarrierFileBMP>(file,
+                                               encoder,
+                                               PermutationFactory::GetPermutation(StegoConfig::local_perm()));
   } else if (ext.compare(".jpg") == 0) {
-    carrier_file = make_shared<CarrierFileJPEG>(file, encoder);
+    carrier_file = make_shared<CarrierFileJPEG>(file,
+                                                encoder,
+                                                PermutationFactory::GetPermutation(StegoConfig::local_perm()));
   }
 
   if (carrier_file) {

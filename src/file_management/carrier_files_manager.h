@@ -29,12 +29,12 @@ class CarrierFilesManager {
 public:
   CarrierFilesManager();
   ~CarrierFilesManager();
-  int LoadDirectory(std::string directory);
+  int LoadDirectory(const std::string &directory);
   void SaveAllFiles();
 
   uint64 GetCapacity();
   uint64 GetRawCapacity();
-
+  std::string GetPath() const;
   uint64 GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder);
 
   void ApplyEncoder();
@@ -42,7 +42,7 @@ public:
   void UnSetEncoder();
   void SetEncoderArg(const std::string &param, const std::string &val);
 
-  void SetPassword(std::string password);
+  void SetPassword(const std::string &password);
 
   bool LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage);
   int SaveVirtualStorage();
@@ -50,7 +50,7 @@ public:
 private:
   void Init();
 
-  void AddFileAtPath(std::string path);
+  void AddFileAtPath(std::string &path);
 
   void GenerateMasterKey();
   void DeriveSubkeys();

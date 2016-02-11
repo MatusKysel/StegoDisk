@@ -7,8 +7,12 @@
 //
 #include "stego_storage.h"
 
+#include <fstream>
+
 #include "virtual_storage/virtual_storage.h"
 #include "file_management/carrier_files_manager.h"
+#include "utils/stego_config.h"
+#include "utils/json.h"
 
 using namespace std;
 
@@ -19,7 +23,12 @@ StegoStorage::StegoStorage() :
 
 StegoStorage::~StegoStorage() {}
 
-void StegoStorage::Open(std::string storage_base_path, std::string password) {
+void StegoStorage::Open(const std::string &storage_base_path,
+                        const std::string &password) {
+
+  if(!StegoConfig::initialized()) {
+    throw std::runtime_error("Storage must be configured before opening");
+  }
   opened_ = false;
 
   carrier_files_manager_->SetPassword(password);
@@ -28,20 +37,36 @@ void StegoStorage::Open(std::string storage_base_path, std::string password) {
   opened_ = true;
 }
 
-void StegoStorage::Load(EncoderFactory::EncoderType encoder,
-                        PermutationFactory::PermutationType global_perm,
-                        PermutationFactory::PermutationType local_perm) {
-  if (!opened_)
-    throw std::runtime_error("Storage must be opened_ before loading");
+void StegoStorage::Configure(const std::string &config_path) const {
+  std::ifstream ifs(config_path.c_str());
+  if (!ifs.is_open()) {
+    //std::cout << "Failed to open config file: " << config_path << std::endl; TODO(MATUS) log it
+  }
 
-  carrier_files_manager_->SetEncoder(
-        EncoderFactory::GetEncoder(encoder));
-  carrier_files_manager_->ApplyEncoder();
+  std::string json_string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+  ifs.close();
 
-  virtual_storage_ = make_shared<VirtualStorage>();
-  virtual_storage_->SetPermutation(
-        PermutationFactory::GetPermutation(global_perm));
-  carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
+  json::JsonObject config;
+  std::string parse_error = json::Parse(json_string, &config);
+  if (!parse_error.empty()) {
+    //      std::cout << "Failed to parse config file: " << parse_error << std::endl; TODO(Matus) log it
+  }
+
+}
+
+void StegoStorage::Configure() const {
+  Configure(carrier_files_manager_->GetPath() + CONFIG_NAME);
+}
+
+void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
+                             const PermutationFactory::PermutationType global_perm,
+                             const PermutationFactory::PermutationType local_perm) const {
+
+  json::JsonObject config;
+  config.AddToObject("encoder", EncoderFactory::GetEncoderName(encoder));
+  config.AddToObject("global_perm", PermutationFactory::GetPermutationName(global_perm));
+  config.AddToObject("local_perm",  PermutationFactory::GetPermutationName(local_perm));
+  StegoConfig::Init(config);
 }
 
 void StegoStorage::Load() {
@@ -49,12 +74,12 @@ void StegoStorage::Load() {
     throw std::runtime_error("Storage must be opened_ before loading");
 
   carrier_files_manager_->SetEncoder(
-        EncoderFactory::GetDefaultEncoder());
+        EncoderFactory::GetEncoder(StegoConfig::encoder()));
   carrier_files_manager_->ApplyEncoder();
 
   virtual_storage_ = make_shared<VirtualStorage>();
   virtual_storage_->SetPermutation(
-        PermutationFactory::GetDefaultPermutation());
+        PermutationFactory::GetPermutation(StegoConfig::global_perm()));
   carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
 }
 

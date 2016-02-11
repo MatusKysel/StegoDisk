@@ -34,6 +34,12 @@ public:
   // get instance of the default permutation
   static std::shared_ptr<Permutation> GetDefaultPermutation();
 
+  static PermutationType GetDefaultPermutationType();
+
+  static PermutationType GetPermutationType(const std::string &permutation);
+
+  static const std::string GetPermutationName( const PermutationType permutation);
+
 private:
   static const PermutationType kDefaultPermutation = PermutationType::FEISTEL_MIX;
 };

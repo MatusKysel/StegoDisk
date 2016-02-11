@@ -40,7 +40,9 @@ namespace stego_disk {
 class CarrierFile {
 
 public:
-  CarrierFile(File file, std::shared_ptr<Encoder> encoder);
+  CarrierFile(File file,
+              std::shared_ptr<Encoder> encoder,
+              std::shared_ptr<Permutation> permutation);
   virtual ~CarrierFile();
 
   uint64 GetCapacity();

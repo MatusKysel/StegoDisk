@@ -21,6 +21,11 @@ std::shared_ptr<Encoder> EncoderFactory::GetDefaultEncoder() {
   return GetEncoder(kDefaultEncoder);
 }
 
+
+EncoderFactory::EncoderType EncoderFactory::GetDefaultEncoderType() {
+  return kDefaultEncoder;
+}
+
 /**
  * @brief Get vector of instances of all the encoders using all possible settings
  *
@@ -137,6 +142,28 @@ std::shared_ptr<Encoder> EncoderFactory::GetEncoder(const EncoderType encoder) {
       return std::make_shared<HammingEncoder>();
     default:
       return nullptr;
+  }
+}
+
+
+EncoderFactory::EncoderType EncoderFactory::GetEncoderType(const std::string &encoder) {
+  std::string l_encoder;
+  std::transform(encoder.begin(), encoder.end(), l_encoder.begin(), ::tolower);
+
+  if (l_encoder == "lsb") {
+    return EncoderType::LSB;
+  } else if (l_encoder == "hamming"){
+    return EncoderType::HAMMING;
+  } else {
+    return GetDefaultEncoderType();
+  }
+}
+
+const std::string EncoderFactory::GetEncoderName(const EncoderType encoder) {
+  if (encoder == EncoderType::LSB) {
+    return "lsb";
+  } else {
+    return "hamming";
   }
 }
 
