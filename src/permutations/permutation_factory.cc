@@ -113,7 +113,7 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
 PermutationFactory::PermutationType PermutationFactory::GetPermutationType(
     const std::string &permutation) {
 
-  std::string l_perm;
+  std::string l_perm(permutation.size(), '\0');
   std::transform(permutation.begin(), permutation.end(), l_perm.begin(), ::tolower);
 
   if (l_perm == "identity") {

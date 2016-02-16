@@ -49,5 +49,5 @@ target_link_libraries(stego-test ${STEGODISK_LIBRARY} ${LIBJPEGTURBO_LIBRARIES_S
 list(APPEND TESTS stego-test)
 
 add_custom_target(check
-  COMMAND ${CMAKE_CTEST_COMMAND} -T test --timeout 600 --output-on-failure --parallel 4
+  COMMAND ${CMAKE_CTEST_COMMAND} -T test --build-config ${CMAKE_CFG_INTDIR} --test-timeout 600 --output-on-failure --parallel 4 
   DEPENDS ${TESTS})

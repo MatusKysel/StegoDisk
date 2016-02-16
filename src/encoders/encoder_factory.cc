@@ -147,7 +147,7 @@ std::shared_ptr<Encoder> EncoderFactory::GetEncoder(const EncoderType encoder) {
 
 
 EncoderFactory::EncoderType EncoderFactory::GetEncoderType(const std::string &encoder) {
-  std::string l_encoder;
+  std::string l_encoder(encoder.size(), '\0');
   std::transform(encoder.begin(), encoder.end(), l_encoder.begin(), ::tolower);
 
   if (l_encoder == "lsb") {
