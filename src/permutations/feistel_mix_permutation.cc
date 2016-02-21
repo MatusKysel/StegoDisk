@@ -39,7 +39,7 @@ FeistelMixPermutation::~FeistelMixPermutation() {
 }
 
 
-void FeistelMixPermutation::Init(PermElem requested_size, Key key) {
+void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
   if (key.GetSize() == 0)
     throw std::runtime_error("FeistelMixPermutation init: "
                              "Invalid key (size=0)");
@@ -121,7 +121,7 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
 }
 
 PermElem FeistelMixPermutation::GetSizeUsingParams(PermElem requested_size,
-                                                   Key key) {
+                                                   Key &key) {
   if (requested_size < FMP_MIN_REQ_SIZE) return 0;
 
   uint8 bit_len = StegoMath::Log2(requested_size);

@@ -20,13 +20,13 @@ public:
   AffinePermutation();
   ~AffinePermutation();
 
-  virtual void Init(PermElem requested_size, Key key);
+  virtual void Init(PermElem requested_size, Key &key);
   virtual PermElem Permute(PermElem index) const;
-  virtual PermElem GetSizeUsingParams(PermElem requested_size, Key key);
+  virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key);
 
   const std::string GetNameInstance() const { return "Affine"; }
 protected:
-  PermElem GetSizeUsingParams(PermElem requested_size, Key key,
+  PermElem GetSizeUsingParams(PermElem requested_size, Key &key,
                               bool overwrite_members);
   uint64 key_param_a_;
   uint64 key_param_b_;

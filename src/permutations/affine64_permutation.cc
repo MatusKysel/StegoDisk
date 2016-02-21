@@ -26,7 +26,7 @@ Affine64Permutation::~Affine64Permutation() {
             GetNameInstance());
 }
 
-void Affine64Permutation::Init(PermElem requested_size, Key key)
+void Affine64Permutation::Init(PermElem requested_size, Key &key)
 {
   initialized_ = false;
 

@@ -172,9 +172,9 @@ int main(int argc, char *argv[]) {
                            StrToPermutation(permutation));
   LOG_DEBUG("Opening storage");
 #ifdef _WIN32
-  stego_storage->Open(FileManager::GetWinPath(dir), PASSWORD);
+  stego_storage->Open(FileManager::GetWinPath(dir), (password) ? PASSWORD : "");
 #else
-  stego_storage->Open(dir, PASSWORD);
+  stego_storage->Open(dir, (password) ? PASSWORD : "");
 #endif
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Opening storage");
   stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
                            StrToPermutation(permutation));
-  stego_storage->Open(dir, PASSWORD);
+  stego_storage->Open(dir, (password) ? PASSWORD : "");
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
   output.resize(input.size());

@@ -23,7 +23,7 @@ IdentityPermutation::~IdentityPermutation() {
             GetNameInstance());
 }
 
-void IdentityPermutation::Init(PermElem requested_size, Key key) {
+void IdentityPermutation::Init(PermElem requested_size, Key &key) {
   //    if (key.getSize() == 0)
   //        throw std::runtime_error("IdentityPermutatuion init: Invalid key (size=0)");
 
@@ -42,7 +42,7 @@ PermElem IdentityPermutation::Permute(PermElem index) const {
 }
 
 PermElem IdentityPermutation::GetSizeUsingParams(PermElem requested_size,
-                                                 Key key) {
+                                                 Key &key) {
   return requested_size;
 }
 

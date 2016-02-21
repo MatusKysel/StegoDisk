@@ -162,6 +162,17 @@ set(ENCODERS_SRCS
   src/encoders/lsb_encoder.cc
 )
 
+# FITNESS FUNCTIONS
+
+set(FITNESS_HDRS
+  src/fitness/fitness.h
+  src/fitness/context_fitness.h
+)
+
+set(FITNESS_SRCS
+  src/fitness/context_fitness.cc
+)
+
 # FILE_MANAGEMENT
 
 set(FILE_MANAGEMENT_HDRS
@@ -280,6 +291,7 @@ set(VIRTUAL_STORAGE_SRCS
 set(STEGODISK_HDRS
   src/stego_storage.h
   ${ENCODERS_HDRS}
+  ${FITNESS_HDRS}
   ${HASH_HDRS}
   ${KEYS_HDRS}
   ${LOGGING_HDRS}
@@ -293,6 +305,7 @@ set(STEGODISK_HDRS
 set(STEGODISK_SRCS
   src/stego_storage.cc
   ${ENCODERS_SRCS}
+  ${FITNESS_SRCS}
   ${HASH_SRCS}
   ${KEYS_SRCS}
   ${LOGGING_SRCS}

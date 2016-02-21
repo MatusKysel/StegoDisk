@@ -26,7 +26,7 @@ AffinePermutation::~AffinePermutation() {
             GetNameInstance());
 }
 
-PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key key,
+PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key,
                                                bool overwrite_members) {
   if (key.GetSize() == 0)
     throw std::runtime_error("AffinePermutation: Invalid key (size=0)");
@@ -80,7 +80,7 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key key,
 }
 
 PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size,
-                                               Key key) {
+                                               Key &key) {
   if (requested_size > 0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
     return 0;
 
@@ -88,7 +88,7 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size,
 }
 
 
-void AffinePermutation::Init(PermElem requested_size, Key key)
+void AffinePermutation::Init(PermElem requested_size, Key &key)
 {
   if (requested_size > 0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
     throw std::out_of_range("AffinePermutation: "

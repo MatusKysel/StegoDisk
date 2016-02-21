@@ -14,8 +14,6 @@
 
 #include "utils/stego_errors.h"
 
-//TODO: Prepisat nacitavanie a ukladanie -> osetrit pripad ak sa medzi naloadovanim a saveovanim zmeni subor (velkost, hlavicka..)
-
 namespace stego_disk {
 
 CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
@@ -32,14 +30,12 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   read_cnt += static_cast<int>(fread(&bmp_info, 1, 40, file_ptr.Get()));
 
   if (read_cnt < 54) {
-    //TODO: throw exception
-    return;
+     throw std::runtime_error("Wrong header size of file " + file_.GetFileName());
   }
 
   uint32_t bmp_file_size = *((uint32_t*)&bmp_header[2]);
-  if (bmp_file_size != file_.GetSize()) { // wrong file size
-    //TODO: throw exception
-    return;
+  if (bmp_file_size != file_.GetSize()) {
+    throw std::runtime_error("Wrong size of file " + file_.GetFileName());
   }
 
   bmp_offset_ = *((uint32_t*)&bmp_header[10]); // should be = 54
@@ -47,14 +43,14 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   uint32_t bmp_compression = *((uint32_t*)&bmp_info[16]); // should be 0
 
   if (bmp_compression != 0) {
-    //TODO: throw exception
-    return;
+    throw std::runtime_error("BMP file " + file_.GetFileName() +
+                             " uses unsupported file compression");
   }
 
-//  if (bmp_bits_per_pixel != 24) {
-//    //TODO: throw exception
-//    return;
-//  } TODO(Matus) podpora inych hlbok
+  //  if (bmp_bits_per_pixel != 24) {
+  //    //TODO: throw exception
+  //    return;
+  //  } TODO(Matus) podpora inych hlbok
 
   //bmp_size_ = *((uint32_t*)&bmp_info[20]); // byva = 0 pri vypnutej kompresii
 
@@ -65,8 +61,8 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
               abs(bmp_height);
 
   if ((bmp_size_ + 54) > bmp_file_size) {
-    //TODO: throw exception
-    return;
+    throw std::runtime_error("Error occured while reading file "
+                             + file_.GetFileName());
   }
   raw_capacity_ = (bmp_size_ / 8);
 }
@@ -88,7 +84,6 @@ int CarrierFileBMP::LoadFile() {
   buffer_.Resize(raw_capacity_);
   buffer_.Clear();
 
-//   TODO: rewrite using memory buffer & exceptions!
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
   uint64 bits_to_modify = permutation_->GetSize();
@@ -101,8 +96,7 @@ int CarrierFileBMP::LoadFile() {
 
   if (read_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Unable to read file.");
-    //TODO: throw exception
-    return SE_READ_FILE;
+    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
   }
 
   // copy LSB data to content buffer
@@ -110,8 +104,6 @@ int CarrierFileBMP::LoadFile() {
   for (uint64 i = 0; i < bits_to_modify; ++i) {
     if (bitmap_buffer[i] & 0x01) SetBitInBufferPermuted(i);
   }
-
-
 
   ExtractBufferUsingEncoder();
 
@@ -126,7 +118,8 @@ int CarrierFileBMP::LoadFile() {
 int CarrierFileBMP::SaveFile() {
   auto file_ptr = file_.Open();
 
-//  if(!file_loaded_) return SE_LOAD_FILE;
+  if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
+                                             " is not loaded");
 
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
@@ -148,9 +141,8 @@ int CarrierFileBMP::SaveFile() {
                                               file_ptr.Get()));
 
   if (read_cnt != raw_capacity_ * 8) {
-    LOG_ERROR("Unable to read file.");
-    //TODO: throw exception
-    return SE_READ_FILE;
+    LOG_ERROR("Unable to read file.")
+    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
   }
   // copy LSB data to content buffer
 
@@ -173,8 +165,8 @@ int CarrierFileBMP::SaveFile() {
 
   if (write_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Writing content to file failed.");
-    //TODO: throw exception
-    return SE_WRITE_FILE;
+    throw std::runtime_error("Writing content to file " + file_.GetFileName() +
+                             " failed");
   }
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");

@@ -1,3 +1,11 @@
+/**
+* @file test_assert_helper.h
+* @author Matus Kysel
+* @date 2016
+* @brief Helper test assertation
+*
+*/
+
 #ifndef TEST_ASSERT_HELPER_H
 #define TEST_ASSERT_HELPER_H
 

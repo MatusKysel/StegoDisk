@@ -30,9 +30,9 @@ public:
   Permutation();
   virtual ~Permutation();
 
-  virtual void Init(PermElem requested_size, Key key) = 0;
+  virtual void Init(PermElem requested_size, Key &key) = 0;
   virtual PermElem Permute(PermElem index) const = 0;
-  virtual PermElem GetSizeUsingParams(PermElem requested_size, Key key) = 0;
+  virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key) = 0;
   virtual const std::string GetNameInstance() const = 0;
 
   PermElem& operator[](PermElem index);

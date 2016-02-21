@@ -68,10 +68,8 @@ private:
 
   std::shared_ptr<VirtualStorage> virtual_storage_;
   std::shared_ptr<Encoder> encoder_;
-  bool is_active_encoder_;
-
   std::unique_ptr<ThreadPool> thread_pool_;
-
+  bool is_active_encoder_;
 };
 
 } // stego_disk

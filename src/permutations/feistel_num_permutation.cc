@@ -35,7 +35,7 @@ FeistelNumPermutation::~FeistelNumPermutation() {
 }
 
 
-void FeistelNumPermutation::Init(PermElem requested_size, Key key) {
+void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
   if (key.GetSize() == 0)
     throw std::runtime_error("FeistelNumPermutation init: "
                              "Invalid key (size=0)");
@@ -106,7 +106,7 @@ PermElem FeistelNumPermutation::Permute(PermElem index) const {
 }
 
 PermElem FeistelNumPermutation::GetSizeUsingParams(PermElem requested_size,
-                                                   Key key) {
+                                                   Key &key) {
   if (requested_size < FNP_MIN_REQ_SIZE) return 0;
 
   uint32 mod = static_cast<uint32>(sqrt(static_cast<double>(requested_size)));

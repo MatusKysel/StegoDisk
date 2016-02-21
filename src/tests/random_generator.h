@@ -1,3 +1,11 @@
+/**
+* @file random_generator.h
+* @author Matus Kysel
+* @date 2016
+* @brief Random generator for unit tests
+*
+*/
+
 #ifndef RANDOM_GENERATOR_H
 #define RANDOM_GENERATOR_H
 

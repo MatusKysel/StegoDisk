@@ -1,3 +1,11 @@
+/**
+* @file file_manager.h
+* @author Matus Kysel
+* @date 2016
+* @brief File manager for unit tests
+*
+*/
+
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 

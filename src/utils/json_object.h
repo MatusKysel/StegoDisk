@@ -80,10 +80,10 @@ public:
   JsonObject(bool val) : type_(BOOLEAN), bool_val_(val) {}
 
   template<typename T>
-  JsonObject(T val, typename std::enable_if<std::is_integral<T>::value>::type *ignore = 0) : type_(NUMBER), number_val_(val) {}
+  JsonObject(T val, typename std::enable_if<std::is_integral<T>::value>) : type_(NUMBER), number_val_(val) {}
 
   template<typename T>
-  JsonObject(T val, typename std::enable_if<std::is_floating_point<T>::value>::type *ignore = 0) : type_(NUMBER), number_val_(val) {}
+  JsonObject(T val, typename std::enable_if<std::is_floating_point<T>::value>) : type_(NUMBER), number_val_(val) {}
 
   JsonObject(const char *val) : type_(STRING), string_(new std::string(val)) {}
   JsonObject(const std::string &val) : type_(STRING), string_(new std::string(val)) {}
