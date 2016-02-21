@@ -1,10 +1,11 @@
-//
-//  KeccakHashImpl.h
-//  StegoDiskCore
-//
-//  Created by Martin Kosdy on 14/04/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file keccak_hash_impl.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Implementation of hash function Keccak
+*
+*/
 
 #ifndef STEGODISK_HASH_KECCAKHASHIMPL_H_
 #define STEGODISK_HASH_KECCAKHASHIMPL_H_

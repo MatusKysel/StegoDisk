@@ -1,10 +1,12 @@
-//
-//  StegoStorage.cpp
-//  StegoDiskCore
-//
-//  Created by Martin Kosdy on 15/04/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file stego_storage.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief File containing implementation of StegoStorage interface.
+*
+*/
+
 #include "stego_storage.h"
 
 #include <fstream>

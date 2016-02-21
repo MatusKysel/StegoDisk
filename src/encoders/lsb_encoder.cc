@@ -1,10 +1,12 @@
-//
-//  LsbEncoder.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/21/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file lsb_encoder.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief LSB encoder class implementation
+*
+*/
+
 #include "lsb_encoder.h"
 
 #include <algorithm>

@@ -1,10 +1,12 @@
-//
-//  CarrierFileFactory.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 4/11/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file carrier_file_factory.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Factory for files
+*
+*/
+
 #include "carrier_file_factory.h"
 
 #include <algorithm>

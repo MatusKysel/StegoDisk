@@ -1,10 +1,11 @@
-//
-//  StegoTypes.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 4/7/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file stego_types.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Definiton of basic types for this library
+*
+*/
 
 #ifndef STEGODISK_UTILS_STEGOTYPES_H_
 #define STEGODISK_UTILS_STEGOTYPES_H_

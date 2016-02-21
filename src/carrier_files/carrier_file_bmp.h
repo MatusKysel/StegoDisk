@@ -1,10 +1,11 @@
-//
-//  CarrierFileBMP.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 1/6/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file carrier_file_bmp.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief File with interfce for loading and saving BMP files
+*
+*/
 
 #ifndef STEGODISK_CARRIERFILES_CARRIERFILEBMP_H_
 #define STEGODISK_CARRIERFILES_CARRIERFILEBMP_H_

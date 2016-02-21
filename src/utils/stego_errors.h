@@ -1,10 +1,13 @@
-//
-//  StegoErrors.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 4/11/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file stego_errors.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Header with basic errors
+*
+*/
+
+//TODO(matus) unnecessary, because everthing will be rewrited to exceptions
 
 #ifndef STEGODISK_UTILS_STEGOERRORS_H_
 #define STEGODISK_UTILS_STEGOERRORS_H_

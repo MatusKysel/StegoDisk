@@ -1,3 +1,12 @@
+/**
+* @file logger.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Simple logger class implementation
+*
+*/
+
 #include "logger.h"
 
 #include <ctype.h>

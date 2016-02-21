@@ -1,10 +1,11 @@
-//
-//  Encoder.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/21/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file encoder.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Implementation of interface class for encoders
+*
+*/
 
 #include "encoder.h"
 

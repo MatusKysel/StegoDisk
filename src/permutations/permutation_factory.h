@@ -1,3 +1,12 @@
+/**
+* @file permutation_factory.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Permutation factory
+*
+*/
+
 #ifndef STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_
 #define STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_
 

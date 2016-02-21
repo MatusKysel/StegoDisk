@@ -1,3 +1,12 @@
+/**
+* @file virtual_storage.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Main class for virtual storage
+*
+*/
+
 #ifndef STEGODISK_VIRTUALSTORAGE_VIRTUALSTORAGE_H_
 #define STEGODISK_VIRTUALSTORAGE_VIRTUALSTORAGE_H_
 

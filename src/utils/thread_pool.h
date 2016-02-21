@@ -1,3 +1,10 @@
+/**
+* @file thread_pool.h
+* @date 2016
+* @brief Thread pool class
+*
+*/
+
 #ifndef STEGODISK_UTILS_THREAD_POOL_H_
 #define STEGODISK_UTILS_THREAD_POOL_H_
 

@@ -1,10 +1,11 @@
-//
-//  StegoStorage.h
-//  StegoDiskCore
-//
-//  Created by Martin Kosdy on 15/04/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file stego_storage.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief File containing StegoStorage interface.
+*
+*/
 
 #ifndef STEGODISK_STEGOSTORAGE_H_
 #define STEGODISK_STEGOSTORAGE_H_

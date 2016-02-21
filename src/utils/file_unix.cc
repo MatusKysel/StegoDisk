@@ -1,3 +1,12 @@
+/**
+* @file file_unix.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Class for files manipulation under UNIX like OSes
+*
+*/
+
 #if defined(__unix__) || defined(__APPLE__)
 #include "file.h" //TODO(matus) cele zle
 
@@ -14,21 +23,6 @@ namespace stego_disk {
 /*
  * beautiful C core of this awesome method is written by mY
  * ugly C++ part of this method is writen by drunk martin
-*/
-
-/*
- *  struct dirent **namelist;
-    int n;
-    n = scandir(".", &namelist, NULL, alphasort);
-    if (n < 0)
-        perror("scandir");
-    else {
-        while (n−−) {
-            printf("%s\n", namelist[n]−>d_name);
-            free(namelist[n]);
-        }
-        free(namelist);
-    }
 */
 
 static int AddFilesInDir(std::string base_path, std::string current_path, std::string mask, std::vector<File>& file_list) {
@@ -69,9 +63,6 @@ static int AddFilesInDir(std::string base_path, std::string current_path, std::s
   while ( (de = readdir(dir)) != NULL ) {
     std::string new_current_path = current_path + "/" + std::string(de->d_name);
     std::string new_path = base_path + new_current_path;
-    // nechceme sa vnarat do adresarov, ktore su nalinkovane, pretoze by sme museli
-    // komplikovane zistovat, ci nenastane zacyklenie...
-    // preto pouzijeme zistovanie info o samotnom objekte fs, nie o pripadnom cieli
     if ( lstat(new_path.c_str(), &sb) == -1 ) {
       fprintf( stderr, "Error: printDir: chyba zistovania info o objekte fs\n" );
       closedir(dir);

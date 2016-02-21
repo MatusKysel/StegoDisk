@@ -1,3 +1,12 @@
+/**
+* @file memory_buffer.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Memofry buffer
+*
+*/
+
 #ifndef STEGODISK_UTILS_MEMORYBUFFER_H_
 #define STEGODISK_UTILS_MEMORYBUFFER_H_
 

@@ -1,3 +1,12 @@
+/**
+* @file stego_header.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Header with basic includes
+*
+*/
+
 #ifndef STEGODISK_UTILS_STEGOHEADER_H_
 #define STEGODISK_UTILS_STEGOHEADER_H_
 
@@ -19,6 +28,6 @@
 
 #include "stego_types.h"
 #include "config.h"
-#include "logging/logger.h" //TODO(Matus) aby som nemusel ist o uroven vyssie
+#include "logging/logger.h"
 
 #endif // STEGODISK_UTILS_STEGO_HEADER_H_

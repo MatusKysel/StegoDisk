@@ -1,11 +1,19 @@
+/**
+* @file file.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Interface for file manipulation
+*
+*/
+
 #include "file.h"
 
 #if _WIN32
 #define PATH_SEPARATOR	'\\'
-#include "file_win.cc"
+//#include "file_win.cc"
 #elif defined(__unix__) || defined(__APPLE__)
 #define PATH_SEPARATOR	'/'
-//#include "file_unix.cc" //TODO(matus) toto je nejako divne previazane a triedu File
 #else
 #error Unsupported OS
 #endif
@@ -94,19 +102,6 @@ std::string File::GetFileName() {
   throw std::exception();
   return "";
 }
-
-
-
-// TODO: add automatic modification date handling (open/close methods)
-//     struct utimbuf new_times;
-
-//    new_times.actime = _stat.st_atime;
-//    new_times.modtime = _stat.st_mtime;
-//    if (utime(_fileName.c_str(), &new_times) < 0) {
-//        return -1;
-//    }
-
-//    return NO_ERROR;
 
 
 FilePtr::FilePtr(const File& file) {

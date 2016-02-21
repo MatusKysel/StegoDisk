@@ -1,10 +1,11 @@
-//
-//  Permutation.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/22/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file permutation.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Permutation interface
+*
+*/
 
 #ifndef STEGODISK_PERMUTATIONS_PERMUTATION_H_
 #define STEGODISK_PERMUTATIONS_PERMUTATION_H_

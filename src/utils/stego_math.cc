@@ -1,10 +1,12 @@
-//
-//  StegoMath.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/23/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file stego_math.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Class with implementation of all mathematical operation
+*
+*/
+
 #include "stego_math.h"
 
 #include <stdlib.h>
@@ -30,12 +32,12 @@ uint64 StegoMath::Gcd(uint64 a, uint64 b) {
 uint64 StegoMath::Lcm(uint64 a, uint64 b) {
   return a * b / Gcd(a,b);
 }
+
 /*
  *  Miller-Rabin Primality Test
  *
  * source: http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=primalityTesting
  */
-
 bool StegoMath::MillerRabin(uint64 p) {
   if(p < 2) {
     return false;
@@ -78,12 +80,9 @@ bool StegoMath::MillerRabin(uint64 p) {
   return true;
 }
 
-// mY changed types do uint64... from long...
+
 /* This function calculates (a^b)%c */
 uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
-  //long long x=1,y=a; // long long is taken to avoid overflow of intermediate results
-  // TODO: we need 128-bit type here !!! from this depends Miller-Rabin test
-  //uint64 x=1,y=a; // we need 128-bit type here!!!
 
 #ifdef STEGO_OS_WIN
   uint64 x = 1, y = a;
@@ -101,44 +100,11 @@ uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
   return x % c;
 }
 
-/* this function calculates (a*b)%c taking into account that a*b might overflow */
-/*
-inline long long StegoMath::mulmod(long long a,long long b,long long c)
-{
-    long long x = 0,y=a%c;
-    while(b > 0){
-        if(b%2 == 1){
-            x = (x+y)%c;
-        }
-        y = (y*2)%c;
-        b /= 2;
-    }
-    return x%c;
-}
- */
-
 uint64 StegoMath::Mulmod(uint64 a,uint64 b,uint64 m) {
   if ((a < 0xFFFFFF) && (b < 0xFFFFFF)) {
     return (a * b) % m;
   }
 
-
-  //if ()
-  /*
-    uint64 x = 0,y=a%c;
-    while(b > 0){
-        if(b%2 == 1){
-            x = (x+y)%c;
-        }
-        //y = (y*2)%c;
-        //b /= 2;
-        y = (y<<1)%c;
-        b = b >> 1;
-    }
-    return x%c;
-    */
-
-  // mY unsigned long res = 0;
   uint64 res = 0;
   while (a != 0) {
     if (a & 1) res = (res + b) % m;
@@ -147,21 +113,6 @@ uint64 StegoMath::Mulmod(uint64 a,uint64 b,uint64 m) {
   }
   return res;
 }
-
-/*
-unsigned long StegoMath::mulmod(unsigned long a, unsigned long b, unsigned long m)
-{
-//inline uint64_t StegoMath::mulmod(uint64_t a, uint64_t b, uint64_t m) {
-    unsigned long res = 0;
-    while (a != 0) {
-        if (a & 1) res = (res + b) % m;
-        a >>= 1;
-        b = (b << 1) % m;
-    }
-    return res;
-}
- */
-
 
 /*
  * Finds the closest smaller prime to the number
@@ -185,7 +136,6 @@ uint64 StegoMath::ClosestSmallerPrime(uint64 number) {
   }
 
 }
-
 
 void StegoMath::PrintHexBuffer(const uint8 *buffer, std::size_t length) {
   //TODO(Matus) zmenit na C++

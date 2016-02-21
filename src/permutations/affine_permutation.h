@@ -1,10 +1,11 @@
-//
-//  AffinePermutation.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/22/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file affine_permutation.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Affine permutation
+*
+*/
 
 #ifndef STEGODISK_PERMUTATIONS_AFFINEPERMUTATION_H_
 #define STEGODISK_PERMUTATIONS_AFFINEPERMUTATION_H_

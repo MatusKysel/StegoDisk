@@ -1,10 +1,12 @@
-//
-//  FeistelNumPermutation.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 4/15/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file feistel_num_permutation.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Feistel Numerical permutation implementation
+*
+*/
+
 #include "feistel_num_permutation.h"
 
 #include <math.h>       /* sqrt */

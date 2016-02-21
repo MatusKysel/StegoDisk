@@ -1,3 +1,11 @@
+/**
+* @file stego_config.h
+* @author Matus Kysel
+* @date 2016
+* @brief File containing singleton class with whole configuration for stego storage
+*
+*/
+
 #ifndef STEGODISK_UTILS_STEGOCONFIG_H_
 #define STEGODISK_UTILS_STEGOCONFIG_H_
 
@@ -22,28 +30,6 @@ public:
     Instance().encoder_ = EncoderFactory::GetEncoderType(config["encoder"].ToString());
     Instance().global_perm_ = PermutationFactory::GetPermutationType(config["glob_perm"].ToString());
     Instance().local_perm_ = PermutationFactory::GetPermutationType(config["local_perm"].ToString());
-
-
-    //      if (Instance().ssl_context_.load_verify_file(ssl_config["ca_cert_file"].ToString(), *error)) {
-    //        LOG_ERROR("StegoConfig.Init", error->message() << ':' << ssl_config["ca_cert_file"].ToString());
-    //        return *error;
-    //      }
-
-    //    if (Instance().ssl_context_.use_certificate_chain_file(ssl_config["cert_chain_file"].ToString(), *error)) {
-    //      LOG_ERROR("StegoConfig.Init", error->message() << ':' << ssl_config["cert_chain_file"].ToString());
-    //      return *error;
-    //    }
-
-    //    if (Instance().ssl_context_.use_private_key_file(ssl_config["private_key_file"].ToString(), boost::asio::ssl::context::pem, *error)) {
-    //      LOG_ERROR("StegoConfig.Init", error->message() << ':' << ssl_config["private_key_file"].ToString());
-    //      return *error;
-    //    }
-
-    //    if (Instance().ssl_context_.use_tmp_dh_file(ssl_config["tmp_dh_file"].ToString(), *error)) {
-    //      LOG_ERROR("StegoConfig.Init", error->message() << ':' << ssl_config["tmp_dh_file"].ToString());
-    //      return *error;
-    //    }
-
     Instance().stego_config_loaded_ = true;
 
   }
@@ -83,4 +69,5 @@ private:
 };
 
 } // stego_disk
+
 #endif // STEGODISK_UTILS_STEGOCONFIG_H_

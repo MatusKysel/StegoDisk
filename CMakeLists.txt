@@ -252,7 +252,6 @@ set(UTILS_HDRS
   src/utils/stego_errors.h
   src/utils/stego_header.h
   src/utils/stego_math.h
-  src/utils/stego_system_params.h
   src/utils/stego_types.h
   src/utils/thread_pool.h
   src/utils/keccak/keccak.h
@@ -264,7 +263,6 @@ set(UTILS_SRCS
   src/utils/file_win.cc
   src/utils/memory_buffer.cc
   src/utils/stego_math.cc
-  src/utils/stego_system_params.cc
   src/utils/keccak/keccak.cc
 )
 

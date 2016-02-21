@@ -1,10 +1,11 @@
-//
-//  Affine64Permutation.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/22/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file affine64_permutation.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Affine 64 permutation implementation
+*
+*/
 
 #include "affine64_permutation.h"
 

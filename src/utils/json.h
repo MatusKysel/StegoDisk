@@ -1,15 +1,3 @@
-#ifndef JSON_H
-#define JSON_H
-
-#include <algorithm>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <fstream>
-#include <cstdlib>
-
-#include "utils/json_object.h"
-
 /*
  * Copyright 2009-2010 Cybozu Labs, Inc.
  * Copyright 2011 Kazuho Oku
@@ -39,6 +27,18 @@
  * policies, either expressed or implied, of Cybozu Labs, Inc.
  *
  */
+
+#ifndef JSON_H
+#define JSON_H
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <fstream>
+#include <cstdlib>
+
+#include "utils/json_object.h"
 
 namespace json {
 template <typename Iter>

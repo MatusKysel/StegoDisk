@@ -1,3 +1,10 @@
+/**
+* @file json_object.h
+* @date 2016
+* @brief Wrapper for better json manipulation
+*
+*/
+
 #ifndef JSON_OBJECT_H
 #define JSON_OBJECT_H
 

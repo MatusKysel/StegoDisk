@@ -1,10 +1,12 @@
-//
-//  CarrierFile.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 1/6/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file carrier_file.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief File with implementation of interfce for loading and saving files
+*
+*/
+
 #include "carrier_file.h"
 
 #include <sys/stat.h>

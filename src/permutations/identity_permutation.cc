@@ -1,10 +1,12 @@
-//
-//  IdentityPermutation.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/22/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file identity_permutation.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Identity permutation implementation
+*
+*/
+
 #include "identity_permutation.h"
 
 #include "utils/stego_header.h"

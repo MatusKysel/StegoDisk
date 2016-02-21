@@ -1,10 +1,12 @@
-//
-//  FeistelMixPermutation.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 4/15/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file feistel_mix_permutation.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Feistel Mixed permutation implementation
+*
+*/
+
 #include "feistel_mix_permutation.h"
 
 #include <algorithm>

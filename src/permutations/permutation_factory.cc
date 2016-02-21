@@ -1,3 +1,12 @@
+/**
+* @file permutation_factory.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Permutation factory implementation
+*
+*/
+
 #include "permutation_factory.h"
 
 #include <algorithm>

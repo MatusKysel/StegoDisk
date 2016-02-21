@@ -1,3 +1,12 @@
+/**
+* @file encoder_factory.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Encoder factory
+*
+*/
+
 #ifndef STEGODISK_ENCODERS_ENCODERFACTORY_H_
 #define STEGODISK_ENCODERS_ENCODERFACTORY_H_
 

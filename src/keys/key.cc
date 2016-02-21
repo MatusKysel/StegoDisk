@@ -1,18 +1,17 @@
-//
-//  Key.cpp
-//  StegoDisk
-//
-//  Created by Martin Kosdy on 4/14/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file key.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Key class implementation
+*
+*/
+
 #include "keys/key.h"
 
 #include <string.h> // memset
 
-//#include "utils/stego_header.h"
 #include "hash/hash.h"
-
-//#define DEFAULT_KEY_SIZE        32
 
 namespace stego_disk {
 

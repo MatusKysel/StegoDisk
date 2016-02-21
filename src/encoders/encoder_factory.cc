@@ -1,3 +1,12 @@
+/**
+* @file encoder_factory.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Encoder factory
+*
+*/
+
 #include "encoder_factory.h"
 
 #include <algorithm>

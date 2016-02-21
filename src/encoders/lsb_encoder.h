@@ -1,10 +1,11 @@
-//
-//  LsbEncoder.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/21/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file lsb_encoder.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief LSB encoder class
+*
+*/
 
 #ifndef STEGODISK_ENCODERS_LSBENCODER_H_
 #define STEGODISK_ENCODERS_LSBENCODER_H_

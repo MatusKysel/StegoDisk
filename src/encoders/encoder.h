@@ -1,10 +1,11 @@
-//
-//  Encoder.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/21/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file encoder.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Interface class for encoders
+*
+*/
 
 #ifndef STEGODISK_ENCODERS_ENCODER_H_
 #define STEGODISK_ENCODERS_ENCODER_H_

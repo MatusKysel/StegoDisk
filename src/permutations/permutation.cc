@@ -1,10 +1,12 @@
-//
-//  Permutation.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/22/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file permutation.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Permutation interface
+*
+*/
+
 #include "permutation.h"
 
 #include <string.h> // memset

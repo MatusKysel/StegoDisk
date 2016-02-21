@@ -1,10 +1,11 @@
-//
-//  Key.h
-//  StegoDisk
-//
-//  Created by Martin Kosdy on 4/14/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file key.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Key class
+*
+*/
 
 #ifndef STEGODISK_KEYS_KEY_H_
 #define STEGODISK_KEYS_KEY_H_
@@ -28,7 +29,6 @@ public:
 
   static Key FromString(std::string input);
 
-  // XOR operators
   Key& operator^=(const Key& other);
   Key operator^(const Key& other);
 

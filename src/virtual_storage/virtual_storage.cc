@@ -1,3 +1,12 @@
+/**
+* @file virtual_storage.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Main class implementation for virtual storage
+*
+*/
+
 #include "virtual_storage.h"
 
 #include <time.h>

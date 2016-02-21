@@ -1,3 +1,12 @@
+/**
+* @file logger.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Simple logger class
+*
+*/
+
 #ifndef STEGODISK_LOGGING_LOGGER_H_
 #define STEGODISK_LOGGING_LOGGER_H_
 

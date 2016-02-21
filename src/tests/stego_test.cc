@@ -1,3 +1,11 @@
+/**
+* @file stego_test.cc
+* @author Matus Kysel
+* @date 2016
+* @brief Helper for execution of unit tests for this library
+*
+*/
+
 #include <iostream>
 #include <algorithm>
 #include <string>

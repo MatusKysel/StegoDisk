@@ -1,3 +1,12 @@
+/**
+* @file file_win.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Class for files manipulation under Windows OS
+*
+*/
+
 #ifdef _MEM_LEAKS
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>

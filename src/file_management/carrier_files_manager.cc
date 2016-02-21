@@ -1,10 +1,11 @@
-//
-//  CarrierFilesManager.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 1/6/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file carrier_files_manager.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Implementation of class for mamanging carrier files
+*
+*/
 
 #include "carrier_files_manager.h"
 

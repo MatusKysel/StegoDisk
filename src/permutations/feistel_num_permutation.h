@@ -1,10 +1,11 @@
-//
-//  FeistelNumPermutation.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 4/15/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file feistel_num_permutation.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Feistel Numerical permutation
+*
+*/
 
 #ifndef STEGODISK_PERMUTATIONS_FEISTELNUMPERMUTATION_H_
 #define STEGODISK_PERMUTATIONS_FEISTELNUMPERMUTATION_H_

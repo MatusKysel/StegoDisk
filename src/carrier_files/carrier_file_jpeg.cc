@@ -1,10 +1,12 @@
-//
-//  CarrierFileJPEG.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 1/9/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file carrier_file_jpeg.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Implementation of class with JPEG file support
+*
+*/
+
 #include "carrier_file_jpeg.h"
 
 #include <stdio.h>

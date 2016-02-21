@@ -1,10 +1,11 @@
-//
-//  Hash.h
-//  StegoDiskCore
-//
-//  Created by Martin Kosdy on 14/04/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file hash.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Interface for hash functions
+*
+*/
 
 #ifndef STEGODISK_HASH_HASH_H_
 #define STEGODISK_HASH_HASH_H_

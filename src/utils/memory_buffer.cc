@@ -1,3 +1,12 @@
+/**
+* @file memory_buffer.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Memofry buffer implementation
+*
+*/
+
 #include "memory_buffer.h"
 
 #include <stdio.h>

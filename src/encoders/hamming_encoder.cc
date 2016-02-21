@@ -1,10 +1,12 @@
-//
-//  HammingEncoder.cpp
-//  StegoFS
-//
-//  Created by Martin Kosdy on 3/21/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file hamming_encoder.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Hamming encoder class implementation
+*
+*/
+
 #include "hamming_encoder.h"
 
 #include <string.h>

@@ -1,10 +1,11 @@
-//
-//  HashImpl.cpp
-//  StegoDiskCore
-//
-//  Created by Martin Kosdy on 14/04/14.
-//  Copyright (c) 2014 Martin Kosdy. All rights reserved.
-//
+/**
+* @file hash_impl.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Interface for hash implementations
+*
+*/
 
 #include "hash_impl.h"
 
@@ -16,14 +17,8 @@ void HashImpl::Append(MemoryBuffer& state,
     throw std::length_error("HashImpl: input state size doesnt "
                             "match with current state size");
 
-  //  METHOD1: newState = oldState ^ hash(input)
-  //    MemoryBuffer buffer(stateSize);
-  //    this->process(buffer, data, length);
-  //    state ^= buffer;
-
-  //  METHOD2: newState = hash(hash(input) | oldState) - where | is concat
   MemoryBuffer hashed_input(state_size_);
-  this->Process(hashed_input, data, length); //TODO(Matus) podla mna staci aj bez this
+  this->Process(hashed_input, data, length);
 
   MemoryBuffer buffer(state_size_ * 2);
   // 1st half - hash(input)
@@ -31,7 +26,7 @@ void HashImpl::Append(MemoryBuffer& state,
   // 2nd half - oldState
   buffer.Write(state_size_, state.GetRawPointer(), state_size_);
 
-  this->Process(state, buffer.GetRawPointer(), buffer.GetSize()); //TODO(Matus) podla mna staci aj bez this
+  this->Process(state, buffer.GetRawPointer(), buffer.GetSize());
 }
 
 } // stego_disk

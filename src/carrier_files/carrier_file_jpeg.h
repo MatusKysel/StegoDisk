@@ -1,10 +1,11 @@
-//
-//  CarrierFileJPEG.h
-//  StegoFS
-//
-//  Created by Martin Kosdy on 1/9/13.
-//  Copyright (c) 2013 Martin Kosdy. All rights reserved.
-//
+/**
+* @file carrier_file_jpeg.h
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief Class with JPEG file support
+*
+*/
 
 #ifndef STEGODISK_CARRIERFILES_CARRIERFILEJPEG_H_
 #define STEGODISK_CARRIERFILES_CARRIERFILEJPEG_H_
