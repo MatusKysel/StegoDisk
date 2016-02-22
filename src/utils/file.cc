@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -56,8 +57,9 @@ std::string File::NormalizePath(std::string platform_specific_path) {
 }
 
 uint64 File::GetSize() {
-  std::ifstream in(GetAbsolutePath(), std::ifstream::ate | std::ifstream::binary);
-  return static_cast<uint64>(in.tellg());
+  struct stat stat_buf;
+  int rc = stat(GetAbsolutePath().c_str(), &stat_buf);
+  return rc == 0 ? static_cast<uint64>(stat_buf.st_size) : -1;
 }
 
 File::File(std::string base_path, std::string relative_path) {
