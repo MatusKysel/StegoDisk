@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include <exception>
 
 #include "stego_types.h"
 
