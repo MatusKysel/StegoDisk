@@ -22,7 +22,6 @@ namespace stego_disk {
 
 typedef uint64 PermutationElement;
 typedef PermutationElement PermElem;
-typedef PermutationElement PermSize; //TODO(Matus) useless
 
 class Permutation {
 

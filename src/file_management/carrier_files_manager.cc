@@ -136,7 +136,7 @@ bool CarrierFilesManager::LoadVirtualStorage(VirtualStoragePtr storage) {
 
   for(auto &&result: load_results) {
     if (result.get() != STEGO_NO_ERROR) {
-      //TODO(Matus) throw something
+		throw std::runtime_error("Unsuccesful loading of carrier files");
     }
   }
 
@@ -240,8 +240,7 @@ void CarrierFilesManager::SetPassword(const std::string &password) {
 void CarrierFilesManager::GenerateMasterKey() {
   if (carrier_files_.size() < 1) {
     LOG_ERROR("Nothing to hash, no files loaded...");
-    //TODO: throw exception?
-    return;
+	throw std::runtime_error("Nothing to hash, no files loaded...");
   }
 
   LOG_DEBUG("CarrierFilesManager::generateMasterKey: PSWD HASH is "
@@ -296,7 +295,7 @@ void CarrierFilesManager::SaveAllFiles() {
 
   for(auto &&result: save_results) {
     if (result.get() != STEGO_NO_ERROR) {
-      //TODO(Matus) throw something
+      throw std::runtime_error("Unsuccesful saving of carrier files");
     }
   }
 }

@@ -19,20 +19,20 @@
 #endif  // _DEBUG
 #endif // _MEM_LEAKS
 
-#include "stego_header.h"
-#include "file.h" //TODO(matus) toto je komplet zle
-
 #ifdef _WIN32
+#include "stego_header.h"
+
+#include "file.h"
 
 #include <Windows.h>
+
 #include <iostream>
 
 using namespace std;
 
 namespace stego_disk {
 
-  static int AddFilesInDir(std::string basePath, std::string currentPath, std::string mask, std::vector<File>& fileList)
-  {
+static void AddFilesInDir(std::string basePath, std::string currentPath, std::string mask, std::vector<File>& fileList) {
     string basePathSafe = basePath;
 
     string currentPathSafe = currentPath;
@@ -62,9 +62,8 @@ namespace stego_disk {
 
     hFind = FindFirstFileA(path.c_str(), &ffd);
 
-    if (INVALID_HANDLE_VALUE == hFind)
-    {
-      return -1;
+    if (INVALID_HANDLE_VALUE == hFind) {
+		throw std::runtime_error("Invalid file handle " + path);
     }
     do
     {
@@ -91,9 +90,7 @@ namespace stego_disk {
     }
 
     FindClose(hFind);
-
-    return 0;
-  }
+ }
 
   // TODO: add wildcard parameter to specify supported file extensions (*.bmp, *.jpg ...)
   std::vector<File> File::GetFilesInDir(std::string path, std::string mask)

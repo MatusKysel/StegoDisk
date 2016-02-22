@@ -138,7 +138,6 @@ uint64 StegoMath::ClosestSmallerPrime(uint64 number) {
 }
 
 void StegoMath::PrintHexBuffer(const uint8 *buffer, std::size_t length) {
-  //TODO(Matus) zmenit na C++
   for (std::size_t i = 0; i < length; ++i) {
     printf("%02x ", (unsigned char)buffer[i]);
   }

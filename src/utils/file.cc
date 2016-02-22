@@ -11,7 +11,6 @@
 
 #if _WIN32
 #define PATH_SEPARATOR	'\\'
-//#include "file_win.cc"
 #elif defined(__unix__) || defined(__APPLE__)
 #define PATH_SEPARATOR	'/'
 #else

@@ -8,7 +8,7 @@
 */
 
 #if defined(__unix__) || defined(__APPLE__)
-#include "file.h" //TODO(matus) cele zle
+#include "file.h"
 
 #include <dirent.h>
 #include <sys/stat.h>
@@ -25,7 +25,7 @@ namespace stego_disk {
  * ugly C++ part of this method is writen by drunk martin
 */
 
-static int AddFilesInDir(std::string base_path, std::string current_path, std::string mask, std::vector<File>& file_list) {
+static void AddFilesInDir(std::string base_path, std::string current_path, std::string mask, std::vector<File>& file_list) {
 
   DIR *dir;
   struct dirent *de;
@@ -56,8 +56,7 @@ static int AddFilesInDir(std::string base_path, std::string current_path, std::s
   dir = opendir(path.c_str());
   if ( !dir ) {
     fprintf(stderr,"Error: opendir '%s': chyba pri otvarani adresara\n", path.c_str() );
-    return -1;
-    //TODO: throw exception
+	throw std::runtime_error("Error occurred while opening directory " + path);
   }
 
   while ( (de = readdir(dir)) != NULL ) {
@@ -66,8 +65,7 @@ static int AddFilesInDir(std::string base_path, std::string current_path, std::s
     if ( lstat(new_path.c_str(), &sb) == -1 ) {
       fprintf( stderr, "Error: printDir: chyba zistovania info o objekte fs\n" );
       closedir(dir);
-      //TODO: throw exception
-      return -1;
+	  throw std::runtime_error("Error occurred while getting info of " + new_path);
     }
 
     // ak je polozka adresarom, tak sa rekurzivne vnorime
@@ -77,12 +75,7 @@ static int AddFilesInDir(std::string base_path, std::string current_path, std::s
         // treba otestovat opravnenie na prava citania a pristupu do adresara
         if ( access(new_path.c_str(), X_OK | R_OK) != -1 ) {
           // otestovat navratovu hodnotu na chybove stavy
-          ret = AddFilesInDir(base_path, current_path, mask, file_list);
-          if ( ret < 0 ) {
-            closedir(dir);
-            //TODO: throw exception
-            return ret;
-          }
+          AddFilesInDir(base_path, current_path, mask, file_list);
         }
       }
     } // if S_ISDIR
@@ -95,8 +88,6 @@ static int AddFilesInDir(std::string base_path, std::string current_path, std::s
 
   // zavrieme adresar
   closedir( dir );
-
-  return 0;
 }
 
 

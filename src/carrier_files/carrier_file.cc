@@ -91,20 +91,9 @@ uint32 CarrierFile::GetBlockCount() {
 }
 
 Key CarrierFile::GetPermKey() {
-  //TODO: hashovat sa nesmie cesta ale iba nazov suboru! resp relativna cesta
-
   string buf = "";
-  //  char time_str_buf[40];
-  buf.append(File::NormalizePath(file_.GetRelativePath()));
-  //#ifdef STEGO_OS_WIN
-  //  sprintf_s(time_str_buf, sizeof(time_str_buf), "%ld", stat_.st_mtime);
-  //#else
-  //  sprintf(time_str_buf, "%40ld", stat_.st_mtime);
-  //#endif
-
-  //buf.append(time_str_buf);
+  buf.append(file_.GetNormalizedPath());
   LOG_TRACE("CarrierFile::GetPermKeyHash: hashing file attributes: " << buf);
-
   return Key::FromString(buf);
 }
 
@@ -172,18 +161,17 @@ void CarrierFile::SetSubkey(const Key& subkey) {
 }
 
 void CarrierFile::SetBitInBufferPermuted(uint64 index) {
-  // TODO: rewrite to run-time exception
   if (index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: index " << index <<
              " is too big!");
-    return;
+	throw std::out_of_range("Index is out of range!");
   }
 
   uint64 permuted_index = permutation_->Permute(index);
 
   if (permuted_index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: permuted index " << permuted_index << " is too big!");
-    return;
+	throw std::out_of_range("Permuted index is out of range!");
   }
 
   buffer_[permuted_index / 8] |= ( 1 << (permuted_index % 8));
@@ -194,7 +182,7 @@ uint8 CarrierFile::GetBitInBufferPermuted(uint64 index) {
   if (index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::GetBitInBufferPermuted: index " << index <<
              " is too big!");
-    return 0;
+	throw std::out_of_range("Index is out of range!");
   }
 
   uint64 permuted_index = permutation_->Permute(index);
@@ -238,21 +226,19 @@ int CarrierFile::ExtractBufferUsingEncoder() {
 
 
 int CarrierFile::EmbedBufferUsingEncoder() {
-  //TODO: rewrite using exceptions!
-  if (buffer_.GetSize() == 0) return -1;
-  if (!encoder_) return -2;
-  if (!codeword_block_size_) return -3;
-  if (!blocks_used_) return -4;
+  if (buffer_.GetSize() == 0) throw std::length_error("Buffer is empty!");
+  if (!encoder_)  throw std::runtime_error("Encoder is not set!");
+  if (!codeword_block_size_)  throw std::runtime_error("Codeword block size si not set!");
+  if (!blocks_used_)  throw std::runtime_error("Number of used block is not set!");
 
   MemoryBuffer data_buffer(data_block_size_);
 
   for (uint64 b = 0; b < blocks_used_; ++b) {
     for (uint64 i = 0; i < data_block_size_; ++i) {
       //TODO:            #warning doriesit try catch!
-      //TODO(Matus): poriesit iba na jeden cyklus
       try {
-        data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
-                                                    (b * data_block_size_) + i);
+		  data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
+			  (b * data_block_size_) + i);
       } catch (std::out_of_range& ex) {
         LOG_DEBUG("CarrierFile::embedBufferUsingEncoder: virtualStorage->"
                   "readByte failed: block: " << (b + 1) << "/" << blocks_used_
@@ -263,7 +249,7 @@ int CarrierFile::EmbedBufferUsingEncoder() {
       }
     }
     encoder_->Embed(&buffer_[b * codeword_block_size_],
-        data_buffer.GetRawPointer());
+        data_buffer.GetConstRawPointer());
   }
 
   return 0;
