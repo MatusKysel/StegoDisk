@@ -1,6 +1,13 @@
-#include "fuse_service.h"
+/**
+* @file fuse_service.cc
+* @author Martin Kosdy
+* @author Matus Kysel
+* @date 2016
+* @brief File containing implementation of StegoStorage interface.
+*
+*/
 
-#ifndef Q_OS_WIN
+#include "fuse_service.h"
 
 #include <ctype.h>
 #include <dirent.h>
@@ -22,9 +29,7 @@
 #include <sys/mount.h>
 
 #include <ctime>
-
-#include <QtConcurrent/QtConcurrent>
-#include <QString>
+#include <string>
 
 #include "file_management/carrier_files_manager.h"
 #include "encoders/hamming_encoder.h"
@@ -54,7 +59,6 @@ static int sfs_rmdir(const char *path);
 static int sfs_rename(const char *from, const char *to);
 static int sfs_chmod(const char *path, mode_t mode);
 static int sfs_chown(const char *path, uid_t uid, gid_t gid);
-//static int sfs_utimens(const char *path, const struct timespec ts[2]);
 static int sfs_open(const char *path, struct fuse_file_info *fi);
 static int sfs_create(const char *path, mode_t mode, struct fuse_file_info *fi);
 static int sfs_read(const char *path, char *buf, size_t size, off_t offset,
@@ -63,69 +67,50 @@ static int sfs_write(const char *path, const char *buf, size_t size,
                      off_t offset, struct fuse_file_info *fi);
 static void sfs_destroy(void* unused);
 static void* sfs_init(fuse_conn_info *conn);
-//static void fuseInitialisedSignalHandler(int sig, siginfo_t *siginfo, void *context);
-//static void fuseEndedSignalHandler(int sig, siginfo_t *siginfo, void *context);
 static void fuseSignalHandler(int sig, siginfo_t *siginfo, void *context);
-static void attachVirtualDisk();
+//static void attachVirtualDisk();
 
-//VirtualDisc* FuseService::virtualDisc = NULL;
-VirtualStorage* FuseService::virtual_storage_ = NULL;
-uint64 FuseService::capacity_ = 0;
-FuseServiceDelegate* FuseService::delegate_ = NULL;
+stego_disk::VirtualStorage* FuseService::virtual_storage_ = nullptr;
+stego_disk::uint64 FuseService::capacity_ = 0;
+//FuseServiceDelegate* FuseService::delegate_ = nullptr;
 pid_t FuseService::fuse_proc_pid_ = 0;
 bool FuseService::fuse_mounted_ = false;
-QString FuseService::mount_point_ = QString("");
-QProcess* FuseService::child_process_ = NULL;
+std::string FuseService::mount_point_ = "";
 
 // =============================================================================
 //      MAIN
 // =============================================================================
 
 
-int FuseService::Init(VirtualStorage *virtual_storage) {
-  //FuseService::virtualDisc = virtualDisc;
+int FuseService::Init(stego_disk::VirtualStorage *virtual_storage) {
   virtual_storage_ = virtual_storage;
 
   capacity_ = virtual_storage_->GetUsableCapacity();
 
   // fuse_operations struct initialization
-  stegofs_ops.init        = sfs_init;
-  stegofs_ops.getattr     = sfs_getattr;
-  stegofs_ops.access		= sfs_access;
-  stegofs_ops.readlink	= sfs_readlink;
-  stegofs_ops.readdir     = sfs_readdir;
-  stegofs_ops.mkdir		= sfs_mkdir;
-  stegofs_ops.unlink		= sfs_unlink;
-  stegofs_ops.rmdir		= sfs_rmdir;
-  stegofs_ops.rename		= sfs_rename;
-  stegofs_ops.chmod		= sfs_chmod;
-  stegofs_ops.chown		= sfs_chown;
+  stegofs_ops.init = sfs_init;
+  stegofs_ops.getattr = sfs_getattr;
+  stegofs_ops.access = sfs_access;
+  stegofs_ops.readlink = sfs_readlink;
+  stegofs_ops.readdir = sfs_readdir;
+  stegofs_ops.mkdir	= sfs_mkdir;
+  stegofs_ops.unlink = sfs_unlink;
+  stegofs_ops.rmdir	= sfs_rmdir;
+  stegofs_ops.rename = sfs_rename;
+  stegofs_ops.chmod	= sfs_chmod;
+  stegofs_ops.chown	= sfs_chown;
   //stegofs_ops.truncate	= sfs_truncate;
   //stegofs_ops.utimens     = sfs_utimens;
-  stegofs_ops.create		= sfs_create;
-  stegofs_ops.open		= sfs_open;
-  stegofs_ops.read		= sfs_read;
-  stegofs_ops.write		= sfs_write;
-  stegofs_ops.destroy     = sfs_destroy;
+  stegofs_ops.create = sfs_create;
+  stegofs_ops.open = sfs_open;
+  stegofs_ops.read = sfs_read;
+  stegofs_ops.write	= sfs_write;
+  stegofs_ops.destroy = sfs_destroy;
 
   return 0;
 }
 
-//int FuseService::mount(const char* mount_point_)
-int FuseService::MountFuse(QString mount_point) {
-  // bbfs doesn't do any access checking on its own (the comment
-  // blocks in fuse.h mention some of the functions that need
-  // accesses checked -- but note there are other functions, like
-  // chown(), that also need checking!).  Since running bbfs as root
-  // will therefore open Metrodome-sized holes in the system
-  // security, we'll check if root is trying to mount the filesystem
-  // and refuse if it is.  The somewhat smaller hole of an ordinary
-  // user doing it with the allow_other flag is still there because
-  // I don't want to parse the options string.
-  //if ((getuid() == 0) || (geteuid() == 0)) {
-  //   fprintf(stderr, "Running BBFS as root opens unnacceptable security holes\n");
-  //   return 1;
-  //}
+int FuseService::MountFuse(std::string &mount_point) {
 
   mount_point_ = mount_point;
 
@@ -137,7 +122,7 @@ int FuseService::MountFuse(QString mount_point) {
   if (!mnt_pt) {
     return -1;
   }
-  strcpy(mnt_pt, mount_point_.toStdString().c_str());
+  strcpy(mnt_pt, mount_point_.c_str());
 
   LOG_INFO("mount point: " << mnt_pt);
 
@@ -182,7 +167,7 @@ int FuseService::MountFuse(QString mount_point) {
       // TODO: add signal handlers to
       //
 
-      fuse_stat = fuse_main(argc, argv, &stegofs_ops, NULL);
+      fuse_stat = fuse_main(argc, argv, &stegofs_ops, nullptr);
       LOG_INFO("fuse_main returned " << fuse_stat);
       _exit(fuse_stat);
     } else {
@@ -197,10 +182,10 @@ int FuseService::MountFuse(QString mount_point) {
       act.sa_sigaction = &fuseSignalHandler;
       /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
       act.sa_flags = SA_SIGINFO;
-      if (sigaction(SIGUSR1, &act, NULL) < 0) {
+      if (sigaction(SIGUSR1, &act, nullptr) < 0) {
         LOG_ERROR("sigaction failed");
       }
-      if (sigaction(SIGUSR2, &act, NULL) < 0) {
+      if (sigaction(SIGUSR2, &act, nullptr) < 0) {
         LOG_ERROR("sigaction failed");
       }
       /*
@@ -214,12 +199,12 @@ int FuseService::MountFuse(QString mount_point) {
             signal(SIGCHLD, fuseSigChldSignalHandler);
             */
       LOG_INFO("wait for fuse pid");
-      waitpid(pid, NULL, 0);
+      waitpid(pid, nullptr, 0);
       LOG_INFO("wait for fuse pid ended");
       fuse_mounted_ = false;
-      if (delegate_ != NULL) {
-        delegate_->fuseUnmounted();
-      }
+      //      if (delegate_ != nullptr) {
+      //        delegate_->fuseUnmounted();
+      //      }
       return 0;
     }
   } else {
@@ -332,8 +317,8 @@ static int sfs_read(const char *path, char *buf, size_t size, off_t offset,
   if (strcmp(path, file_path) != 0)
     return -ENOENT;
 
-  uint64 offset64 = offset;
-  uint64 size64 = size;
+  stego_disk::uint64 offset64 = offset;
+  stego_disk::uint64 size64 = size;
 
   if (offset64 >= FuseService::capacity_) /* Trying to read past the end of file. */ {
     LOG_ERROR("fuse service: offset+size > capacity_... offset:"
@@ -350,9 +335,10 @@ static int sfs_read(const char *path, char *buf, size_t size, off_t offset,
   }
 
   //int err = FuseService::virtualDisc->write((uint8*)buf, (uint32)size, offset);
-  int err = FuseService::virtual_storage_->Read(offset64,
-                                                static_cast<uint32>(size64),
-                                                (uint8*)buf);
+  int err = 0;
+  FuseService::virtual_storage_->Read(offset64,
+                                      static_cast<stego_disk::uint32>(size64),
+                                      (stego_disk::uint8*)buf);
 
   if (err) {
     // TODO: treba nejak rozumne prelozit errory
@@ -369,8 +355,8 @@ static int sfs_write(const char *path, const char *buf, size_t size,
   if (strcmp(path, file_path) != 0)
     return -ENOENT;
 
-  uint64 offset64 = offset;
-  uint64 size64 = size;
+  stego_disk::uint64 offset64 = offset;
+  stego_disk::uint64 size64 = size;
 
   if (offset64 >= FuseService::capacity_) /* Trying to read past the end of file. */ {
     LOG_ERROR("fuse service: offset > capacity_... offset:"
@@ -387,9 +373,10 @@ static int sfs_write(const char *path, const char *buf, size_t size,
   }
 
   //int err = FuseService::virtualDisc->write((uint8*)buf, (uint32)size, offset);
-  int err = FuseService::virtual_storage_->Write(offset64,
-                                                 static_cast<uint32>(size64),
-                                                 (uint8*)buf);
+  int err = 0;
+  FuseService::virtual_storage_->Write(offset64,
+                                       static_cast<stego_disk::uint32>(size64),
+                                       (stego_disk::uint8*)buf);
 
   if (err) {
     // TODO: treba nejak rozumne prelozit errory
@@ -403,7 +390,7 @@ static int sfs_write(const char *path, const char *buf, size_t size,
 static void* sfs_init(struct fuse_conn_info *) {
   LOG_DEBUG("SFS_INIT CALLED");
   //kill(getppid(), SIGUSR1);
-  return NULL;
+  return nullptr;
 }
 
 static void sfs_destroy(void*) {
@@ -413,18 +400,18 @@ static void sfs_destroy(void*) {
   kill(getppid(), SIGUSR2);
 }
 
-static void fuseInitialisedSignalHandler() {
-  LOG_INFO("sig1 handler called");
+//static void fuseInitialisedSignalHandler() {
+//  LOG_INFO("sig1 handler called");
 
-  /*
-    if (FuseService::delegate_ != NULL) {
-        FuseService::delegate_->fuse_mounted_(true);
-    }
-    */
+//  /*
+//    if (FuseService::delegate_ != NULL) {
+//        FuseService::delegate_->fuse_mounted_(true);
+//    }
+//    */
 
-  QtConcurrent::run(attachVirtualDisk);
+//  //QtConcurrent::run(attachVirtualDisk);
 
-}
+//}
 
 //static void fuseEndedSignalHandler()
 //{
@@ -447,78 +434,78 @@ static void fuseSigChldSignalHandler() {
   }
 
   FuseService::fuse_mounted_ = false;
-  if (FuseService::delegate_ != NULL) {
-    FuseService::delegate_->fuseUnmounted();
-  }
+  //  if (FuseService::delegate_ != nullptr) {
+  //    FuseService::delegate_->fuseUnmounted();
+  //  }
 
 }
 
 
-static void attachVirtualDisk() {
+//static void attachVirtualDisk() {
 
-  if (FuseService::child_process_) {
-    // TODO: do sth
-  }
+//  if (FuseService::child_process_) {
+//    // TODO: do sth
+//  }
 
-  QString virtual_disk_file_path =
-      QDir(FuseService::mount_point_).absoluteFilePath(
-        QString(FuseService::virtual_file_name_));
-  LOG_INFO("VDF PATH: " << virtual_disk_file_path.toStdString());
-  LOG_INFO("file exists: " <<
-           QFile().exists(QDir(FuseService::mount_point_).absoluteFilePath(
-                            QString(FuseService::virtual_file_name_))));
+//  QString virtual_disk_file_path =
+//      QDir(FuseService::mount_point_).absoluteFilePath(
+//        QString(FuseService::virtual_file_name_));
+//  LOG_INFO("VDF PATH: " << virtual_disk_file_path.toStdString());
+//  LOG_INFO("file exists: " <<
+//           QFile().exists(QDir(FuseService::mount_point_).absoluteFilePath(
+//                            QString(FuseService::virtual_file_name_))));
 
-  QProcess *attach = new QProcess();
-  FuseService::child_process_ = attach;
-  QStringList args;
-  args.push_back("attach");
-  args.push_back(virtual_disk_file_path);
-  args.push_back("-imagekey");
-  args.push_back("diskimage-class=CRawDiskImage");
-  //args.push_back("-nomount");
+//  QProcess *attach = new QProcess();
+//  FuseService::child_process_ = attach;
+//  QStringList args;
+//  args.push_back("attach");
+//  args.push_back(virtual_disk_file_path);
+//  args.push_back("-imagekey");
+//  args.push_back("diskimage-class=CRawDiskImage");
+//  //args.push_back("-nomount");
 
-  LOG_INFO("calling attach");
-  //QObject::connect(attach, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(onAttachFinished(int,QProcess::ExitStatus)));
-  attach->setProcessChannelMode(QProcess::MergedChannels);
-  attach->start("hdiutil", args);
-  attach->waitForFinished(60000);
-  //int retval = QProcess::execute("hdiutil", args);
-  //LOG_INFO("returned: " << retval);
+//  LOG_INFO("calling attach");
+//  //QObject::connect(attach, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(onAttachFinished(int,QProcess::ExitStatus)));
+//  attach->setProcessChannelMode(QProcess::MergedChannels);
+//  attach->start("hdiutil", args);
+//  attach->waitForFinished(60000);
+//  //int retval = QProcess::execute("hdiutil", args);
+//  //LOG_INFO("returned: " << retval);
 
 
-  //attach->readAll()
-  QByteArray output = attach->readAllStandardOutput();
-  QString diskName = QString(output).trimmed();
-  LOG_INFO("trimmed:" << diskName.toStdString());
-  if (diskName.startsWith("/dev/")) {
-    LOG_INFO("disk name ok");
-  }
-  LOG_INFO("exit code: " << attach->exitCode());
-  LOG_INFO("exit status: " << attach->exitStatus());
+//  //attach->readAll()
+//  QByteArray output = attach->readAllStandardOutput();
+//  QString diskName = QString(output).trimmed();
+//  LOG_INFO("trimmed:" << diskName.toStdString());
+//  if (diskName.startsWith("/dev/")) {
+//    LOG_INFO("disk name ok");
+//  }
+//  LOG_INFO("exit code: " << attach->exitCode());
+//  LOG_INFO("exit status: " << attach->exitStatus());
 
-  // exit code 1 a "hdiutil: attach failed - no mountable file systems"
-  // exit code 0 a /dev/diskX - ked nomount
+//  // exit code 1 a "hdiutil: attach failed - no mountable file systems"
+//  // exit code 0 a /dev/diskX - ked nomount
 
-  /*
-    LOG_INFO("byte array len: " << output.size());
-    LOG_INFO("output: o'" << QString(output).toStdString() << "'o");
-    QString outStr = QString(output);
-    QStringList outStringList = outStr.split("\n");
-    LOG_INFO("lines: " << outStringList.size());
-    if (outStringList.size()>0) {
-        LOG_INFO("1.: l'" << outStringList.at(0).toStdString() << "'l");
-        if (outStringList.at(0).startsWith("/dev/disk")) {
-            LOG_INFO("dobry riadok muehehe");
-            QString cool = outStringList.at(0).trimmed();
-        }
-    }
-    output = attach->readAllStandardError();
-    LOG_INFO("errout: e'" << QString(output).toStdString() << "'e");
-    LOG_INFO("exit code: " << attach->exitCode());
-    LOG_INFO("exit status: " << attach->exitStatus());
-    */
+//  /*
+//    LOG_INFO("byte array len: " << output.size());
+//    LOG_INFO("output: o'" << QString(output).toStdString() << "'o");
+//    QString outStr = QString(output);
+//    QStringList outStringList = outStr.split("\n");
+//    LOG_INFO("lines: " << outStringList.size());
+//    if (outStringList.size()>0) {
+//        LOG_INFO("1.: l'" << outStringList.at(0).toStdString() << "'l");
+//        if (outStringList.at(0).startsWith("/dev/disk")) {
+//            LOG_INFO("dobry riadok muehehe");
+//            QString cool = outStringList.at(0).trimmed();
+//        }
+//    }
+//    output = attach->readAllStandardError();
+//    LOG_INFO("errout: e'" << QString(output).toStdString() << "'e");
+//    LOG_INFO("exit code: " << attach->exitCode());
+//    LOG_INFO("exit status: " << attach->exitStatus());
+//    */
 
-}
+//}
 
 static void fuseSignalHandler(int sig, siginfo_t *siginfo, void *) {
   LOG_INFO("SIGNAL HANDLER CALLED sig: " << sig << ", pid: "
@@ -529,7 +516,7 @@ static void fuseSignalHandler(int sig, siginfo_t *siginfo, void *) {
 
     switch (sig) {
       case SIGUSR1:
-        QtConcurrent::run(fuseInitialisedSignalHandler);
+        //QtConcurrent::run(fuseInitialisedSignalHandler);
         break;
       case SIGCHLD:
         fuseSigChldSignalHandler();
@@ -539,25 +526,22 @@ static void fuseSignalHandler(int sig, siginfo_t *siginfo, void *) {
     return;
   }
 
-  if (FuseService::child_process_) {
-    if (siginfo->si_pid == FuseService::child_process_->pid()) {
-      LOG_INFO("program: " <<
-               FuseService::child_process_->program().toStdString());
-      QByteArray output = FuseService::child_process_->readAllStandardOutput();
-      LOG_INFO("output: " << QString(output).toStdString());
-      output = FuseService::child_process_->readAllStandardError();
-      LOG_INFO("std err output: " << QString(output).toStdString());
-      LOG_INFO("exit code: " << FuseService::child_process_->exitCode());
-      LOG_INFO("exit status: " << FuseService::child_process_->exitStatus());
-    }
-  }
+  //  if (FuseService::child_process_) {
+  //    if (siginfo->si_pid == FuseService::child_process_->pid()) {
+  //      LOG_INFO("program: " <<
+  //               FuseService::child_process_->program().toStdString());
+  //      QByteArray output = FuseService::child_process_->readAllStandardOutput();
+  //      LOG_INFO("output: " << QString(output).toStdString());
+  //      output = FuseService::child_process_->readAllStandardError();
+  //      LOG_INFO("std err output: " << QString(output).toStdString());
+  //      LOG_INFO("exit code: " << FuseService::child_process_->exitCode());
+  //      LOG_INFO("exit status: " << FuseService::child_process_->exitStatus());
+  //    }
+  //  }
 
 }
 
-int FuseService::unmountFuse(QString mount_point_) {
-  LOG_INFO("unmounting: " << mount_point_.toStdString());
-  //return umount(mount_point_.toStdString().c_str());
-  return 1;
+int FuseService::UnmountFuse(std::string &mount_point_) {
+  LOG_INFO("unmounting: " << mount_point_);
+  return umount(mount_point_.c_str());
 }
-
-#endif

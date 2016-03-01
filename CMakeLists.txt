@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(StegoDisk)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
-option(WITH_FUSE "Build this library with FUSE" OFF)
+option(WITH_FUSE "Build this library with FUSE" ON)
 option(BUILD_SHARED "Build this as shared library" OFF)
 option(BUILD_TESTS "Whether to build automatic test suite" ON)
 
@@ -185,15 +185,17 @@ set(FILE_MANAGEMENT_SRCS
 
 # FUSE
 
-set(FUSE_HDRS
-  src/fuse/fuse_service.h
-  src/fuse/fuse_service_delegate.h
-)
+if(FUSE_FOUND)
+  set(FUSE_HDRS
+    src/fuse/fuse_service.h
+#    src/fuse/fuse_service_delegate.h
+  )
 
-set(FUSE_SRCS
-  src/fuse/fuse_service.cc
-  src/fuse/fuse_service_delegate.cc
-)
+  set(FUSE_SRCS
+    src/fuse/fuse_service.cc
+#    src/fuse/fuse_service_delegate.cc
+  )
+endif()
 
 # HASH
 
