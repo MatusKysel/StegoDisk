@@ -93,6 +93,7 @@ int CarrierFileBMP::LoadFile() {
   if(fitness_ != nullptr) {
     usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
   } else {
+    delete(usable_buffer);
     usable_buffer = &bitmap_buffer;
   }
 
@@ -149,6 +150,7 @@ int CarrierFileBMP::SaveFile() {
   if(fitness_ != nullptr) {
     usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
   } else {
+    delete(usable_buffer);
     usable_buffer = &bitmap_buffer;
   }
 
@@ -175,6 +177,7 @@ int CarrierFileBMP::SaveFile() {
   if(fitness_ != nullptr) {
     fitness_->InsertBytes((*usable_buffer), output_buffer);
   } else {
+    delete(output_buffer);
     output_buffer = usable_buffer;
   }
 
