@@ -54,7 +54,7 @@ bool ContextFitness::CheckValidity(const std::array<unsigned char, 9> &box) cons
 }
 
 
-uint64 ContextFitness::SelectBytes(MemoryBuffer &in, MemoryBuffer *out) {
+uint64 ContextFitness::SelectBytes(const MemoryBuffer &in, MemoryBuffer *out) {
   if(file_->IsGrayscale()) {
     uint64 counter  = 0, i_max, j_max, i_ind, j_ind, index;
 
@@ -92,12 +92,12 @@ uint64 ContextFitness::SelectBytes(MemoryBuffer &in, MemoryBuffer *out) {
     return counter;
 
   } else {
-    out->Resize(in.GetSize());
-    out = &in;
+    delete out;
+    out = new MemoryBuffer(in);
     return in.GetSize();
   }
 }
-void ContextFitness::InsertBytes(MemoryBuffer &in, MemoryBuffer *out) const {
+void ContextFitness::InsertBytes(const MemoryBuffer &in, MemoryBuffer *out) const {
   if(file_->IsGrayscale()) {
     out->Resize(in.GetSize());
     uint64 index = 0;
@@ -107,7 +107,8 @@ void ContextFitness::InsertBytes(MemoryBuffer &in, MemoryBuffer *out) const {
     }
 
   } else {
-    out = &in;
+    delete out;
+    out = new MemoryBuffer(in);
   }
 }
 

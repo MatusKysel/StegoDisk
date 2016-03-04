@@ -115,7 +115,8 @@ int CarrierFileBMP::LoadFile() {
 
   LOG_INFO("File " << file_.GetRelativePath() << " loaded");
 
-  delete(usable_buffer);
+  if(fitness_ != nullptr)
+    delete(usable_buffer);
 
   return STEGO_NO_ERROR;
 }
@@ -190,8 +191,10 @@ int CarrierFileBMP::SaveFile() {
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");
 
-  delete(output_buffer);
-  delete(usable_buffer);
+  if(fitness_ != nullptr) {
+    delete(output_buffer);
+    delete(usable_buffer);
+  }
   return STEGO_NO_ERROR;
 }
 

@@ -31,9 +31,9 @@ public:
 
   virtual ~Fitness();
 
-  virtual uint64 SelectBytes(MemoryBuffer &in, MemoryBuffer *out) = 0;
+  virtual uint64 SelectBytes(const MemoryBuffer &in, MemoryBuffer *out) = 0;
 
-  virtual void InsertBytes(MemoryBuffer &in, MemoryBuffer *out) const = 0;
+  virtual void InsertBytes(const MemoryBuffer &in, MemoryBuffer *out) const = 0;
 
 protected:
   std::shared_ptr<CarrierFile> file_;

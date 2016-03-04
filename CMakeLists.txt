@@ -72,9 +72,9 @@ if(QT_CREATOR_PROJECT_SHOW)
   add_custom_target(DummyHeaderShow SOURCES ${SRCS} ${HDRS})
 endif()
 
-#if(NOT CMAKE_BUILD_TYPE)
-#  set(CMAKE_BUILD_TYPE Release)
-#endif()
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
