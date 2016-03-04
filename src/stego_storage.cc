@@ -27,10 +27,6 @@ StegoStorage::~StegoStorage() {}
 
 void StegoStorage::Open(const std::string &storage_base_path,
                         const std::string &password) {
-
-  if(!StegoConfig::initialized()) {
-    throw std::runtime_error("Storage must be configured before opening");
-  }
   opened_ = false;
 
   carrier_files_manager_->SetPassword(password);
@@ -57,7 +53,13 @@ void StegoStorage::Configure(const std::string &config_path) const {
 }
 
 void StegoStorage::Configure() const {
-  Configure(carrier_files_manager_->GetPath() + CONFIG_NAME);
+  if (opened_) {
+    Configure(carrier_files_manager_->GetPath() + CONFIG_NAME);
+  } else {
+    Configure(EncoderFactory::GetDefaultEncoderType(),
+		      PermutationFactory::GetDefaultPermutationType(),
+		      PermutationFactory::GetDefaultPermutationType());
+  }
 }
 
 void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
@@ -72,8 +74,13 @@ void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
 }
 
 void StegoStorage::Load() {
-  if (!opened_)
-    throw std::runtime_error("Storage must be opened_ before loading");
+
+  if (!StegoConfig::initialized()) {
+    throw std::runtime_error("Storage must be configured before opening");
+  }
+  if (!opened_) {
+	throw std::runtime_error("Storage must be opened_ before loading");
+  }
 
   carrier_files_manager_->SetEncoder(
         EncoderFactory::GetEncoder(StegoConfig::encoder()));
