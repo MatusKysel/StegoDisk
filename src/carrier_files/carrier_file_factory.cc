@@ -18,25 +18,22 @@
 #include "permutations/permutation_factory.h"
 #include "utils/stego_config.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 CarrierFilePtr CarrierFileFactory::CreateCarrierFile(const File& file) {
-  //CarrierFilePtr carrier_file;
   shared_ptr<CarrierFile> carrier_file;
-  std::shared_ptr<Encoder> encoder = std::shared_ptr<Encoder>(nullptr);
 
-  // get ext
-  string ext = file.GetExtension();
+  std::string ext = file.GetExtension();
   if (ext.compare(".bmp") == 0) {
-    carrier_file = make_shared<CarrierFileBMP>(file,
-                                               encoder,
-                                               PermutationFactory::GetPermutation(StegoConfig::local_perm()));
+    carrier_file = std::make_shared<CarrierFileBMP>(file,
+                                               nullptr,
+                                               PermutationFactory::GetPermutation(StegoConfig::local_perm()),
+                                               nullptr);
   } else if (ext.compare(".jpg") == 0) {
-    carrier_file = make_shared<CarrierFileJPEG>(file,
-                                                encoder,
-                                                PermutationFactory::GetPermutation(StegoConfig::local_perm()));
+    carrier_file = std::make_shared<CarrierFileJPEG>(file,
+                                                nullptr,
+                                                PermutationFactory::GetPermutation(StegoConfig::local_perm()),
+                                                nullptr);
   }
 
   if (carrier_file) {

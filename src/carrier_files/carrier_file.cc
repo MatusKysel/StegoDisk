@@ -26,8 +26,12 @@ namespace stego_disk {
 
 CarrierFile::CarrierFile(File file,
                          std::shared_ptr<Encoder> encoder,
-                         std::shared_ptr<Permutation> permutation)
-  : codeword_block_size_(0),
+                         std::shared_ptr<Permutation> permutation,
+                         std::unique_ptr<Fitness> fitness)
+  : width_(0),
+    height_(0),
+    is_grayscale_(false),
+    codeword_block_size_(0),
     data_block_size_(0),
     block_count_(0),
     capacity_(0),
@@ -38,6 +42,7 @@ CarrierFile::CarrierFile(File file,
     file_(file),
     encoder_(encoder),
     permutation_(permutation),
+    fitness_(std::move(fitness)),
     virtual_storage_(VirtualStoragePtr(nullptr)) {
 
   if (encoder)  {
@@ -164,14 +169,14 @@ void CarrierFile::SetBitInBufferPermuted(uint64 index) {
   if (index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: index " << index <<
              " is too big!");
-	throw std::out_of_range("Index is out of range!");
+    throw std::out_of_range("Index is out of range!");
   }
 
   uint64 permuted_index = permutation_->Permute(index);
 
   if (permuted_index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: permuted index " << permuted_index << " is too big!");
-	throw std::out_of_range("Permuted index is out of range!");
+    throw std::out_of_range("Permuted index is out of range!");
   }
 
   buffer_[permuted_index / 8] |= ( 1 << (permuted_index % 8));
@@ -182,7 +187,7 @@ uint8 CarrierFile::GetBitInBufferPermuted(uint64 index) {
   if (index >= permutation_->GetSize()) {
     LOG_INFO("CarrierFile::GetBitInBufferPermuted: index " << index <<
              " is too big!");
-	throw std::out_of_range("Index is out of range!");
+    throw std::out_of_range("Index is out of range!");
   }
 
   uint64 permuted_index = permutation_->Permute(index);
@@ -237,8 +242,8 @@ int CarrierFile::EmbedBufferUsingEncoder() {
     for (uint64 i = 0; i < data_block_size_; ++i) {
       //TODO:            #warning doriesit try catch!
       try {
-		  data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
-			  (b * data_block_size_) + i);
+        data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
+                                                    (b * data_block_size_) + i);
       } catch (std::out_of_range& ex) {
         LOG_DEBUG("CarrierFile::embedBufferUsingEncoder: virtualStorage->"
                   "readByte failed: block: " << (b + 1) << "/" << blocks_used_
@@ -255,4 +260,16 @@ int CarrierFile::EmbedBufferUsingEncoder() {
   return 0;
 }
 
+
+uint32 CarrierFile::GetWidth() {
+  return width_;
+}
+
+uint32 CarrierFile::GetHeight() {
+  return height_;
+}
+
+bool CarrierFile::IsGrayscale() {
+  return is_grayscale_;
+}
 } // stego_disk

@@ -27,10 +27,12 @@
 #include "permutations/permutation.h"
 #include "virtual_storage/virtual_storage.h"
 #include "keys/key.h"
+#include "fitness/fitness.h"
 
-using namespace std;
 
 namespace stego_disk {
+
+
 
 /**
  * The CarrierFile class.
@@ -43,7 +45,9 @@ class CarrierFile {
 public:
   CarrierFile(File file,
               std::shared_ptr<Encoder> encoder,
-              std::shared_ptr<Permutation> permutation);
+              std::shared_ptr<Permutation> permutation,
+              std::unique_ptr<Fitness> fitness);
+
   virtual ~CarrierFile();
 
   uint64 GetCapacity();
@@ -67,6 +71,9 @@ public:
                           uint64 bytes_used);
 
   Key GetPermKey();
+  uint32 GetWidth();
+  uint32 GetHeight();
+  bool IsGrayscale();
 
   bool operator< (const CarrierFile& val) const;
 
@@ -84,6 +91,9 @@ protected:
   int EmbedBufferUsingEncoder();
 
   MemoryBuffer buffer_;
+  uint32 width_;
+  uint32 height_;
+  bool is_grayscale_;
   uint32 codeword_block_size_;
   uint32 data_block_size_;
   uint32 block_count_;
@@ -92,11 +102,11 @@ protected:
   uint32 blocks_used_;
   uint64 virtual_storage_offset_;
   bool file_loaded_;
-  struct stat stat_;
   Key subkey_;
   File file_;
   std::shared_ptr<Encoder> encoder_;
   std::shared_ptr<Permutation> permutation_;
+  std::unique_ptr<Fitness> fitness_;
   VirtualStoragePtr virtual_storage_;
 };
 

@@ -17,8 +17,9 @@
 namespace stego_disk {
 
 CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
-                               std::shared_ptr<Permutation> permutation) :
-  CarrierFile(file, encoder, permutation) {
+                               std::shared_ptr<Permutation> permutation,
+                               std::unique_ptr<Fitness> fitness) :
+  CarrierFile(file, encoder, permutation, std::move(fitness)) {
 
   auto file_ptr = file.Open();
 
@@ -30,7 +31,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   read_cnt += static_cast<int>(fread(&bmp_info, 1, 40, file_ptr.Get()));
 
   if (read_cnt < 54) {
-     throw std::runtime_error("Wrong header size of file " + file_.GetFileName());
+    throw std::runtime_error("Wrong header size of file " + file_.GetFileName());
   }
 
   uint32_t bmp_file_size = *((uint32_t*)&bmp_header[2]);
@@ -47,18 +48,15 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
                              " uses unsupported file compression");
   }
 
-  //  if (bmp_bits_per_pixel != 24) {
-  //    //TODO: throw exception
-  //    return;
-  //  } TODO(Matus) podpora inych hlbok
+  if (bmp_bits_per_pixel == 8) is_grayscale_ = true;
 
   //bmp_size_ = *((uint32_t*)&bmp_info[20]); // byva = 0 pri vypnutej kompresii
 
-  int32_t bmp_width = *((int32_t*)&bmp_info[4]);
-  int32_t bmp_height = *((int32_t*)&bmp_info[8]);
+  width_ = abs(*((int32_t*)&bmp_info[4]));
+  height_ = abs(*((int32_t*)&bmp_info[8]));
 
-  bmp_size_ = (((bmp_bits_per_pixel * bmp_width + 31) / 32) * 4) *
-              abs(bmp_height);
+  bmp_size_ = (((bmp_bits_per_pixel * width_ + 31) / 32) * 4) *
+              height_;
 
   if ((bmp_size_ + 54) > bmp_file_size) {
     throw std::runtime_error("Error occured while reading file "
@@ -77,17 +75,7 @@ int CarrierFileBMP::LoadFile() {
 
   LOG_INFO("Loading file " << file_.GetRelativePath());
 
-  if (permutation_->GetSize() == 0) {
-    permutation_->Init(raw_capacity_ * 8, subkey_);
-  }
-
-  buffer_.Resize(raw_capacity_);
-  buffer_.Clear();
-
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
-
-  uint64 bits_to_modify = permutation_->GetSize();
-
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
   uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
@@ -99,10 +87,26 @@ int CarrierFileBMP::LoadFile() {
     throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
   }
 
-  // copy LSB data to content buffer
+  uint64 usable_capacity = raw_capacity_;
+  MemoryBuffer* usable_buffer = new MemoryBuffer();
+
+  if(fitness_ != nullptr) {
+    usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
+  } else {
+    usable_buffer = &bitmap_buffer;
+  }
+
+  buffer_.Resize(usable_capacity);
+  buffer_.Clear();
+
+  if (permutation_->GetSize() == 0) {
+    permutation_->Init(usable_capacity * 8, subkey_);
+  }
+
+  uint64 bits_to_modify = permutation_->GetSize();
 
   for (uint64 i = 0; i < bits_to_modify; ++i) {
-    if (bitmap_buffer[i] & 0x01) SetBitInBufferPermuted(i);
+    if ((*usable_buffer)[i] & 0x01) SetBitInBufferPermuted(i);
   }
 
   ExtractBufferUsingEncoder();
@@ -110,6 +114,8 @@ int CarrierFileBMP::LoadFile() {
   file_loaded_ = true;
 
   LOG_INFO("File " << file_.GetRelativePath() << " loaded");
+
+  delete(usable_buffer);
 
   return STEGO_NO_ERROR;
 }
@@ -124,16 +130,7 @@ int CarrierFileBMP::SaveFile() {
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
 
-  if (permutation_->GetSize() == 0) {
-    permutation_->Init(raw_capacity_ * 8, subkey_);
-  }
-
-  buffer_.Resize(raw_capacity_);
-  buffer_.Clear();
-
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
-
-  uint64 bits_to_modify = permutation_->GetSize();
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
   uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
@@ -142,24 +139,46 @@ int CarrierFileBMP::SaveFile() {
 
   if (read_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Unable to read file.")
-    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
+        throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
   }
-  // copy LSB data to content buffer
+
+  uint64 usable_capacity = raw_capacity_;
+  MemoryBuffer* usable_buffer = new MemoryBuffer();
+
+  if(fitness_ != nullptr) {
+    usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
+  } else {
+    usable_buffer = &bitmap_buffer;
+  }
+
+  buffer_.Resize(usable_capacity);
+  buffer_.Clear();
+
+  if (permutation_->GetSize() == 0) {
+    permutation_->Init(usable_capacity * 8, subkey_);
+  }
+
+  uint64 bits_to_modify = permutation_->GetSize();
 
   for (uint64 i = 0; i < bits_to_modify; ++i) {
-    if (bitmap_buffer[i] & 0x01) SetBitInBufferPermuted(i);
+    if ((*usable_buffer)[i] & 0x01) SetBitInBufferPermuted(i);
   }
 
   EmbedBufferUsingEncoder();
 
   for (uint64 i = 0; i < bits_to_modify ; ++i) {
-    bitmap_buffer[i] = (bitmap_buffer[i] & 0xFE) | GetBitInBufferPermuted(i);
+    (*usable_buffer)[i] = ((*usable_buffer)[i] & 0xFE) | GetBitInBufferPermuted(i);
   }
 
-  // write data
+  MemoryBuffer *output_buffer = new MemoryBuffer();
+  if(fitness_ != nullptr) {
+    fitness_->InsertBytes((*usable_buffer), output_buffer);
+  } else {
+    output_buffer = usable_buffer;
+  }
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 write_cnt = static_cast<uint32>(fwrite(bitmap_buffer.GetRawPointer(),
+  uint32 write_cnt = static_cast<uint32>(fwrite(output_buffer->GetRawPointer(),
                                                 1, raw_capacity_ * 8,
                                                 file_ptr.Get()));
 
@@ -171,6 +190,8 @@ int CarrierFileBMP::SaveFile() {
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");
 
+  delete(output_buffer);
+  delete(usable_buffer);
   return STEGO_NO_ERROR;
 }
 

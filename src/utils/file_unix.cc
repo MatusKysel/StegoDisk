@@ -30,7 +30,6 @@ static void AddFilesInDir(std::string base_path, std::string current_path, std::
   DIR *dir;
   struct dirent *de;
   struct stat sb;
-  int ret;
 
   // base_path_safe contains / at the end of the string
   std::string base_path_safe = base_path;

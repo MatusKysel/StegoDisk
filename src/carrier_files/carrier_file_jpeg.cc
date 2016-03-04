@@ -26,8 +26,9 @@ namespace stego_disk {
 
 CarrierFileJPEG::CarrierFileJPEG(File file,
                                  std::shared_ptr<Encoder> encoder,
-                                 std::shared_ptr<Permutation> permutation) :
-  CarrierFile(file, encoder, permutation) {
+                                 std::shared_ptr<Permutation> permutation,
+                                 std::unique_ptr<Fitness> fitness) :
+  CarrierFile(file, encoder, permutation, std::move(fitness)) {
   ComputeCapacity();
 }
 
