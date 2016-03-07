@@ -70,7 +70,7 @@ static void* sfs_init(fuse_conn_info *conn);
 static void fuseSignalHandler(int sig, siginfo_t *siginfo, void *context);
 //static void attachVirtualDisk();
 
-stego_disk::VirtualStorage* FuseService::virtual_storage_ = nullptr;
+stego_disk::StegoStorage* FuseService::stego_storage_ = nullptr;
 stego_disk::uint64 FuseService::capacity_ = 0;
 //FuseServiceDelegate* FuseService::delegate_ = nullptr;
 pid_t FuseService::fuse_proc_pid_ = 0;
@@ -82,10 +82,10 @@ std::string FuseService::mount_point_ = "";
 // =============================================================================
 
 
-int FuseService::Init(stego_disk::VirtualStorage *virtual_storage) {
-  virtual_storage_ = virtual_storage;
+int FuseService::Init(stego_disk::StegoStorage *stego_storage) {
+  stego_storage_ = stego_storage;
 
-  capacity_ = virtual_storage_->GetUsableCapacity();
+  capacity_ = stego_storage_->GetSize();
 
   // fuse_operations struct initialization
   stegofs_ops.init = sfs_init;
@@ -336,9 +336,7 @@ static int sfs_read(const char *path, char *buf, size_t size, off_t offset,
 
   //int err = FuseService::virtualDisc->write((uint8*)buf, (uint32)size, offset);
   int err = 0;
-  FuseService::virtual_storage_->Read(offset64,
-                                      static_cast<stego_disk::uint32>(size64),
-                                      (stego_disk::uint8*)buf);
+  FuseService::stego_storage_->Read(buf, offset64, size64);
 
   if (err) {
     // TODO: treba nejak rozumne prelozit errory
@@ -374,9 +372,7 @@ static int sfs_write(const char *path, const char *buf, size_t size,
 
   //int err = FuseService::virtualDisc->write((uint8*)buf, (uint32)size, offset);
   int err = 0;
-  FuseService::virtual_storage_->Write(offset64,
-                                       static_cast<stego_disk::uint32>(size64),
-                                       (stego_disk::uint8*)buf);
+  FuseService::stego_storage_->Write(buf, offset64, size64);
 
   if (err) {
     // TODO: treba nejak rozumne prelozit errory

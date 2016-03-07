@@ -43,7 +43,7 @@ CarrierFile::CarrierFile(File file,
     encoder_(encoder),
     permutation_(permutation),
     fitness_(std::move(fitness)),
-    virtual_storage_(VirtualStoragePtr(nullptr)) {
+    virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)) {
 
   if (encoder)  {
     data_block_size_ = encoder->GetDataBlockSize();
@@ -106,7 +106,8 @@ bool CarrierFile::IsFileLoaded() {
   return file_loaded_;
 }
 
-int CarrierFile::AddToVirtualStorage(VirtualStoragePtr storage, uint64 offset,
+int CarrierFile::AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage,
+                                     uint64 offset,
                                      uint64 bytes_used) {
   virtual_storage_ = storage;
   virtual_storage_offset_ = offset;

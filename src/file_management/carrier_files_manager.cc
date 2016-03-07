@@ -36,7 +36,7 @@ namespace stego_disk {
 CarrierFilesManager::CarrierFilesManager() :
   capacity_(0),
   files_in_directory_(0),
-  virtual_storage_(VirtualStoragePtr(nullptr)),
+  virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
   thread_pool_(new ThreadPool(0)), //std::make_unique<ThreadPool>(0) c++14
   is_active_encoder_(false) {}
@@ -95,7 +95,7 @@ int CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
 // return false, if checksum is not valid, true otherwise
 // TODO mY check PERMUTATION init by PASSWORD
-bool CarrierFilesManager::LoadVirtualStorage(VirtualStoragePtr storage) {
+bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage) {
   if (!storage)
     throw std::invalid_argument("CarrierFilesManager::loadVirtualStorage: "
                                 "arg 'storage' is nullptr");

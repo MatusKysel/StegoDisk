@@ -19,12 +19,6 @@
 
 namespace stego_disk {
 
-#ifndef __SHARED_PTR_VIRTUALSTORAGE__
-#define __SHARED_PTR_VIRTUALSTORAGE__
-class VirtualStorage;
-typedef std::shared_ptr<VirtualStorage> VirtualStoragePtr;
-#endif // __SHARED_PTR_VIRTUALSTORAGE__
-
 /**
  * Main storage buffer that utilizes global permutation in readByte/writeByte ops
  *
@@ -39,8 +33,8 @@ public:
   VirtualStorage();
   ~VirtualStorage();
 
-  static VirtualStoragePtr GetNewInstance();
-  static VirtualStoragePtr GetNewInstance(string permutation);
+  static std::shared_ptr<VirtualStorage> GetNewInstance();
+  static std::shared_ptr<VirtualStorage> GetNewInstance(string permutation);
 
   // Initialization of the VirtualStorage depends on permutation
   void SetPermutation(std::shared_ptr<Permutation> permutation);

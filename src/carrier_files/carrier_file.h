@@ -67,7 +67,7 @@ public:
   virtual int SaveFile() = 0;
 
   void SetSubkey(const Key& subkey_);
-  int AddToVirtualStorage(VirtualStoragePtr storage, uint64 offSet,
+  int AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage, uint64 offSet,
                           uint64 bytes_used);
 
   Key GetPermKey();
@@ -107,7 +107,7 @@ protected:
   std::shared_ptr<Encoder> encoder_;
   std::shared_ptr<Permutation> permutation_;
   std::unique_ptr<Fitness> fitness_;
-  VirtualStoragePtr virtual_storage_;
+  std::shared_ptr<VirtualStorage> virtual_storage_;
 };
 
 } // stego_disk

@@ -34,8 +34,10 @@ public:
   void Load();
   void Save();
 
-  void Read(void* destination, std::size_t offset, std::size_t length) const;
-  void Write(void* source, std::size_t offset, std::size_t length);
+  void Read(const void* destination, const std::size_t offset,
+            const std::size_t length) const;
+  void Write(const void* source, const std::size_t offset,
+             const std::size_t length) const;
 
   void Configure(const std::string &config_path) const;
   void Configure() const;
@@ -48,11 +50,8 @@ public:
 private:
 
   std::unique_ptr<CarrierFilesManager> carrier_files_manager_;
-
-  //TODO: after some refactoring unique_ptr could be enough here:
   std::shared_ptr<VirtualStorage> virtual_storage_;
   bool opened_;
-
 };
 
 } // stego_disk

@@ -23,7 +23,7 @@
 
 //#include "fuse_service_delegate.h"
 #include "logging/logger.h"
-#include "virtual_storage/virtual_storage.h"
+#include "stego_storage.h"
 
 static struct fuse_operations stegofs_ops;
 
@@ -33,14 +33,14 @@ public:
   FuseService();
 
 //  static FuseServiceDelegate* delegate_;
-  static stego_disk::VirtualStorage* virtual_storage_;
+  static stego_disk::StegoStorage* stego_storage_;
   static stego_disk::uint64 capacity_;
   static bool fuse_mounted_;
   static const char* virtual_file_name_;
   static std::string mount_point_;
   static pid_t fuse_proc_pid_;
 
-  static int Init(stego_disk::VirtualStorage *virtual_storage);
+  static int Init(stego_disk::StegoStorage *stego_storage);
   static int MountFuse(std::string &mount_point);
   static int UnmountFuse(std::string &mount_point);
 

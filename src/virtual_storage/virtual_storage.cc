@@ -38,15 +38,15 @@ VirtualStorage::~VirtualStorage() {
   Init();
 }
 
-VirtualStoragePtr VirtualStorage::GetNewInstance() {
-  VirtualStoragePtr virtual_storage =
+std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance() {
+  std::shared_ptr<VirtualStorage> virtual_storage =
       shared_ptr<VirtualStorage>(new VirtualStorage());
   virtual_storage->SetPermutation(PermutationFactory::GetDefaultPermutation());
   return virtual_storage;
 }
 
-VirtualStoragePtr VirtualStorage::GetNewInstance(string permutation) {
-  VirtualStoragePtr virtual_storage =
+std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(string permutation) {
+  std::shared_ptr<VirtualStorage> virtual_storage =
       shared_ptr<VirtualStorage>(new VirtualStorage());
   try {
     virtual_storage->SetPermutation(
