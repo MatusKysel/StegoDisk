@@ -28,6 +28,15 @@ addons:
     - clang-3.7
     - libfuse-dev
 
+  coverity_scan:
+    project:
+      name: "MatusKysel/StegoDisk"
+      description: "Build submitted via Travis CI"
+    notification_email: qwart279@gmail.com
+    build_command_prepend: "mkdir build; cd build; cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .."
+    build_command:   "make -j 4"
+    branch_pattern: master
+
 before_script:
   - mkdir build
   - cd build
@@ -49,16 +58,3 @@ notifications:
   email:
     on_success: never
     on_failure: always
-
-
-
-
-addons:
-  coverity_scan:
-    project:
-      name: "MatusKysel/StegoDisk"
-      description: "<Your project description here>"
-    notification_email: qwart279@gmail.com
-    build_command_prepend: "<Your build preprocessing command here>"
-    build_command:   "<Your build command here>"
-    branch_pattern: coverity_scan
