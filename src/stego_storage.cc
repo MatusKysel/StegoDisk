@@ -138,4 +138,11 @@ std::size_t StegoStorage::GetSize() const {
   catch (...) { throw; }
 }
 
+std::size_t StegoStorage::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) const {
+	try {
+		return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+	}
+	catch (...) { throw; }
+}
+
 } // stego_disk

@@ -46,6 +46,7 @@ public:
                  const PermutationFactory::PermutationType local_perm) const;
 
   std::size_t GetSize() const;
+  std::size_t GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) const;
 
 private:
 
