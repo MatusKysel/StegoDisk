@@ -100,7 +100,7 @@ void StegoStorage::Save() {
   carrier_files_manager_->SaveVirtualStorage();
 }
 
-void StegoStorage::Read(const void* destination, const std::size_t offSet,
+void StegoStorage::Read(void* destination, const std::size_t offSet,
                         const std::size_t length) const {
   if (virtual_storage_ == nullptr)
     throw std::runtime_error("Storage must be loaded before use");

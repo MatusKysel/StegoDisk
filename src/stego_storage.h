@@ -34,7 +34,7 @@ public:
   void Load();
   void Save();
 
-  void Read(const void* destination, const std::size_t offset,
+  void Read(void* destination, const std::size_t offset,
             const std::size_t length) const;
   void Write(const void* source, const std::size_t offset,
              const std::size_t length) const;
