@@ -34,7 +34,7 @@ addons:
       description: "Build submitted via Travis CI"
     notification_email: qwart279@gmail.com
     build_command_prepend: "mkdir build; cd build; cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .."
-    build_command:   "make -j 4"
+    build_command:   "make -j4"
     branch_pattern: master
 
 before_script:

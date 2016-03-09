@@ -110,7 +110,7 @@ int FuseService::Init(stego_disk::StegoStorage *stego_storage) {
   return 0;
 }
 
-int FuseService::MountFuse(std::string &mount_point) {
+int FuseService::MountFuse(const std::string &mount_point) {
 
   mount_point_ = mount_point;
 
@@ -537,7 +537,8 @@ static void fuseSignalHandler(int sig, siginfo_t *siginfo, void *) {
 
 }
 
-int FuseService::UnmountFuse(std::string &mount_point_) {
+int FuseService::UnmountFuse(const std::string &mount_point_) {
   LOG_INFO("unmounting: " << mount_point_);
+  fuse_mounted_ = false; //TODO (Matus) nastavit podla vratenej hodnoty
   return umount(mount_point_.c_str());
 }

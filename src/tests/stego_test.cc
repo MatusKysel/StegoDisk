@@ -21,7 +21,7 @@
 #include "tests/test_config.h"
 
 
-bool TransferEngineInit() {
+bool LoggerInit() {
 
   std::string logging_level("INFO");
 
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
   //! Disables output truncating for ctest xml
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
 
-  if (!TransferEngineInit()) return -1;
+  if (!LoggerInit()) return -1;
 
   std::string encoder;
   std::string permutation;
@@ -161,8 +161,8 @@ int main(int argc, char *argv[]) {
     std::cout << dir << std::endl;
     dir = DST_DIRECTORY + dir;
     std::cout << dir << std::endl;
-    FileManager::RemoveDirecotry(dir);
-    FileManager::CopyDirecotry(SRC_DIRECTORY, dir);
+    FileManager::RemoveDirectory(dir);
+    FileManager::CopyDirectory(SRC_DIRECTORY, dir);
   }
   if (dir.empty()) {
     LOG_ERROR("directory was not set");
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Saving storage");
   stego_storage->Save();
 
-  if(test_directory) FileManager::RemoveDirecotry(dir);
+  if(test_directory) FileManager::RemoveDirectory(dir);
 
   if (input != output) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<

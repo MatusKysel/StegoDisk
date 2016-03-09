@@ -36,7 +36,7 @@ public:
 	  return out;
   }
 
-  inline static void CopyDirecotry(const std::string &src, const std::string &dst) {
+  inline static void CopyDirectory(const std::string &src, const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
 	  std::string cmd = "xcopy " + GetWinPath(src) + " " + GetWinPath(dst) + " /s /e /h /i";
@@ -47,7 +47,7 @@ public:
     system(cmd.c_str());
   }
 
-  inline static void RemoveDirecotry(const std::string &path) {
+  inline static void RemoveDirectory(const std::string &path) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
 	  std::string cmd = "rd /s /q " + GetWinPath(path);

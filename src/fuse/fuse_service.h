@@ -41,8 +41,8 @@ public:
   static pid_t fuse_proc_pid_;
 
   static int Init(stego_disk::StegoStorage *stego_storage);
-  static int MountFuse(std::string &mount_point);
-  static int UnmountFuse(std::string &mount_point);
+  static int MountFuse(const std::string &mount_point);
+  static int UnmountFuse(const std::string &mount_point);
 
 };
 

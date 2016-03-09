@@ -38,9 +38,9 @@ add_stego_test(HammingNumericFeistelWPassword "hamming" "num_feistel" 1)
 
 add_executable(stego-test stego_test.cc)
 
-#if(FUSE_FOUND)
-#  add_executable(stego-fuse-test stego_fuse_test.cc)
-#endif()
+if(FUSE_FOUND)
+  add_executable(stego-fuse-test stego_fuse_test.cc)
+endif()
 
 if(NOT WIN32)
 	set(LIBJPEGTURBO_LIBRARIES_STATIC ${CMAKE_BINARY_DIR}/${LIBDIR}/libjpeg.a)
@@ -50,6 +50,11 @@ else()
 endif()
 
 target_link_libraries(stego-test ${STEGODISK_LIBRARY} ${LIBJPEGTURBO_LIBRARIES_STATIC})
+
+if(FUSE_FOUND)
+  target_link_libraries(stego-fuse-test ${STEGODISK_LIBRARY} ${FUSE_LIBRARIES} ${LIBJPEGTURBO_LIBRARIES_STATIC})
+endif()
+
 list(APPEND TESTS stego-test)
 
 add_custom_target(check
