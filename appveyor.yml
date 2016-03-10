@@ -11,7 +11,7 @@ build:
   verbosity: minimal
   parallel: true
 
-build_script: msbuild StegoDisk.sln /t:StegoDisk:check
+build_script: msbuild StegoDisk.sln /t:check
 
 notifications:
 - provider: Email
