@@ -3,6 +3,8 @@ configuration: Release
 platform: x64
 before_build:
 - ps: >-
+    git submodule update --init --recursive
+
     mkdir build
 
     cd build
@@ -10,6 +12,8 @@ before_build:
     cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
 build:
   verbosity: minimal
+  parallel: true
+
 notifications:
 - provider: Email
   to:
@@ -17,3 +21,7 @@ notifications:
   on_build_success: false
   on_build_failure: true
   on_build_status_changed: false
+
+branches:
+  only:
+    - master
