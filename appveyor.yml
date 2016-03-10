@@ -1,13 +1,16 @@
 version: 1.0.{build}
+configuration: Release
+platform: x64
 before_build:
 - ps: >-
     git submodule update --init --recursive
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
+    cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
 build:
   verbosity: minimal
   parallel: true
-  project: StegoDisk.sln
+  -ps: >-
+    msbuild StegoDisk.sln /t:StegoDisk:check
 
 notifications:
 - provider: Email
