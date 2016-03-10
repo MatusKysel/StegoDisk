@@ -4,12 +4,13 @@ platform: x64
 before_build:
 - ps: >-
     git submodule update --init --recursive
-
-    mkdir build
-
+    ls
+    mkdir build 
+    ls
     cd build
-
-    cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
+    ls
+    cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .. 
+    ls
 build:
   verbosity: minimal
   parallel: true
@@ -25,4 +26,4 @@ notifications:
 
 branches:
   only:
-    - master
+    - Windows
