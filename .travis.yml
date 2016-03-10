@@ -32,7 +32,7 @@ before_script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
-  - if [[ "$COVERITY_SCAN" == "1" ]]; then $COVERITY_SCAN_BUILD || true ; fi
+  - if [[ "$COVERITY_SCAN" == "1" ]]; then curl -s https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh | bash; fi
 
 script: 
   - if [ "$COVERITY_SCAN" != 1 ]; then make -j8; fi
@@ -55,5 +55,3 @@ env:
    - COVERITY_SCAN_NOTIFICATION_EMAIL="qwart279@gmail.com"
    - COVERITY_SCAN_BRANCH_PATTERN="master"
    - COVERITY_SCAN_BUILD_COMMAND="make -j8"
-   - COVERITY_SCAN_BUILD_URL="https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh"
-   - COVERITY_SCAN_BUILD="curl -s $COVERITY_SCAN_BUILD_URL | bash"
