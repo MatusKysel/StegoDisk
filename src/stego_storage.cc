@@ -135,15 +135,15 @@ std::size_t StegoStorage::GetSize() const {
 
 void StegoStorage::ChangeEncoder(std::string &config) const {
 
-  json::JsonObject config;
-  std::string parse_error = json::Parse(config, &config);
+  json::JsonObject json_config;
+  std::string parse_error = json::Parse(config, &json_config);
 
   if (!parse_error.empty()) {
     throw std::runtime_error("Failed to parse config file " + parse_error);
   }
 
   try {
-    return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+//    return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
   }
   catch (...) { throw; }
 }

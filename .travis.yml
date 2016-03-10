@@ -32,6 +32,7 @@ before_script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
+  - if [[ "$COVERITY_SCAN" == "1" ]]; then $COVERITY_SCAN_BUILD || true ; fi
 
 script: 
   - if [ "$COVERITY_SCAN" != 1 ]; then make -j8; fi
