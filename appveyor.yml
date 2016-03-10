@@ -5,19 +5,7 @@ before_build:
 - ps: >-
     git submodule update --init --recursive
 
-    ls
-
-    mkdir build 
-
-    ls
-
-    cd build
-
-    ls
-
-    cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .. 
-
-    ls
+    cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
 build:
   verbosity: minimal
   parallel: true
