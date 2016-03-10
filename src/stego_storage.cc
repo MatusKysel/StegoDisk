@@ -14,7 +14,6 @@
 #include "virtual_storage/virtual_storage.h"
 #include "file_management/carrier_files_manager.h"
 #include "utils/stego_config.h"
-#include "utils/json.h"
 
 namespace stego_disk {
 
@@ -51,13 +50,9 @@ void StegoStorage::Configure(const std::string &config_path) const {
 }
 
 void StegoStorage::Configure() const {
-  if (opened_) {
-    Configure(carrier_files_manager_->GetPath() + CONFIG_NAME);
-  } else {
-    Configure(EncoderFactory::GetDefaultEncoderType(),
-              PermutationFactory::GetDefaultPermutationType(),
-              PermutationFactory::GetDefaultPermutationType());
-  }
+  Configure(EncoderFactory::GetDefaultEncoderType(),
+            PermutationFactory::GetDefaultPermutationType(),
+            PermutationFactory::GetDefaultPermutationType());
 }
 
 void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
@@ -81,14 +76,14 @@ void StegoStorage::Load() {
   }
   
   try {
-	  carrier_files_manager_->SetEncoder(
-		  EncoderFactory::GetEncoder(StegoConfig::encoder()));
-	  carrier_files_manager_->ApplyEncoder();
+    carrier_files_manager_->SetEncoder(
+          EncoderFactory::GetEncoder(StegoConfig::encoder()));
+    carrier_files_manager_->ApplyEncoder();
 
-	  virtual_storage_ = std::make_shared<VirtualStorage>();
-	  virtual_storage_->SetPermutation(
-		  PermutationFactory::GetPermutation(StegoConfig::global_perm()));
-	  carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
+    virtual_storage_ = std::make_shared<VirtualStorage>();
+    virtual_storage_->SetPermutation(
+          PermutationFactory::GetPermutation(StegoConfig::global_perm()));
+    carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
   }
   catch (...) { throw; }
 }
@@ -101,7 +96,7 @@ void StegoStorage::Save() {
     throw std::runtime_error("Storage must be loaded before saving");
 
   try {
-	  carrier_files_manager_->SaveVirtualStorage();
+    carrier_files_manager_->SaveVirtualStorage();
   }
   catch (...) { throw; }
 }
@@ -112,7 +107,7 @@ void StegoStorage::Read(void* destination, const std::size_t offSet,
     throw std::runtime_error("Storage must be loaded before use");
 
   try {
-	  virtual_storage_->Read(offSet, length, (uint8*)destination);
+    virtual_storage_->Read(offSet, length, (uint8*)destination);
   }
   catch (...) { throw; }
 }
@@ -123,9 +118,9 @@ void StegoStorage::Write(const void* source, const std::size_t offSet,
     throw std::runtime_error("Storage must be loaded before use");
 
   try {
-	  virtual_storage_->Write(offSet, length, (uint8*)source);
+    virtual_storage_->Write(offSet, length, (uint8*)source);
   }
-  catch (...) { throw; } 
+  catch (...) { throw; }
 }
 
 std::size_t StegoStorage::GetSize() const {
@@ -133,16 +128,24 @@ std::size_t StegoStorage::GetSize() const {
     return 0;
 
   try {
-	  return virtual_storage_->GetUsableCapacity();
+    return virtual_storage_->GetUsableCapacity();
   }
   catch (...) { throw; }
 }
 
-std::size_t StegoStorage::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) const {
-	try {
-		return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
-	}
-	catch (...) { throw; }
+void StegoStorage::ChangeEncoder(std::string &config) const {
+
+  json::JsonObject config;
+  std::string parse_error = json::Parse(config, &config);
+
+  if (!parse_error.empty()) {
+    throw std::runtime_error("Failed to parse config file " + parse_error);
+  }
+
+  try {
+    return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+  }
+  catch (...) { throw; }
 }
 
 } // stego_disk

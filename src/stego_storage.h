@@ -16,8 +16,7 @@
 
 #include "encoders/encoder_factory.h"
 #include "permutations/permutation_factory.h"
-
-#define CONFIG_NAME ".config.json"
+#include "utils/json.h"
 
 namespace stego_disk {
 
@@ -46,7 +45,8 @@ public:
                  const PermutationFactory::PermutationType local_perm) const;
 
   std::size_t GetSize() const;
-  std::size_t GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) const;
+
+  void ChangeEncoder(std::string &config) const;
 
 private:
 

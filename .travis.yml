@@ -14,7 +14,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Caskroom/cask/osxfuse --force; fi
 
 install:
-- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-5" CC="gcc-5"; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-5" CC="gcc-5" COVERITY_SCAN=1; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
 
 addons:
@@ -34,8 +34,8 @@ before_script:
   - cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
 
 script: 
-  - make -j4
-  - make check
+  - if [ "$COVERITY_SCAN" != 1 ]; then make -j8; fi
+  - if [ "$COVERITY_SCAN" != 1 ]; then make check; fi
 
 sudo: required
 dist: trusty
@@ -45,3 +45,14 @@ notifications:
   email:
     on_success: never
     on_failure: always
+
+env:
+  global:
+   # Coverity Scan environment
+   - secure: "HSJuGTLKV5HU0rkRUE6jlHzkzK7oaKw8vEvhhMCSE6CaamZtEeiX2H/7rS47+LC+TwYEiRePwPUhClP4sov/FDF0ZhYSV6N3FG9mD+iUWVY/Trzo5xCMgZMf7Ht+GVnIHCNg5Jwyt0LiJysybr7CCD/1LQ+7gmpZjMzgaAo41tnYmjmqc0nmxZ9cyqcuZoFaWQdgahx2zKsaN6WauHQCshbO6QW9j0iIyp7Ak40K2B2/MMa3/e1PVj11QVgYdoPy8B6kMXqjQ8B8B9A9arPSppJMN5MMd7+v7jqI1jvtrbai91pgBoHW71VxlcXtzpj/lX6wuiLHVkBkq8xI5taGS3V3Htj9hlhpvyfW51wQK7q49xm1oacMxZ5+1B3ursjU5UzkdWD92J5mRhhtMTXAdOUonPfr/zCbAfYYg/eEUKxVPQSpWWBaEn6J7tF3Fa1W6yf9s6t1hsOZCxQv1J+H4dtRFMGv7qxtXpICXQsmLj4s32TDQR4FqYaEfDjWiHQhjPDf3lXkwX+HgSHYAGyRWfygJ4JJUPj93wXA/XwHPIvQjfzeXfRt30syB/sF4xB0/DGJrHmwhfVMQSiCNv9ooFFV6Z/2OH0xFwgdoBl/zOGt1tRu8c9eNQZ4Nhz918eNnm/Gr8yXEDE08mOjFDdjhE7Emawc99y2UOzRskKf4f4="
+   - COVERITY_SCAN_PROJECT_NAME="MatusKysel/StegoDisk"
+   - COVERITY_SCAN_NOTIFICATION_EMAIL="qwart279@gmail.com"
+   - COVERITY_SCAN_BRANCH_PATTERN="master"
+   - COVERITY_SCAN_BUILD_COMMAND="make -j8"
+   - COVERITY_SCAN_BUILD_URL="https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh"
+   - COVERITY_SCAN_BUILD="curl -s $COVERITY_SCAN_BUILD_URL | bash"
