@@ -131,11 +131,11 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Storage size = " << size << "B" << std::endl;
   if( gen_file_size == 0) gen_file_size = size;
-//  std::string input;
-//  std::string output;
-//  std::string input_file = std::string("/tmp/test") +
-//                           std::string(FuseService::virtual_file_name_,
-//                                       std::strlen(FuseService::virtual_file_name_));
+  std::string input;
+  std::string output;
+  std::string input_file = std::string(DST_DIRECTORY) +
+                           std::string(FuseService::virtual_file_name_,
+                                       std::strlen(FuseService::virtual_file_name_));
 //  LOG_DEBUG("Generating random string");
 //  GenerateRandomString(&input, gen_file_size);
 //  LOG_DEBUG("Writing to the storage");

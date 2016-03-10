@@ -3,7 +3,7 @@
 * @author Martin Kosdy
 * @author Matus Kysel
 * @date 2016
-* @brief Class for mamanging carrier files
+* @brief Class for managing carrier files
 *
 */
 

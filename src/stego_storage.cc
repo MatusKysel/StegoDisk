@@ -79,15 +79,18 @@ void StegoStorage::Load() {
   if (!opened_) {
     throw std::runtime_error("Storage must be opened_ before loading");
   }
+  
+  try {
+	  carrier_files_manager_->SetEncoder(
+		  EncoderFactory::GetEncoder(StegoConfig::encoder()));
+	  carrier_files_manager_->ApplyEncoder();
 
-  carrier_files_manager_->SetEncoder(
-        EncoderFactory::GetEncoder(StegoConfig::encoder()));
-  carrier_files_manager_->ApplyEncoder();
-
-  virtual_storage_ = std::make_shared<VirtualStorage>();
-  virtual_storage_->SetPermutation(
-        PermutationFactory::GetPermutation(StegoConfig::global_perm()));
-  carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
+	  virtual_storage_ = std::make_shared<VirtualStorage>();
+	  virtual_storage_->SetPermutation(
+		  PermutationFactory::GetPermutation(StegoConfig::global_perm()));
+	  carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
+  }
+  catch (...) { throw; }
 }
 
 void StegoStorage::Save() {
@@ -97,15 +100,21 @@ void StegoStorage::Save() {
   if (virtual_storage_ == nullptr)
     throw std::runtime_error("Storage must be loaded before saving");
 
-  carrier_files_manager_->SaveVirtualStorage();
+  try {
+	  carrier_files_manager_->SaveVirtualStorage();
+  }
+  catch (...) { throw; }
 }
 
-void StegoStorage::Read(const void* destination, const std::size_t offSet,
+void StegoStorage::Read(void* destination, const std::size_t offSet,
                         const std::size_t length) const {
   if (virtual_storage_ == nullptr)
     throw std::runtime_error("Storage must be loaded before use");
 
-  virtual_storage_->Read(offSet, length, (uint8*) destination);
+  try {
+	  virtual_storage_->Read(offSet, length, (uint8*)destination);
+  }
+  catch (...) { throw; }
 }
 
 void StegoStorage::Write(const void* source, const std::size_t offSet,
@@ -113,14 +122,27 @@ void StegoStorage::Write(const void* source, const std::size_t offSet,
   if (virtual_storage_ == nullptr)
     throw std::runtime_error("Storage must be loaded before use");
 
-  virtual_storage_->Write(offSet, length, (uint8*) source);
+  try {
+	  virtual_storage_->Write(offSet, length, (uint8*)source);
+  }
+  catch (...) { throw; } 
 }
 
 std::size_t StegoStorage::GetSize() const {
   if (virtual_storage_ == nullptr)
     return 0;
 
-  return virtual_storage_->GetUsableCapacity();
+  try {
+	  return virtual_storage_->GetUsableCapacity();
+  }
+  catch (...) { throw; }
+}
+
+std::size_t StegoStorage::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) const {
+	try {
+		return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+	}
+	catch (...) { throw; }
 }
 
 } // stego_disk

@@ -28,15 +28,6 @@ addons:
     - clang-3.7
     - libfuse-dev
 
-  coverity_scan:
-    project:
-      name: "MatusKysel/StegoDisk"
-      description: "Build submitted via Travis CI"
-    notification_email: qwart279@gmail.com
-    build_command_prepend: "mkdir build; cd build; cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .."
-    build_command:   "make -j4"
-    branch_pattern: master
-
 before_script:
   - mkdir build
   - cd build
@@ -45,10 +36,6 @@ before_script:
 script: 
   - make -j4
   - make check
-
-env:
-  global:
-   - secure: "axec5G/ltZPHu23UJ0l6KqwMYu4bGD8t1GmTcoyh+gNXeNmsx3K6MP9KbLqA96HtZGzL7u0hVe830gysVrqJppt8zQwfaYXew4ghUhODgnFyZNrc2p3vwoS7htsd5vmXWRgfe/vNXZvI2EOdbaI4PgQxeKc+ZlP1ld4u/tDgdB7PQ8qqOSQW8Qk+Jf5eWsdzZe+QXJ9Kw38Uwt5nKAp8O7nR2xjuQ4xhWHQvoDdo4/vmBe/DhUb6v14yhwaIr7U48My8yQRpqUtjs/TzuVkjMqlLz7BxSThqIiFm9h3KJWtTUZE5us5IO+7pQYkSWWRHYg3R/F/242Uo6FilbMVhmwXjbDnaDLBaXMbFpvNx96soZdedHJWiozWPe1NY9EIql11rjO00LMCALAjvW8u/8CWa0JSVBSrD7cUsXtlsEIDqlQPMk6/EVxaERbi3Q1IMMC4iyf3SxwyyQ5LDBpIzg9jT5FJn5vqJB4bQuDIIFwoQZPzn+sijhKTU6MB7fRXvJiCNJFb/YWHOmue7CzDOfgoSGui2d1WBRykCFv/bomiVondE1xH840LRTSBXvGOQQ16DKJ0/x0/mcnxQQfCAi3gdUIcqzJF61zLQ9QZzjvnmj0oDQn4MvDz2J2ybmQxOQPklAkNVSKWmoltCxLhfs6p/1daSQb6NavBxcTrzOgY="
 
 sudo: required
 dist: trusty

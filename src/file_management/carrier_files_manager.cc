@@ -3,7 +3,7 @@
 * @author Martin Kosdy
 * @author Matus Kysel
 * @date 2016
-* @brief Implementation of class for mamanging carrier files
+* @brief Implementation of class for managing carrier files
 *
 */
 
@@ -136,7 +136,7 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
 
   for(auto &&result: load_results) {
     if (result.get() != STEGO_NO_ERROR) {
-		throw std::runtime_error("Unsuccesful loading of carrier files");
+		throw std::runtime_error("Unsuccessful loading of carrier files");
     }
   }
 
@@ -295,7 +295,7 @@ void CarrierFilesManager::SaveAllFiles() {
 
   for(auto &&result: save_results) {
     if (result.get() != STEGO_NO_ERROR) {
-      throw std::runtime_error("Unsuccesful saving of carrier files");
+      throw std::runtime_error("Unsuccessful saving of carrier file");
     }
   }
 }
