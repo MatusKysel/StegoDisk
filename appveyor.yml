@@ -12,7 +12,7 @@ build:
   verbosity: minimal
   parallel: true
 
-build_script: msbuild StegoDisk.sln /m /t:check /property:Configuration=Release
+build_script: msbuild StegoDisk.sln /m /property:Configuration=Release
 
 notifications:
 - provider: Email
