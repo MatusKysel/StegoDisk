@@ -3,13 +3,9 @@ configuration: Release
 platform: x64
 before_build:
 - ps: >-
-    setx TEMP "c:"
-
-    setx TMP "c:"
-
     git submodule update --init --recursive
 
-    cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
+    cmake -G "Visual Studio 14 2015 Win64" -DTEST_DIR=c: -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
 
     cmake --build . --target check --config Release
 build:

@@ -6,10 +6,14 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 #add_definitions(-DRANDOM_TESTS=10)
 
-if(NOT WIN32)
-	set(DST_DIRECTORY /tmp/)
+if(NOT TEST_DIR)
+	if(NOT WIN32)
+		set(DST_DIRECTORY /tmp/)
+	else()
+		set(DST_DIRECTORY "$ENV{TEMP}/")
+	endif()
 else()
-	set(DST_DIRECTORY "$ENV{TEMP}/")
+	set(DST_DIRECTORY ${TEST_DIR})
 endif()
 
 set(SRC_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/img)
