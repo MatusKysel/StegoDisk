@@ -3,7 +3,7 @@ configuration: Release
 platform: x64
 before_build:
 - ps: >-
-    set TEMP=c:\temp
+    setx TEMP "c:"
 
     git submodule update --init --recursive
 
