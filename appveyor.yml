@@ -5,8 +5,9 @@ before_build:
 - ps: >-
     git submodule update --init --recursive
 
-    cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 --build . --target check
+    cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
 
+    cmake --build . --target check
 build:
   verbosity: minimal
   parallel: true
