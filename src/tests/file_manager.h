@@ -32,9 +32,7 @@ public:
 
   inline static std::string GetWinPath(const std::string &input) {
 	  std::string out = input;
-	  std::cout << input << std::endl;
 	  std::replace(out.begin(), out.end(), '/', '\\');
-	  std::cout << out << std::endl;
 	  return out;
   }
 
