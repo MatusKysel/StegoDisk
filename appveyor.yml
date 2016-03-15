@@ -7,12 +7,11 @@ before_build:
 
     cmake -G "Visual Studio 14 2015 Win64" -DTEST_DIR=c: -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .
 
-    cmake --build . --target check --config Release
 build:
   verbosity: minimal
   parallel: true
 
-build_script: msbuild StegoDisk.sln /m /property:Configuration=Release
+build_script: cmake --build . --target check --config Release
 
 notifications:
 - provider: Email

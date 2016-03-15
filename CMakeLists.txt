@@ -21,11 +21,11 @@ cmake_policy(SET CMP0009 NEW)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 if(NOT WIN32)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 else()
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 endif()
 
 set(STEGODISK_MAJOR_VERSION 0)
@@ -40,25 +40,25 @@ endif()
 
 math(EXPR STEGODISK_VERSION_NUMBER "${STEGODISK_MAJOR_VERSION} * 1000000 + ${STEGODISK_MINOR_VERSION} * 1000 + ${STEGODISK_PATCH_VERSION}")
 
-configure_file(${CMAKE_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
 
 
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(ADD_CMAKE_MODULE_PATH)
   set(CMAKE_MODULE_PATH ${ADD_CMAKE_MODULE_PATH})
 endif()
 
 if(NOT WIN32)
-	if(NOT LIBDIR)
-		set(LIBDIR "lib")
-	endif()
+    if(NOT LIBDIR)
+        set(LIBDIR "lib")
+    endif()
 else()
-	if(NOT LIBDIR)
-		set(LIBDIR "bin")
-	endif()
+    if(NOT LIBDIR)
+        set(LIBDIR "bin")
+    endif()
 endif()
 
 
@@ -81,21 +81,21 @@ endif()
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -pthread ${warnings}")
 endif()
 
 if(WIN32)
-	if (BUILD_SHARED_LIBS)
+    if (BUILD_SHARED_LIBS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS")
-	endif()
+    endif()
 endif()
 ################ CXX FLAGS ##################
 
 ################ LIBJPEGTURBO ##################
-if(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt.orig")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt.orig")
   message(STATUS "Library 'libjpeg-turbo' already patched.")
-elseif(EXISTS "${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
-  execute_process(COMMAND patch ${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET OUTPUT_QUIET)
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
+  execute_process(COMMAND patch ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_CURRENT_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET OUTPUT_QUIET)
 else()
   message(FATAL_ERROR "Unable to find 'libjpeg-turbo' library.")
 endif()
@@ -104,9 +104,9 @@ option(ENABLE_SHARED OFF)
 option(WITH_SIMD OFF)
 option(WITH_TURBOJPEG OFF)
 add_subdirectory(lib/libjpeg-turbo)
-set(LIBJPEGTURBO_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
-include_directories(${CMAKE_SOURCE_DIR}/lib/libjpeg-turbo)
-include_directories(${CMAKE_BINARY_DIR}/lib/libjpeg-turbo)
+set(LIBJPEGTURBO_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 ################ LIBJPEGTURBO ##################
 
 ################ FUSE ##################
@@ -123,7 +123,7 @@ else()
 endif()
 ################ FUSE ##################
 
-include_directories(${CMAKE_SOURCE_DIR}/src) #this makes src root dir
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) #this makes src root dir
 
 ##############################################################################################################################
 ##############################################################################################################################
@@ -152,7 +152,7 @@ set(ENCODERS_HDRS
   src/encoders/encoder.h
   src/encoders/encoder_factory.h
   src/encoders/hamming_encoder.h
-  src/encoders/lsb_encoder.h 
+  src/encoders/lsb_encoder.h
 )
 
 set(ENCODERS_SRCS
@@ -233,7 +233,7 @@ set(LOGGING_SRCS
 
 # PERMUTATIONS
 
-set(PERMUTATIONS_HDRS 
+set(PERMUTATIONS_HDRS
   src/permutations/affine_permutation.h
   src/permutations/affine64_permutation.h
   src/permutations/feistel_mix_permutation.h
@@ -312,7 +312,7 @@ set(STEGODISK_SRCS
   ${KEYS_SRCS}
   ${LOGGING_SRCS}
   ${PERMUTATIONS_SRCS}
-  ${UTILS_SRCS} 
+  ${UTILS_SRCS}
   ${CARRIER_FILES_SRCS}
   ${VIRTUAL_STORAGE_SRCS}
   ${FILE_MANAGEMENT_SRCS}
