@@ -100,8 +100,6 @@ void AffinePermutation::Init(PermElem requested_size, Key &key)
     throw std::runtime_error("AffinePermutation: requested size is too small");
 
   initialized_ = true;
-
-  //LOG_DEBUG("AffinePermutation::init: hash is " << StegoMath::hexBufferToStr(keyHash, SFS_KEY_HASH_LENGTH) << ", size: " << _size << ", paramA: " << _key_param_a_ << ", paramB: " << _key_param_b_);
 }
 
 
