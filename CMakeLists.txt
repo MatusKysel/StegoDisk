@@ -85,9 +85,10 @@ if(NOT WIN32)
 endif()
 
 if(WIN32)
-    if (BUILD_SHARED_LIBS)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS")
-    endif()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  if (BUILD_SHARED_LIBS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS")
+  endif()
 endif()
 ################ CXX FLAGS ##################
 

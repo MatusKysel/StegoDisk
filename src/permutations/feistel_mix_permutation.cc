@@ -121,7 +121,7 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
 }
 
 PermElem FeistelMixPermutation::GetSizeUsingParams(PermElem requested_size,
-                                                   Key &key) {
+                                                   Key& /*key*/) {
   if (requested_size < FMP_MIN_REQ_SIZE) return 0;
 
   uint8 bit_len = StegoMath::Log2(requested_size);
