@@ -14,6 +14,7 @@
 #include "carrier_file.h"
 #include "carrier_file_bmp.h"
 #include "carrier_file_jpeg.h"
+#include "carrier_file_png.h"
 #include "encoders/encoder_factory.h"
 #include "permutations/permutation_factory.h"
 #include "utils/stego_config.h"
@@ -31,6 +32,11 @@ CarrierFilePtr CarrierFileFactory::CreateCarrierFile(const File& file) {
                                                nullptr);
   } else if (ext.compare(".jpg") == 0) {
     carrier_file = std::make_shared<CarrierFileJPEG>(file,
+                                                nullptr,
+                                                PermutationFactory::GetPermutation(StegoConfig::local_perm()),
+                                                nullptr);
+  } else if (ext.compare(".png") == 0) {
+    carrier_file = std::make_shared<CarrierFilePNG>(file,
                                                 nullptr,
                                                 PermutationFactory::GetPermutation(StegoConfig::local_perm()),
                                                 nullptr);

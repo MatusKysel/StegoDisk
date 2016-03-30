@@ -124,6 +124,11 @@ else()
 endif()
 ################ FUSE ##################
 
+################ LodePNG ##################
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng)
+set(LODEPNG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.cpp ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.h)
+################ LodePNG ##################
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) #this makes src root dir
 
 ##############################################################################################################################
@@ -138,6 +143,7 @@ set(CARRIER_FILES_HDRS
   src/carrier_files/carrier_file.h
   src/carrier_files/carrier_file_factory.h
   src/carrier_files/carrier_file_jpeg.h
+  src/carrier_files/carrier_file_png.h
 )
 
 set(CARRIER_FILES_SRCS
@@ -145,6 +151,7 @@ set(CARRIER_FILES_SRCS
   src/carrier_files/carrier_file.cc
   src/carrier_files/carrier_file_factory.cc
   src/carrier_files/carrier_file_jpeg.cc
+  src/carrier_files/carrier_file_png.cc
 )
 
 # ENCODERS
@@ -330,9 +337,9 @@ endif()
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(FUSE_FOUND)
-  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${FUSE_LIBRARIES})
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${LODEPNG_LIBRARIES} ${FUSE_LIBRARIES})
 else()
-  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${LODEPNG_LIBRARIES})
 endif()
 
 
@@ -347,7 +354,7 @@ else()
   set(STEGODISK_LIBRARY stego-disk)
 endif()
 
-add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS})
+add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_SRC})
 
 if(REQUIRE_LIB_SYMBOL)
   target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
