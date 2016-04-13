@@ -90,6 +90,8 @@ uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
 #else
   uint64 x = 1, y = a;
 #endif
+#else
+  uint64 x = 1, y = a;
 #endif
 
   while (b > 0) {
