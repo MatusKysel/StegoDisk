@@ -84,10 +84,12 @@ bool StegoMath::MillerRabin(uint64 p) {
 /* This function calculates (a^b)%c */
 uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
 
-#ifdef STEGO_OS_WIN
-  uint64 x = 1, y = a;
+#if __GNUC__
+#if __x86_64__ || __ppc64__
+  __unit128_t x = 1, y = a;
 #else
-  __uint128_t x = 1, y = a; // this is for gcc 4.8
+  uint64 x = 1, y = a;
+#endif
 #endif
 
   while (b > 0) {

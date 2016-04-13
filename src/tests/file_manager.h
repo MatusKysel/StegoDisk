@@ -39,23 +39,25 @@ public:
   inline static void CopyDirectory(const std::string &src, const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
-	  std::string cmd = "xcopy " + GetWinPath(src) + " " + GetWinPath(dst) + " /s /e /h /i";
+    std::string cmd = "xcopy " + GetWinPath(src) + " " + GetWinPath(dst) + " /s /e /h /i";
 #else
     std::string cmd = "cp -rf " + src + " " + dst;
 #endif
-	std::cout << cmd << std::endl;
-    system(cmd.c_str());
+    std::cout << cmd << std::endl;
+
+    if(system(cmd.c_str())) throw std::runtime_error("Failed to execute: " + cmd);
   }
 
   inline static void RemoveDirectory(const std::string &path) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
-	  std::string cmd = "rd /s /q " + GetWinPath(path);
+    std::string cmd = "rd /s /q " + GetWinPath(path);
 #else
     std::string cmd = "rm -rf " + path;
 #endif
-	std::cout << cmd << std::endl;
-    system(cmd.c_str());
+    std::cout << cmd << std::endl;
+
+    if(system(cmd.c_str())) throw std::runtime_error("Failed to execute: " + cmd);
   }
 };
 
