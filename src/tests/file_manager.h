@@ -45,7 +45,7 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str())) throw std::runtime_error("Failed to execute: " + cmd);
+    if(system(cmd.c_str()) < 0) throw std::runtime_error("Failed to execute: " + cmd);
   }
 
   inline static void RemoveDirectory(const std::string &path) {
@@ -57,7 +57,7 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str())) throw std::runtime_error("Failed to execute: " + cmd);
+    if(system(cmd.c_str()) < 0) throw std::runtime_error("Failed to execute: " + cmd);
   }
 };
 
