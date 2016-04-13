@@ -86,7 +86,7 @@ uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
 
 #if __GNUC__
 #if __x86_64__ || __ppc64__
-  __unit128_t x = 1, y = a;
+  __uint128_t x = 1, y = a;
 #else
   uint64 x = 1, y = a;
 #endif
