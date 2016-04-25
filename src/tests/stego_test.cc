@@ -42,6 +42,7 @@ static void PrintHelp(char *name) {
             << "\t-e,--encoder ENCODER\tSpecify the encoder\n"
             << "\t-p,--permutation PERMUTATION\tSpecify the permutation\n"
             << "\t-g,--gen_file_size GEN_SIZE\tSpecify size of generated data\n"
+            << "\t-%,--percent PERCENT\tSpecify percentage of carrier loading\n"
             << "\t-d,--directory DIRECTORY\tSpecify the source directory\n"
             << "\t-t,--test_directory \tSpecify that this directory is only for"
                " testing and it will create copy of it\n"
@@ -93,7 +94,9 @@ int main(int argc, char *argv[]) {
   std::string dir;
   bool test_directory = false;
   bool password = false;
+  bool invert = false;
   size_t gen_file_size = 0;
+  size_t percent = 100;
 
   if (argc < 3) {
     PrintHelp(argv[0]);
@@ -125,6 +128,17 @@ int main(int argc, char *argv[]) {
         LOG_ERROR("--gen_file_size option requires one argument.");
         return -1;
       }
+    } else if ((arg == "-%") || (arg == "--percent")) {
+      if (++i < argc) {
+        percent = atoi(argv[i]);
+  if (((long)percent<0) || (percent>100)) {
+          LOG_ERROR("--percent option must be in <0;100>.");
+          return -1;
+  }
+      } else {
+        LOG_ERROR("--percent option requires one argument.");
+        return -1;
+      }
     } else if ((arg == "-d") || (arg == "--directory")) {
       if (++i < argc) {
         dir = argv[i];
@@ -134,6 +148,8 @@ int main(int argc, char *argv[]) {
       }
     } else if ((arg == "-t") || (arg == "--test_directory")) {
       test_directory = true;
+    } else if ((arg == "-i") || (arg == "--invert")) {
+      invert = true;
     } else if ((arg == "-f") || (arg == "--file_type")) {
       if (++i < argc) {
         file_type = argv[i];
@@ -174,17 +190,29 @@ int main(int argc, char *argv[]) {
   stego_storage->Open(dir, (password) ? PASSWORD : "");
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
-  size = stego_storage->GetSize();
+  size = stego_storage->GetSize() * ((double)percent/100.0);
   std::cout << "Storage size = " << size << "B" << std::endl;
   if( gen_file_size == 0) gen_file_size = size;
   std::string input;
   std::string output;
-  LOG_DEBUG("Generating random string");
-  GenerateRandomString(&input, gen_file_size);
+
+  if ( invert == false ) {
+    LOG_DEBUG("Generating random string");
+    GenerateRandomString(&input, gen_file_size);
+  } else {
+    LOG_DEBUG("Creating inverted DCT string");
+    input.resize(gen_file_size);
+    stego_storage->Read(&(input[0]), 0, input.size());
+    for (size_t i = 0; i < input.size(); ++i) {
+      input[i] = ~(input[i]);
+    }
+  }
+
   LOG_DEBUG("Writing to the storage");
   stego_storage->Write(&(input[0]), 0, input.size());
   LOG_DEBUG("Saving storage");
   stego_storage->Save();
+
   LOG_DEBUG("Opening storage");
   stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
                            StrToPermutation(permutation));
@@ -194,8 +222,6 @@ int main(int argc, char *argv[]) {
   output.resize(input.size());
   LOG_DEBUG("Reading from the storage");
   stego_storage->Read(&(output[0]), 0, input.size());
-  LOG_DEBUG("Saving storage");
-  stego_storage->Save();
 
   if(test_directory) FileManager::RemoveDirectory(dir);
 

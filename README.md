@@ -4,7 +4,6 @@ Linux/OSX [![Build Status](https://travis-ci.org/MatusKysel/StegoDisk.svg?branch
 
 Windows [![Build status](https://ci.appveyor.com/api/projects/status/0x4qk5yudw0o30m7?svg=true)](https://ci.appveyor.com/project/MatusKysel/stegodisk)
 
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/8187/badge.svg)](https://scan.coverity.com/projects/matuskysel-stegodisk)
 
 ###Overview###
 StegoDisk is cross platform steganographic file system ... TODO
