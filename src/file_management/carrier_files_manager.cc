@@ -24,6 +24,7 @@
 #include "carrier_files/carrier_file.h"
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
+#include "utils/stego_config.h"
 #include "utils/config.h"
 #include "utils/stego_math.h"
 #include "utils/file.h"
@@ -68,9 +69,11 @@ int CarrierFilesManager::LoadDirectory(const std::string &directory) {
   std::vector<std::future<CarrierFilePtr>> carrier_files;
 
   for(auto &file: files) {
-    carrier_files.emplace_back(thread_pool_->enqueue(
-                                 &CarrierFileFactory::CreateCarrierFile,
-                                 file));
+    if(StegoConfig::exclude_list().find(file.GetExtension()) == StegoConfig::exclude_list().end()) {
+      carrier_files.emplace_back(thread_pool_->enqueue(
+                                   &CarrierFileFactory::CreateCarrierFile,
+                                   file));
+    }
   }
 
   for(auto &&file: carrier_files) {
@@ -163,7 +166,7 @@ int CarrierFilesManager::SaveVirtualStorage() {
 }
 
 void CarrierFilesManager::SetEncoderArg(const string &param,
-                                              const string &val) {
+                                        const string &val) {
   if (!encoder_)
     throw std::invalid_argument("CarrierFilesManager::SetEncoderArgByName: "
                                 "encoder is not Set yet");
@@ -172,7 +175,7 @@ void CarrierFilesManager::SetEncoderArg(const string &param,
                                 "another encoder is active; please first unSet "
                                 "this encoder");
 
-  try { EncoderFactory::SetEncoderArg(encoder_,param,val); }
+  try { EncoderFactory::SetEncoderArg(encoder_, param, val); }
   catch (...) { throw; }
 }
 

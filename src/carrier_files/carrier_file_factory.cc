@@ -25,20 +25,26 @@ CarrierFilePtr CarrierFileFactory::CreateCarrierFile(const File& file) {
   shared_ptr<CarrierFile> carrier_file;
 
   std::string ext = file.GetExtension();
-  if (ext.compare(".bmp") == 0) {
+  if (ext.compare("bmp") == 0) {
     carrier_file = std::make_shared<CarrierFileBMP>(file,
                                                nullptr,
-                                               PermutationFactory::GetPermutation(StegoConfig::local_perm()),
+                                               PermutationFactory::GetPermutation(
+                                                      (StegoConfig::file_config().find("bmp") != StegoConfig::file_config().end())
+                                                      ? StegoConfig::file_config()["bmp"].second : StegoConfig::local_perm()),
                                                nullptr);
-  } else if (ext.compare(".jpg") == 0) {
+  } else if (ext.compare("jpg") == 0) {
     carrier_file = std::make_shared<CarrierFileJPEG>(file,
                                                 nullptr,
-                                                PermutationFactory::GetPermutation(StegoConfig::local_perm()),
+                                               PermutationFactory::GetPermutation(
+                                                      (StegoConfig::file_config().find("jpg") != StegoConfig::file_config().end())
+                                                      ? StegoConfig::file_config()["jpg"].second : StegoConfig::local_perm()),
                                                 nullptr);
-  } else if (ext.compare(".png") == 0) {
+  } else if (ext.compare("png") == 0) {
     carrier_file = std::make_shared<CarrierFilePNG>(file,
                                                 nullptr,
-                                                PermutationFactory::GetPermutation(StegoConfig::local_perm()),
+                                                PermutationFactory::GetPermutation(
+                                                       (StegoConfig::file_config().find("png") != StegoConfig::file_config().end())
+                                                       ? StegoConfig::file_config()["png"].second : StegoConfig::local_perm()),
                                                 nullptr);
   }
 

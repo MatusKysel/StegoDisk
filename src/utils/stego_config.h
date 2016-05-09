@@ -10,7 +10,7 @@
 #define STEGODISK_UTILS_STEGOCONFIG_H_
 
 #include <string>
-#include <vector>
+#include <set>
 #include <map>
 #include <tuple>
 #include <memory>
@@ -32,22 +32,42 @@ public:
     Instance().local_perm_ = PermutationFactory::GetPermutationType(config["local_perm"].ToString());
     Instance().stego_config_loaded_ = true;
 
+    if(config["exclude_types"].IsArray()) {
+      json::JsonObject exclude_list = config["exclude_types"];
+      for (size_t i = 0; i < exclude_list.ArraySize(); ++i) {
+         if(exclude_list[i].IsString()) {
+           Instance().exclude_list_.insert(exclude_list[i].ToString());
+         }
+       }
+    }
+
+    if(config["file_types"].IsArray()) {
+      json::JsonObject file_types = config["file_types"];
+       for (size_t i = 0; i < file_types.ArraySize(); ++i) {
+         if(file_types[i].IsObject()) {
+           if(file_types[i]["file_type"].IsString()){
+              Instance().file_config_[file_types[i]["file_type"].ToString()] =
+                  std::make_pair(EncoderFactory::GetEncoderType(file_types[i]["encoder"].ToString()),
+                  PermutationFactory::GetPermutationType(file_types[i]["permutation"].ToString()));
+           }
+         }
+       }
+    }
   }
 
   inline static PermutationFactory::PermutationType &global_perm() { return Instance().global_perm_; }
   inline static PermutationFactory::PermutationType &local_perm() { return Instance().local_perm_; }
   inline static EncoderFactory::EncoderType &encoder() { return Instance().encoder_; }
-  inline static std::unique_ptr< std::vector<std::string> > &exclude_list() { return Instance().exclude_list_; }
-  inline static std::unique_ptr<std::map<std::string,
-  std::pair<EncoderFactory::EncoderType, PermutationFactory::PermutationType> > >
+  inline static std::set<std::string> &exclude_list() { return Instance().exclude_list_; }
+  inline static std::map<std::string, std::pair<EncoderFactory::EncoderType, PermutationFactory::PermutationType> >
   &file_config() { return Instance().file_config_; }
 
 
 private:
   StegoConfig() :
     stego_config_loaded_(false),
-    exclude_list_(nullptr),
-    file_config_(nullptr)
+    exclude_list_(),
+    file_config_()
   {}
 
   ~StegoConfig() {}
@@ -61,9 +81,8 @@ private:
   EncoderFactory::EncoderType encoder_;
   PermutationFactory::PermutationType global_perm_;
   PermutationFactory::PermutationType local_perm_;
-  std::unique_ptr< std::vector<std::string> > exclude_list_;
-  std::unique_ptr<std::map<std::string,
-  std::pair<EncoderFactory::EncoderType, PermutationFactory::PermutationType> > > file_config_;
+  std::set<std::string> exclude_list_;
+  std::map<std::string, std::pair<EncoderFactory::EncoderType, PermutationFactory::PermutationType> > file_config_;
 
   static StegoConfig stego_config_;
 };

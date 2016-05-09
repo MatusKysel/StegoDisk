@@ -47,6 +47,7 @@ void StegoStorage::Configure(const std::string &config_path) const {
   if (!parse_error.empty()) {
     throw std::runtime_error("Failed to parse config file " + parse_error);
   }
+  StegoConfig::Init(config);
 }
 
 void StegoStorage::Configure() const {

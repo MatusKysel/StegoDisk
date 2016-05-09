@@ -91,7 +91,7 @@ std::string File::GetExtension(bool convert_to_lowercase) const {
   if (ext_pos == string::npos) return "";
   if ((relative_path_.length() - ext_pos) > 5) return "";
 
-  string ext = relative_path_.substr(ext_pos);
+  string ext = relative_path_.substr(ext_pos + 1);
   if (convert_to_lowercase)
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
