@@ -67,9 +67,9 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
 
 
 
-int CarrierFileBMP::LoadFile() {
+void CarrierFileBMP::LoadFile() {
 
-  if (file_loaded_) return STEGO_NO_ERROR;
+  if (file_loaded_) return;
 
   auto file_ptr = file_.Open();
 
@@ -118,12 +118,10 @@ int CarrierFileBMP::LoadFile() {
 
   if(fitness_ != nullptr)
     delete(usable_buffer);
-
-  return STEGO_NO_ERROR;
 }
 
 
-int CarrierFileBMP::SaveFile() {
+void CarrierFileBMP::SaveFile() {
   auto file_ptr = file_.Open();
 
   if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
@@ -140,8 +138,8 @@ int CarrierFileBMP::SaveFile() {
                                               file_ptr.Get()));
 
   if (read_cnt != raw_capacity_ * 8) {
-    LOG_ERROR("Unable to read file.")
-        throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
+    LOG_ERROR("Unable to read file.");
+    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
   }
 
   uint64 usable_capacity = raw_capacity_;
@@ -198,7 +196,6 @@ int CarrierFileBMP::SaveFile() {
     delete(output_buffer);
     delete(usable_buffer);
   }
-  return STEGO_NO_ERROR;
 }
 
 } // stego_disk

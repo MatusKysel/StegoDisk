@@ -130,7 +130,7 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
     offset += carrier_files_[i]->GetCapacity();
   }
 
-  std::vector<std::future<int>> load_results;
+  std::vector<std::future<void>> load_results;
 
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     load_results.emplace_back(thread_pool_->enqueue(&CarrierFile::LoadFile,
@@ -138,9 +138,8 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   }
 
   for(auto &&result: load_results) {
-    if (result.get() != STEGO_NO_ERROR) {
-		throw std::runtime_error("Unsuccessful loading of carrier files");
-    }
+    try {result.get();}
+    catch (...) { throw; }
   }
 
   virtual_storage_ = storage;
@@ -289,7 +288,7 @@ void CarrierFilesManager::DeriveSubkeys() {
 
 
 void CarrierFilesManager::SaveAllFiles() {
-  std::vector<std::future<int>> save_results;
+  std::vector<std::future<void>> save_results;
 
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     save_results.emplace_back(
@@ -297,9 +296,8 @@ void CarrierFilesManager::SaveAllFiles() {
   }
 
   for(auto &&result: save_results) {
-    if (result.get() != STEGO_NO_ERROR) {
-      throw std::runtime_error("Unsuccessful saving of carrier file");
-    }
+    try {result.get();}
+    catch (...) { throw; }
   }
 }
 

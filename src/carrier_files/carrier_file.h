@@ -63,8 +63,8 @@ public:
   uint64 GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder);
 
   virtual bool IsFileLoaded();
-  virtual int LoadFile() = 0;
-  virtual int SaveFile() = 0;
+  virtual void LoadFile() = 0;
+  virtual void SaveFile() = 0;
 
   void SetSubkey(const Key& subkey_);
   int AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage, uint64 offSet,

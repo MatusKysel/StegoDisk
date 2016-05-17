@@ -20,7 +20,7 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
-#define EXIT_SUCCESS 0
+#define COLOR_SPACE 1 //YCbCr
 
 namespace stego_disk {
 
@@ -32,7 +32,7 @@ CarrierFileJPEG::CarrierFileJPEG(File file,
   ComputeCapacity();
 }
 
-int CarrierFileJPEG::ComputeCapacity() {
+void CarrierFileJPEG::ComputeCapacity() {
   // TODO: test if file is Opened OK
   auto file_ptr = file_.Open();
 
@@ -64,7 +64,7 @@ int CarrierFileJPEG::ComputeCapacity() {
 
   uint32 capacity_in_bits = 0;
 
-  for (ci = 0; ci < 3; ++ci) {
+  for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; by < compptr->height_in_blocks; ++by) {
       jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
@@ -83,18 +83,12 @@ int CarrierFileJPEG::ComputeCapacity() {
 
   jpeg_finish_decompress(&cinfo_decompress);
   jpeg_destroy_decompress(&cinfo_decompress);
-
-  return 0;
-
 }
 
-int CarrierFileJPEG::LoadFile() {
-  if (file_loaded_) return STEGO_NO_ERROR;
+void CarrierFileJPEG::LoadFile() {
+  if (file_loaded_) return;
 
   auto file_ptr = file_.Open();
-//  if(!file_loaded_) return SE_LOAD_FILE;
-
-  //LOG_TRACE("CarrierFileJPEG::loadFile: Loading file " << file_.GetRelativePath());
 
   if (permutation_->GetSize() == 0) {
     permutation_->Init(raw_capacity_ * 8, subkey_);
@@ -138,7 +132,7 @@ int CarrierFileJPEG::LoadFile() {
   LOG_TRACE("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath() <<
             ", bits to modify: " << bits_to_modify);
 
-  for (ci = 0; ci < 3; ++ci) {
+  for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; (by < compptr->height_in_blocks) && should_read; ++by) {
       jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
@@ -168,6 +162,8 @@ int CarrierFileJPEG::LoadFile() {
   if (ExtractBufferUsingEncoder()) {
     LOG_ERROR("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath()
               << ", saving: buffer extracting failed!");
+    throw std::runtime_error("File " + file_.GetFileName() +
+                                                  " buffer extracting failed!");
   }
 
   file_loaded_ = true;
@@ -178,12 +174,14 @@ int CarrierFileJPEG::LoadFile() {
   LOG_TRACE("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath()
             << " loaded");
 
-  return STEGO_NO_ERROR;
 }
 
-int CarrierFileJPEG::SaveFile() {
+void CarrierFileJPEG::SaveFile() {
 
   auto file_ptr = file_.Open();
+
+  if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
+                                             " is not loaded");
 
   LOG_TRACE("Saving file " << file_.GetRelativePath());
 
@@ -240,7 +238,7 @@ int CarrierFileJPEG::SaveFile() {
 
   // read LSBs from DCT coefficient and store them in temporary buffer in "locally" permuted order
 
-  for (ci = 0; ci < 3; ++ci) {
+  for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; (by < compptr->height_in_blocks) && should_read; ++by) {
       jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
@@ -272,6 +270,8 @@ int CarrierFileJPEG::SaveFile() {
   if (EmbedBufferUsingEncoder()) {
     LOG_ERROR("CarrierFileJPEG::saveFile: '" << file_.GetRelativePath() <<
               "': buffer embedding failed!");
+    throw std::runtime_error("File " + file_.GetFileName() +
+                                                  " buffer extracting failed!");
   }
 
   //LOG_INFO(_relativePath << ", embedded buffer: " << StegoMath::hexBufferToStr(buffer_, 10));
@@ -282,7 +282,7 @@ int CarrierFileJPEG::SaveFile() {
   coeff_counter = 0;
 //  uint8 tmp_lsb = 0;
 
-  for (ci = 0; ci < 3; ++ci){
+  for (ci = 0; ci < COLOR_SPACE; ++ci){
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; (by < compptr->height_in_blocks) && should_write; ++by) {
       jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
@@ -347,8 +347,6 @@ int CarrierFileJPEG::SaveFile() {
             " saved");
 
   //file_loaded_ = false;
-
-  return STEGO_NO_ERROR;
 }
 
 int CarrierFileJPEG::GetHistogram()
@@ -369,7 +367,7 @@ int CarrierFileJPEG::GetHistogram()
 
     int coefCount = 0;
 
-    for (ci = 0; ci < 3; ci++)
+    for (ci = 0; ci < COLOR_SPACE; ci++)
     {
         compptr = _cinfo_decompress.comp_info + ci;
         for (by = 0; by < compptr->height_in_blocks; by++)

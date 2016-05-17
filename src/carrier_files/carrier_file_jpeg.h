@@ -31,7 +31,7 @@ namespace stego_disk {
 class CarrierFileJPEG : public CarrierFile {
 
 private:
-  int ComputeCapacity();
+  void ComputeCapacity();
 
 public:
   CarrierFileJPEG(File file,
@@ -39,8 +39,8 @@ public:
                   std::shared_ptr<Permutation> permutation,
                   std::unique_ptr<Fitness> fitness);
 
-  int LoadFile();
-  int SaveFile();
+  void LoadFile();
+  void SaveFile();
 
   int GetHistogram();
 

@@ -45,9 +45,9 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
   raw_capacity_ = (lodepng_get_raw_size(width_, height_, &state_.info_raw) / 8);
 }
 
-int CarrierFilePNG::LoadFile() {
+void CarrierFilePNG::LoadFile() {
 
-  if (file_loaded_) return STEGO_NO_ERROR;
+  if (file_loaded_) return;
 
     auto file_ptr = file_.Open();
 
@@ -96,12 +96,10 @@ int CarrierFilePNG::LoadFile() {
     file_loaded_ = true;
 
     LOG_INFO("File " << file_.GetRelativePath() << " loaded");
-
-    return STEGO_NO_ERROR;
 }
 
 
-int CarrierFilePNG::SaveFile() {
+void CarrierFilePNG::SaveFile() {
   auto file_ptr = file_.Open();
 
   if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
@@ -177,8 +175,6 @@ int CarrierFilePNG::SaveFile() {
   free(image_out);
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");
-
-  return STEGO_NO_ERROR;
 }
 
 } // stego_disk

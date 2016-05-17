@@ -123,18 +123,18 @@ int main(int argc, char *argv[]) {
       }
     } else if ((arg == "-g") || (arg == "--gen_file_size")) {
       if (++i < argc) {
-        gen_file_size = atoi(argv[i]);
+        gen_file_size = static_cast<size_t>(atoi(argv[i]));
       } else {
         LOG_ERROR("--gen_file_size option requires one argument.");
         return -1;
       }
     } else if ((arg == "-%") || (arg == "--percent")) {
       if (++i < argc) {
-        percent = atoi(argv[i]);
-  if (((long)percent<0) || (percent>100)) {
+        percent = static_cast<size_t>(atoi(argv[i]));
+        if ((static_cast<int>(percent) < 0) || (percent > 100)) {
           LOG_ERROR("--percent option must be in <0;100>.");
           return -1;
-  }
+        }
       } else {
         LOG_ERROR("--percent option requires one argument.");
         return -1;
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
   stego_storage->Open(dir, (password) ? PASSWORD : "");
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
-  size = stego_storage->GetSize() * ((double)percent/100.0);
+  size = stego_storage->GetSize() * static_cast<size_t>(static_cast<double>(percent) / 100.0);
   std::cout << "Storage size = " << size << "B" << std::endl;
   if( gen_file_size == 0) gen_file_size = size;
   std::string input;

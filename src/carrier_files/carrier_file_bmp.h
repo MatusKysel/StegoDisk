@@ -30,8 +30,8 @@ public:
                  std::shared_ptr<Permutation> permutation,
                  std::unique_ptr<Fitness> fitness);
 
-  int LoadFile();
-  int SaveFile();
+  void LoadFile();
+  void SaveFile();
 
 
 private:
