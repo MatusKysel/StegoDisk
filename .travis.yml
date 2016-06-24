@@ -1,27 +1,8 @@
 language: cpp
-
-compiler:
-  - gcc
-
-os:
-  - linux
-
-install:
-- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-5" CC="gcc-5"; fi
-
-script: 
-- echo $HOME
-
+compiler: gcc
+os: linux
+script: echo $HOME
 addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.7
-    packages:
-    - gcc-5
-    - g++-5
-    - clang-3.7
-    - libfuse-dev
   coverity_scan:
     project:
       name: "MatusKysel/StegoDisk"
@@ -33,19 +14,15 @@ addons:
 
 sudo: required
 dist: trusty
-
 notifications:
   email:
     on_success: never
     on_failure: always
-
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "dqEODtEOfbDMuNO9Zju3C7rtRFpbqTgX+xFH4prpbXlQm5xOwI1ZX4vjDsgiyyVtcP8Db+/VUopw1UOEs8gKFmQvA9n6fHlAz8pWg69K0U/luRu+4ztF62wYZKyMOU6DOUPDL3R9MhGxdk5kk1Ak/lzIZszqsCcbsKnuRxNbdlguxEVzJ8gevl6ICcO4XE935yN71q3YFTO0wcKYqeS0k+16Yf8B2UVWmndxIx1iETaC10LzzHrZv1S8D24hYVk+fiG5Z480ac6ayNizSx56m9FsXTGoLrIDAsaq244Ta0+PS74noAlNEW+DTlX4EczDxX4pu1sdxv2BKhiKBsIKvzdyUuW2TA+VKIvCG9oHun+1p36A33+iLogHuSysQuAcZZF3H/87OhOlq1jnVMkepJk/8JKFVykLy7i6lGgBgGwIF9TmIsKbW0vyO3bcyvszNLJS+tMwi97av68t+jDjG0g6pZTRL6mqe10pwNP04FBZV7zeqArDrXCqpnOF1WU+lIY46F4Y/gZEp5CAGVmDegHIBKnqSLSMo0jd1kqjAo8If/o8WSvQo5uOitPPiYLUWCYxAwPiPGUvQJc3R9t2ePJ/BZ0uujGpTb/rfv47OLtJyqtaOa70sNeJi+/UjlajB4ETKoktKCtTvmSL+/4Ha6Fn6F+EmGesj/cKdZjGCAk="
-
 branches:
-  only:
-    - coverity
+  only: coverity
 
