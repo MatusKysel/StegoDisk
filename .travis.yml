@@ -2,19 +2,12 @@ language: cpp
 
 compiler:
   - gcc
-  - clang
 
 os:
   - linux
-  - osx
-
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Caskroom/cask/osxfuse --force; fi
 
 install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-5" CC="gcc-5"; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
 
 addons:
   apt:
@@ -27,24 +20,31 @@ addons:
     - clang-3.7
     - libfuse-dev
 
-before_script:
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
-
-script: 
-  - make -j8
-  - make check
+addons:
+  coverity_scan:
+    project:
+      name: "MatusKysel/StegoDisk"
+      description: "Build submitted via Travis CI"
+    notification_email: qwart279@gmail.com
+    build_command_prepend: "cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 .."
+    build_command:   "make -j8"
+    branch_pattern: coverity_scan
 
 sudo: required
 dist: trusty
-osx_image: xcode7.3
 
 notifications:
   email:
     on_success: never
     on_failure: always
 
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "dqEODtEOfbDMuNO9Zju3C7rtRFpbqTgX+xFH4prpbXlQm5xOwI1ZX4vjDsgiyyVtcP8Db+/VUopw1UOEs8gKFmQvA9n6fHlAz8pWg69K0U/luRu+4ztF62wYZKyMOU6DOUPDL3R9MhGxdk5kk1Ak/lzIZszqsCcbsKnuRxNbdlguxEVzJ8gevl6ICcO4XE935yN71q3YFTO0wcKYqeS0k+16Yf8B2UVWmndxIx1iETaC10LzzHrZv1S8D24hYVk+fiG5Z480ac6ayNizSx56m9FsXTGoLrIDAsaq244Ta0+PS74noAlNEW+DTlX4EczDxX4pu1sdxv2BKhiKBsIKvzdyUuW2TA+VKIvCG9oHun+1p36A33+iLogHuSysQuAcZZF3H/87OhOlq1jnVMkepJk/8JKFVykLy7i6lGgBgGwIF9TmIsKbW0vyO3bcyvszNLJS+tMwi97av68t+jDjG0g6pZTRL6mqe10pwNP04FBZV7zeqArDrXCqpnOF1WU+lIY46F4Y/gZEp5CAGVmDegHIBKnqSLSMo0jd1kqjAo8If/o8WSvQo5uOitPPiYLUWCYxAwPiPGUvQJc3R9t2ePJ/BZ0uujGpTb/rfv47OLtJyqtaOa70sNeJi+/UjlajB4ETKoktKCtTvmSL+/4Ha6Fn6F+EmGesj/cKdZjGCAk="
+
 branches:
   only:
-    - master
+    - coverity
+
