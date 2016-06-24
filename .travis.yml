@@ -9,6 +9,9 @@ os:
 install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-5" CC="gcc-5"; fi
 
+script: 
+- echo $HOME
+
 addons:
   apt:
     sources:
