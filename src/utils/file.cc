@@ -58,7 +58,7 @@ std::string File::NormalizePath(std::string platform_specific_path) {
 uint64 File::GetSize() {
   struct stat stat_buf;
   int rc = stat(GetAbsolutePath().c_str(), &stat_buf);
-  return rc == 0 ? static_cast<uint64>(stat_buf.st_size) : -1;
+  return rc == 0 ? static_cast<uint64>(stat_buf.st_size) : 0;
 }
 
 File::File(std::string base_path, std::string relative_path) {
@@ -126,7 +126,6 @@ FilePtr::~FilePtr() {
   if (file_handle_ != nullptr) {
     if (fclose(file_handle_) != 0 ) {
       LOG_ERROR("FilePtr::FilePtr: cannot close file " << strerror(errno));
-      throw std::runtime_error("FilePtr::FilePtr: cannot close file");
     }
     file_handle_ = nullptr;
   }

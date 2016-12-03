@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(StegoDisk)
+project(StegoDisk CXX)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" ON)
@@ -93,17 +93,9 @@ endif()
 ################ CXX FLAGS ##################
 
 ################ LIBJPEGTURBO ##################
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt.orig")
-  message(STATUS "Library 'libjpeg-turbo' already patched.")
-elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt")
-  execute_process(COMMAND patch -b ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo/CMakeLists.txt ${CMAKE_CURRENT_SOURCE_DIR}/patches/libjpeg-turbo/libjpeg-turbo.CMakeLists.txt.diff ERROR_QUIET OUTPUT_QUIET)
-else()
-  message(FATAL_ERROR "Unable to find 'libjpeg-turbo' library.")
-endif()
-
 option(ENABLE_SHARED OFF)
-option(WITH_SIMD OFF)
 option(WITH_TURBOJPEG OFF)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_subdirectory(lib/libjpeg-turbo)
 set(LIBJPEGTURBO_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo)
