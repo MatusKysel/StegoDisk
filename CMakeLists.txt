@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(StegoDisk CXX)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
-option(WITH_FUSE "Build this library with FUSE" ON)
+option(WITH_FUSE "Build this library with FUSE" OFF)
 option(BUILD_SHARED "Build this as shared library" OFF)
 option(BUILD_TESTS "Whether to build automatic test suite" ON)
 
