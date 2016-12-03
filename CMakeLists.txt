@@ -95,6 +95,7 @@ endif()
 ################ LIBJPEGTURBO ##################
 option(ENABLE_SHARED OFF)
 option(WITH_TURBOJPEG OFF)
+option(WITH_SIMD OFF)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_subdirectory(lib/libjpeg-turbo)
 set(LIBJPEGTURBO_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
