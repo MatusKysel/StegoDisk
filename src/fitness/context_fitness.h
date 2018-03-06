@@ -16,6 +16,7 @@
 
 namespace stego_disk {
 
+//PSTODO nemalo by toto byt niekde pouzite?
 class ContextFitness : public Fitness {
 
 public:

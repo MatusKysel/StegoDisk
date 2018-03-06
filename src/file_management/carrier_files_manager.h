@@ -11,9 +11,9 @@
 #define STEGODISK_FILEMANAGEMENT_CARRIERFILESMANAGER_H_
 
 #include <iostream>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "hash/hash.h"
 #include "keys/key.h"
@@ -30,7 +30,7 @@ class CarrierFilesManager {
 public:
   CarrierFilesManager();
   ~CarrierFilesManager();
-  int LoadDirectory(const std::string &directory);
+  void LoadDirectory(const std::string &directory);
   void SaveAllFiles();
 
   uint64 GetCapacity();
@@ -46,7 +46,7 @@ public:
   void SetPassword(const std::string &password);
 
   bool LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage);
-  int SaveVirtualStorage();
+  void SaveVirtualStorage();
 
 private:
   void Init();

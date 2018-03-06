@@ -81,7 +81,7 @@ endif()
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC -std=c++11 -pthread ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC -std=c++14 -pthread ${warnings}")
 endif()
 
 if(WIN32)

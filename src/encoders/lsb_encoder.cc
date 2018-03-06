@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <string.h>
 
-#include "utils/stego_math.h"
 #include "logging/logger.h"
+#include "utils/stego_math.h"
 
 namespace stego_disk {
 

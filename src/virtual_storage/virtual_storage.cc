@@ -13,13 +13,13 @@
 
 #include <exception>
 
+#include "hash/hash.h"
+#include "logging/logger.h"
 #include "permutations/permutation.h"
-#include "utils/stego_math.h"
-#include "utils/stego_errors.h"
 #include "utils/config.h"
 #include "utils/keccak/keccak.h"
-#include "logging/logger.h"
-#include "hash/hash.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
 
 namespace stego_disk {
 
@@ -112,7 +112,6 @@ void VirtualStorage::UnSetPermutation() {
  * Global permutation is used by readByte/writeByte methods.
  *
  * @param[in] globalPermutation Correctly Initialized permutation
- * @return Error code (NO ERROR)
  */
 void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
   if ( !global_permutation_ )
@@ -151,7 +150,7 @@ void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
  *
  * @param[in]  position  offset of requested byte
  * @param[out] value     byte at position
- * @return Error code (0 = NO ERROR)
+ * @return Requested data
  */
 
 uint8 VirtualStorage::ReadByte(uint64 position) {
@@ -172,7 +171,6 @@ uint8 VirtualStorage::ReadByte(uint64 position) {
  *
  * @param[in] position  offset
  * @param[in] value     byte at position
- * @return Error code (0 = NO ERROR)
  */
 void VirtualStorage::WriteByte(uint64 position, uint8 value) {
   if (position >= raw_capacity_)
@@ -235,8 +233,6 @@ void VirtualStorage::Write(uint64 offset,
 
 /**
  * @brief Fills the storage with random data_
- *
- * @return Error code (0 = NO ERROR)
  */
 void VirtualStorage::RandomizeBuffer() {
   data_.Randomize();
@@ -244,8 +240,6 @@ void VirtualStorage::RandomizeBuffer() {
 
 /**
  * @brief Fills the storage with zeros
- *
- * @return Error code (0 = NO ERROR)
  */
 void VirtualStorage::ClearBuffer() {
   data_.Clear();
@@ -267,7 +261,7 @@ void VirtualStorage::FillBuffer(uint8 value) {
  *
  * Compares checksum (hash) stored at the end of the storage
  *
- * @return Error code or 0 if integrity check succeeds
+ * @return true if the checksum is valid, false otherwise
  */
 bool VirtualStorage::IsValidChecksum() {
   if (data_.GetSize() == 0)

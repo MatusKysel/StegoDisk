@@ -12,6 +12,7 @@
 
 #include <string>
 
+//PSTODO co toto je?
 class FuseServiceDelegate {
 public:
     virtual void FuseMounted(bool success) = 0;

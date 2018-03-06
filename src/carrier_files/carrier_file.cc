@@ -15,12 +15,12 @@
 
 #include <algorithm>
 
-#include "utils/stego_header.h"
+#include "encoders/encoder.h"
+#include "permutations/permutation_factory.h"
+#include "utils/config.h"
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
-#include "utils/config.h"
-#include "permutations/permutation_factory.h"
-#include "encoders/encoder.h"
+#include "utils/stego_header.h"
 
 namespace stego_disk {
 

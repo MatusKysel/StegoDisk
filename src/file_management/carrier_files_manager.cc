@@ -9,26 +9,26 @@
 
 #include "carrier_files_manager.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-#include <iostream>
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
-#include "carrier_files/carrier_file_factory.h"
-#include "virtual_storage/virtual_storage.h"
 #include "carrier_files/carrier_file.h"
-#include "utils/keccak/keccak.h"
-#include "utils/stego_errors.h"
-#include "utils/stego_config.h"
-#include "utils/config.h"
-#include "utils/stego_math.h"
-#include "utils/file.h"
+#include "carrier_files/carrier_file_factory.h"
 #include "logging/logger.h"
+#include "utils/config.h"
+#include "utils/file.h"
+#include "utils/keccak/keccak.h"
+#include "utils/stego_config.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
+#include "virtual_storage/virtual_storage.h"
 
 using namespace std;
 
@@ -39,7 +39,7 @@ CarrierFilesManager::CarrierFilesManager() :
   files_in_directory_(0),
   virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
-  thread_pool_(new ThreadPool(0)), //std::make_unique<ThreadPool>(0) c++14
+  thread_pool_(std::make_unique<ThreadPool>(0)),
   is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
@@ -50,7 +50,7 @@ std::string CarrierFilesManager::GetPath() const {
   return base_path_;
 }
 
-int CarrierFilesManager::LoadDirectory(const std::string &directory) {
+void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   carrier_files_.clear();
   capacity_ = 0;
@@ -92,8 +92,6 @@ int CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   std::sort(carrier_files_.begin(), carrier_files_.end(),
             CarrierFile::CompareBySharedPointers);
-
-  return STEGO_NO_ERROR;
 }
 
 // return false, if checksum is not valid, true otherwise
@@ -154,14 +152,13 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   return true;
 }
 
-int CarrierFilesManager::SaveVirtualStorage() {
-  if (!virtual_storage_) return SE_UNINITIALIZED;
+void CarrierFilesManager::SaveVirtualStorage() {
+  if (!virtual_storage_)
+	  throw std::runtime_error("You need initialize virtual storage first");
 
   virtual_storage_->WriteChecksum();
 
   SaveAllFiles();
-
-  return STEGO_NO_ERROR;
 }
 
 void CarrierFilesManager::SetEncoderArg(const string &param,
@@ -237,7 +234,6 @@ void CarrierFilesManager::SetPassword(const std::string &password) {
 
 /**
  * @brief Generates Master Key hash from password (hash) and keys generated from individual carrier files
- * @return Error code (0 = NO ERROR)
  */
 void CarrierFilesManager::GenerateMasterKey() {
   if (carrier_files_.size() < 1) {

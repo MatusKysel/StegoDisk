@@ -16,6 +16,7 @@
 
 namespace stego_disk {
 
+//PSTODO preco nje vector?
 class MemoryBuffer {
 public:
   MemoryBuffer();

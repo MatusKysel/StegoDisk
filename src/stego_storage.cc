@@ -11,9 +11,9 @@
 
 #include <fstream>
 
-#include "virtual_storage/virtual_storage.h"
 #include "file_management/carrier_files_manager.h"
 #include "utils/stego_config.h"
+#include "virtual_storage/virtual_storage.h"
 
 namespace stego_disk {
 

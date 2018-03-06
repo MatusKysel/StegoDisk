@@ -41,6 +41,7 @@ public:
   void UnSetPermutation();
   void ApplyPermutation(uint64 requested_size, Key key);
 
+  //PSTODO ak tomu spravne chapem, *Byte robi na spermutovanimi, read/write nad nespermutovanimi? ak ano, su to trochu neintuitivne nazvy...
   // Accessed by CarrierFile during save/load operation
   void WriteByte(uint64 position, uint8 value);
   uint8 ReadByte(uint64 position);

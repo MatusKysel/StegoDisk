@@ -10,24 +10,24 @@
 #ifndef STEGODISK_CARRIERFILES_CARRIERFILE_H_
 #define STEGODISK_CARRIERFILES_CARRIERFILE_H_
 
-#include <sys/stat.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #include <iostream>
 #include <string>
 #include <typeinfo>
 
+#include "encoders/encoder_factory.h"
+#include "fitness/fitness.h"
+#include "keys/key.h"
+#include "logging/logger.h"
+#include "permutations/permutation.h"
+#include "permutations/permutation_factory.h"
 #include "utils/config.h"
-#include "utils/stego_types.h"
 #include "utils/file.h"
 #include "utils/memory_buffer.h"
-#include "logging/logger.h"
-#include "encoders/encoder_factory.h"
-#include "permutations/permutation_factory.h"
-#include "permutations/permutation.h"
+#include "utils/stego_types.h"
 #include "virtual_storage/virtual_storage.h"
-#include "keys/key.h"
-#include "fitness/fitness.h"
 
 
 namespace stego_disk {

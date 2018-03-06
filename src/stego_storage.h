@@ -23,6 +23,7 @@ namespace stego_disk {
 class CarrierFilesManager;
 class VirtualStorage;
 
+//PSTODO wtf? preco su vsetky metodi const?
 class StegoStorage {
 
 public:
