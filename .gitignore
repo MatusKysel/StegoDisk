@@ -3,6 +3,7 @@ cscope.out*
 tags
 
 *.a
+*.so
 
 CMakeCache.txt
 CMakeFiles

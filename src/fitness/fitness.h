@@ -29,7 +29,7 @@ public:
   Fitness(const Fitness&) = delete;
   Fitness& operator=(const Fitness&) = delete;
 
-  virtual ~Fitness();
+  virtual ~Fitness() {}
 
   virtual uint64 SelectBytes(const MemoryBuffer &in, MemoryBuffer *out) = 0;
 
