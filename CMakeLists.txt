@@ -290,6 +290,11 @@ set(VIRTUAL_STORAGE_SRCS
   src/virtual_storage/virtual_storage.cc
 )
 
+# LINKER SCRIPT
+set(LINKER_SCRIPTS
+  src/make/export_symbols.ld
+)
+
 ## STEGODISK_LIBRARY ##
 set(STEGODISK_HDRS
   src/stego_storage.h
@@ -363,6 +368,26 @@ endif()
 ##############################################################################################################################
 ##############################################################################################################################
 ##############################################################################################################################
+
+
+################ LD FLAGS ##################
+if(NOT WIN32)
+  #PSTODO test under LLVM
+  #PSTODO work only on shared library, not on static
+  set(new_link_flags "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld")
+  get_target_property(existing_link_flags ${STEGODISK_LIBRARY} LINK_FLAGS)
+  if(existing_link_flags)
+      set(new_link_flags "${existing_link_flags} ${new_link_flags}")
+  endif()
+  set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS ${new_link_flags})
+  set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPTS})
+endif()
+
+#if(WIN32)
+#  #PSTODO
+#endif()
+################ LD FLAGS ##################
+
 # TESTING
 
 if(BUILD_TESTS)
