@@ -78,10 +78,11 @@ endif()
 
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
+set(CMAKE_CXX_STANDARD 17)
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC -std=c++14 -pthread ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC -pthread ${warnings}")
 endif()
 
 if(WIN32)
@@ -292,7 +293,7 @@ set(VIRTUAL_STORAGE_SRCS
 
 # LINKER SCRIPT
 set(LINKER_SCRIPTS
-  src/make/export_symbols.ld
+  ${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld
 )
 
 ## STEGODISK_LIBRARY ##
@@ -374,7 +375,7 @@ endif()
 if(NOT WIN32)
   #PSTODO test under LLVM
   #PSTODO work only on shared library, not on static
-  set(new_link_flags "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld")
+  set(new_link_flags "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld -s")
   get_target_property(existing_link_flags ${STEGODISK_LIBRARY} LINK_FLAGS)
   if(existing_link_flags)
       set(new_link_flags "${existing_link_flags} ${new_link_flags}")
