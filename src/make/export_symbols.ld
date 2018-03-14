@@ -5,6 +5,7 @@ global:
 		stego_disk::EncoderFactory::*;
 		stego_disk::PermutationFactory::*;
 		stego_disk::PermutationFactory::*;
+		FuseService::*;
 		"LoggerVerbosityLevel";
 		Logger::*;
     };
