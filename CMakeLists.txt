@@ -83,7 +83,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC -pthread ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pthread ${warnings}")
 endif()
 
 if(WIN32)
