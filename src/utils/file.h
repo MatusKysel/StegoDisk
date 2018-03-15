@@ -33,6 +33,7 @@ private:
   FILE* file_handle_;
 };
 
+//PSTODO je celkom bordel s timi pathami, cize idealne sa toho zbavit najviac ako sa da, len je otazka ci nie skor ked bude podporovany iba std::filesystem, kedze podla mna by sa to dalo nahradit za fs::path
 class File {
 public:
   File(std::string base_path, std::string relative_path);

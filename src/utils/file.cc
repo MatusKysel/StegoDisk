@@ -67,14 +67,14 @@ File::File(std::string base_path, std::string relative_path) {
   if (base_path_safe.empty())
     base_path_safe = ".";
 
-  if (base_path_safe[base_path.length() - 1] != PATH_SEPARATOR)
+  if (base_path_safe.back() != PATH_SEPARATOR)
     base_path_safe.push_back(PATH_SEPARATOR);
 
   base_path_ = base_path_safe;
 
   string relative_path_safe = relative_path;
   if (relative_path_safe.length() > 0)
-    if (relative_path_safe[0] == PATH_SEPARATOR)
+    if (relative_path_safe.front() == PATH_SEPARATOR)
       relative_path_safe = relative_path_safe.substr(1);
 
   relative_path_ = relative_path_safe;

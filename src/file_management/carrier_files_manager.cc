@@ -28,6 +28,7 @@
 #include "utils/stego_config.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
+#include "utils/thread_pool.h"
 #include "virtual_storage/virtual_storage.h"
 
 using namespace std;
@@ -58,7 +59,7 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   base_path_ = directory;
 
-  vector<File> files = File::GetFilesInDir(directory, "");
+  vector<File> files = File::GetFilesInDir(directory, ""); //PSTODO neskodila by nejaka filtracia
 
   files_in_directory_ = files.size();
 

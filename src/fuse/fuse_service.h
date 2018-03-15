@@ -27,6 +27,7 @@
 
 static struct fuse_operations stegofs_ops;
 
+//PSTODO add namespace
 class FuseService {
 
 public:
