@@ -275,8 +275,9 @@ set(UTILS_HDRS
 
 set(UTILS_SRCS
   src/utils/file.cc
-  src/utils/file_unix.cc
-  src/utils/file_win.cc
+  src/utils/file_unix.inc
+  src/utils/file_win.inc
+  src/utils/file_impl.cc
   src/utils/memory_buffer.cc
   src/utils/stego_math.cc
   src/utils/keccak/keccak.cc
@@ -342,6 +343,9 @@ else()
   set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
 endif()
 
+if(NOT WIN32)
+  list(APPEND THIRD_LIBRARIES "stdc++fs")
+endif()
 
 if(APPLE)
    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
