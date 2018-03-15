@@ -53,10 +53,16 @@ else()
 	set(LIBJPEGTURBO_LIBRARIES_STATIC jpeg-static)
 endif()
 
-target_link_libraries(stego-test ${STEGODISK_LIBRARY} ${LIBJPEGTURBO_LIBRARIES_STATIC})
+set(STEGO_TEST_LIBRARIES ${STEGODISK_LIBRARY})
+if(NOT BUILD_SHARED_LIBS)
+  set(STEGO_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${LIBJPEGTURBO_LIBRARIES_STATIC})
+endif()
+set(STEGO_FUSE_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${FUSE_LIBRARIES})
+
+target_link_libraries(stego-test ${STEGO_TEST_LIBRARIES})
 
 if(FUSE_FOUND)
-  target_link_libraries(stego-fuse-test ${STEGODISK_LIBRARY} ${FUSE_LIBRARIES} ${LIBJPEGTURBO_LIBRARIES_STATIC})
+  target_link_libraries(stego-fuse-test ${STEGO_FUSE_TEST_LIBRARIES})
 endif()
 
 list(APPEND TESTS stego-test)

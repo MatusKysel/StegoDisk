@@ -79,6 +79,7 @@ endif()
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
@@ -99,7 +100,7 @@ option(WITH_TURBOJPEG OFF)
 option(WITH_SIMD OFF)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_subdirectory(lib/libjpeg-turbo)
-set(LIBJPEGTURBO_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
+set(LIBJPEGTURBO_LIBRARIES jpeg-static)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 ################ LIBJPEGTURBO ##################
@@ -336,9 +337,9 @@ endif()
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(FUSE_FOUND)
-  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${LODEPNG_LIBRARIES} ${FUSE_LIBRARIES})
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${FUSE_LIBRARIES})
 else()
-  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${LODEPNG_LIBRARIES})
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
 endif()
 
 
@@ -355,9 +356,7 @@ endif()
 
 add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_SRC})
 
-if(REQUIRE_LIB_SYMBOL)
-  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
-endif()
+target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
 
 
 #install(TARGETS ${STEGODISK_LIBRARY}
@@ -376,11 +375,11 @@ if(NOT WIN32)
   #PSTODO test under LLVM
   #PSTODO work only on shared library, not on static
   set(new_link_flags "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld -s")
-  get_target_property(existing_link_flags ${STEGODISK_LIBRARY} LINK_FLAGS)
+  get_target_property(existing_link_flags ${STEGODISK_LIBRARY} LINK_FLAGS_RELEASE)
   if(existing_link_flags)
       set(new_link_flags "${existing_link_flags} ${new_link_flags}")
   endif()
-  set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS ${new_link_flags})
+  set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS_RELEASE ${new_link_flags})
   set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPTS})
 endif()
 
