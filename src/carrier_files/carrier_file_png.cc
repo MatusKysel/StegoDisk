@@ -9,9 +9,10 @@
 
 #include "carrier_file_png.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "utils/exceptions.h"
 #include "utils/stego_errors.h"
 
 
@@ -31,13 +32,13 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
 
 
   if (read_cnt < 64) {
-    throw std::runtime_error("Wrong header size of file " + file_.GetFileName());
+	throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
   }
 
   lodepng_state_init(&state_);
   unsigned error = lodepng_inspect(&width_, &height_, &state_, png_header, 64);
   if(error)
-    throw std::runtime_error("Unable to read file state" + file_.GetFileName());
+	throw exception::ParseError{file_.GetFileName(), "Unable to read file state"};
 
   state_.info_raw.colortype = LCT_RGB;
   state_.info_raw.bitdepth = 8;
@@ -72,7 +73,7 @@ void CarrierFilePNG::LoadFile() {
 
     if (read_cnt < file_.GetSize()) {
       LOG_ERROR("Unable to read file.");
-      throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
+	  throw exception::IoError{file_.GetFileName()};
     }
 
     unsigned char* image;
@@ -81,7 +82,7 @@ void CarrierFilePNG::LoadFile() {
     unsigned error = lodepng_decode(&image, &width, &height, &state_, png_buffer.GetConstRawPointer(), read_cnt);
 
     if(error)
-      throw std::runtime_error("Unable to decode file " + file_.GetFileName());
+	  throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
 
     // copy LSB data to content buffer
 
@@ -102,8 +103,10 @@ void CarrierFilePNG::LoadFile() {
 void CarrierFilePNG::SaveFile() {
   auto file_ptr = file_.Open();
 
-  if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
-                                             " is not loaded");
+  if(!file_loaded_)
+    throw exception::InvalidState{exception::Operation::save,
+                                  exception::Component::file,
+								  exception::ComponentState::notLoaded};
 
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
@@ -126,7 +129,7 @@ void CarrierFilePNG::SaveFile() {
 
   if (read_cnt < file_.GetSize()) {
     LOG_ERROR("Unable to read file.")
-    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
+	throw exception::IoError{file_.GetFileName()};
   }
   // copy LSB data to content buffer
 
@@ -136,7 +139,7 @@ void CarrierFilePNG::SaveFile() {
   unsigned error = lodepng_decode(&image, &width, &height, &state_, png_buffer.GetConstRawPointer(), read_cnt);
 
   if(error)
-    throw std::runtime_error("Unable to decode file " + file_.GetFileName());
+    throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
 
   // copy LSB data to content buffer
 
@@ -156,7 +159,7 @@ void CarrierFilePNG::SaveFile() {
   error = lodepng_encode(&image_out, &size_out, image, width_, height_, &state_);
 
   if(error)
-    throw std::runtime_error("Unable to encode file " + file_.GetFileName());
+    throw exception::ParseError{file_.GetFileName(), "Unable to encode file"};
 
   // write data
 
@@ -167,8 +170,7 @@ void CarrierFilePNG::SaveFile() {
 
   if (write_cnt != size_out) {
     LOG_ERROR("Writing PNG file expanded");
-    throw std::runtime_error("Writing content to file " + file_.GetFileName() +
-                             " failed");
+	throw exception::IoError{file_.GetFileName()};
   }
 
   free(image);

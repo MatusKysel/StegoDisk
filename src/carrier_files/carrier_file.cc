@@ -9,8 +9,8 @@
 
 #include "carrier_file.h"
 
-#include <sys/stat.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <time.h>
 
 #include <algorithm>
@@ -18,6 +18,7 @@
 #include "encoders/encoder.h"
 #include "permutations/permutation_factory.h"
 #include "utils/config.h"
+#include "utils/exceptions.h"
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_header.h"
@@ -233,9 +234,12 @@ int CarrierFile::ExtractBufferUsingEncoder() {
 
 int CarrierFile::EmbedBufferUsingEncoder() {
   if (buffer_.GetSize() == 0) throw std::length_error("Buffer is empty!");
-  if (!encoder_)  throw std::runtime_error("Encoder is not set!");
-  if (!codeword_block_size_)  throw std::runtime_error("Codeword block size si not set!");
-  if (!blocks_used_)  throw std::runtime_error("Number of used block is not set!");
+  if (!encoder_)
+    throw exception::InvalidState{exception::Operation::embedBufferUsingEncoder,
+		                          exception::Component::encoder,
+								  exception::ComponentState::notSetted};
+  if (!codeword_block_size_) throw exception::EmptyMember{"codeword_block_size_"};
+  if (!blocks_used_) throw exception::EmptyMember{"codeword_block_size_"};
 
   MemoryBuffer data_buffer(data_block_size_);
 

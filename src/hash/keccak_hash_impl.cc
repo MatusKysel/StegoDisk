@@ -11,6 +11,7 @@
 
 #include <stdexcept>
 
+#include "utils/exceptions.h"
 #include "utils/keccak/keccak.h"
 
 namespace stego_disk {
@@ -29,7 +30,7 @@ void KeccakHashImpl::Process(MemoryBuffer& state,
                                 "doesnt match with current state size");
 
     if (data == nullptr)
-        throw std::invalid_argument("data pointer cannot be null");
+        throw exception::NullptrArgument{"data"};
 
     //TOOD: rewrite implementation (int data types)
     //TODO: create new optimized version (sth like FastKeccakImpl / NISTKeccakImpl)

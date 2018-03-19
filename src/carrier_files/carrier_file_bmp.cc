@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "utils/exceptions.h"
 #include "utils/stego_errors.h"
 
 namespace stego_disk {
@@ -31,12 +32,12 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   read_cnt += static_cast<int>(fread(&bmp_info, 1, 40, file_ptr.Get()));
 
   if (read_cnt < 54) {
-    throw std::runtime_error("Wrong header size of file " + file_.GetFileName());
+    throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
   }
 
   uint32_t bmp_file_size = *((uint32_t*)&bmp_header[2]);
   if (bmp_file_size != file_.GetSize()) {
-    throw std::runtime_error("Wrong size of file " + file_.GetFileName());
+    throw exception::ParseError{file_.GetFileName(), "Wrong size of file"};
   }
 
   bmp_offset_ = *((uint32_t*)&bmp_header[10]); // should be = 54
@@ -44,8 +45,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   uint32_t bmp_compression = *((uint32_t*)&bmp_info[16]); // should be 0
 
   if (bmp_compression != 0) {
-    throw std::runtime_error("BMP file " + file_.GetFileName() +
-                             " uses unsupported file compression");
+    throw exception::ParseError{file_.GetFileName(), "BMP file uses unsupported file compression"};
   }
 
   if (bmp_bits_per_pixel == 8) is_grayscale_ = true;
@@ -59,8 +59,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
               height_;
 
   if ((bmp_size_ + 54) > bmp_file_size) {
-    throw std::runtime_error("Error occured while reading file "
-                             + file_.GetFileName());
+    throw exception::IoError(file_.GetFileName());
   }
   raw_capacity_ = (bmp_size_ / 8);
 }
@@ -84,7 +83,7 @@ void CarrierFileBMP::LoadFile() {
 
   if (read_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Unable to read file.");
-    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
+    throw exception::IoError{file_.GetFileName()};
   }
 
   uint64 usable_capacity = raw_capacity_;
@@ -124,8 +123,10 @@ void CarrierFileBMP::LoadFile() {
 void CarrierFileBMP::SaveFile() {
   auto file_ptr = file_.Open();
 
-  if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
-                                             " is not loaded");
+  if(!file_loaded_)
+    throw exception::InvalidState{exception::Operation::save,
+                                  exception::Component::file,
+								  exception::ComponentState::notLoaded};
 
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
@@ -139,7 +140,7 @@ void CarrierFileBMP::SaveFile() {
 
   if (read_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Unable to read file.");
-    throw std::runtime_error("Unable to read to read file " + file_.GetFileName());
+	throw exception::IoError{file_.GetFileName()};
   }
 
   uint64 usable_capacity = raw_capacity_;
@@ -186,8 +187,7 @@ void CarrierFileBMP::SaveFile() {
 
   if (write_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Writing content to file failed.");
-    throw std::runtime_error("Writing content to file " + file_.GetFileName() +
-                             " failed");
+	throw exception::IoError{file_.GetFileName()};
   }
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");

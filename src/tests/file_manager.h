@@ -16,6 +16,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "utils/exceptions.h"
+
 
 class FileManager {
 public:
@@ -36,6 +38,7 @@ public:
 	  return out;
   }
 
+  //PSTODO change to filesystem
   inline static void CopyDirectory(const std::string &src, const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
@@ -45,9 +48,11 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str()) < 0) throw std::runtime_error("Failed to execute: " + cmd);
+    if(system(cmd.c_str()) < 0)
+      throw stego_disk::exception::ExecFailed{cmd};
   }
 
+  //PSTODO change to filesystem
   inline static void RemoveDirectory(const std::string &path) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
@@ -57,7 +62,8 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str()) < 0) throw std::runtime_error("Failed to execute: " + cmd);
+    if(system(cmd.c_str()) < 0)
+      throw stego_disk::exception::ExecFailed{cmd};
   }
 };
 

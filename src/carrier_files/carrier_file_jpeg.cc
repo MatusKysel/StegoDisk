@@ -9,14 +9,15 @@
 
 #include "carrier_file_jpeg.h"
 
+#include <errno.h>
+#include <math.h>
+#include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
-#include <setjmp.h>
-#include <math.h>
-#include <errno.h>
 
 #include <iostream>
 
+#include "utils/exceptions.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
@@ -180,8 +181,10 @@ void CarrierFileJPEG::SaveFile() {
 
   auto file_ptr = file_.Open();
 
-  if(!file_loaded_) throw std::runtime_error("File " + file_.GetFileName() +
-                                             " is not loaded");
+  if(!file_loaded_)
+    throw exception::InvalidState{exception::Operation::save,
+                                  exception::Component::file,
+								  exception::ComponentState::notLoaded};
 
   LOG_TRACE("Saving file " << file_.GetRelativePath());
 

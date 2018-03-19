@@ -26,6 +26,7 @@
 #include <fstream>
 
 #include "stego_header.h"
+#include "utils/exceptions.h"
 
 using namespace std;
 
@@ -100,7 +101,7 @@ std::string File::GetExtension(bool convert_to_lowercase) const {
 
 std::string File::GetFileName() {
   //TODO: implement this
-  throw std::exception();
+  throw exception::FuctionNotImplementad{};
   return "";
 }
 
@@ -117,8 +118,7 @@ FilePtr::FilePtr(const File& file) {
   if (ret != 0) {
     LOG_ERROR("FilePtr::FilePtr: cannot open file '" <<
               file.GetAbsolutePath() << "': " << strerror(ret));
-    throw std::runtime_error("FilePtr::FilePtr: cannot open file '" +
-                             file.GetAbsolutePath() + "': " + strerror(ret));
+    throw exception::ErrorOpenFIle(file.GetAbsolutePath(), strerror(ret));
   }
 }
 

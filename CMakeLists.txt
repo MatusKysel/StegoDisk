@@ -260,9 +260,11 @@ set(PERMUTATIONS_SRCS
 
 set(UTILS_HDRS
   src/utils/config.h
+  src/utils/exceptions.h
   src/utils/file.h
   src/utils/json.h
   src/utils/json_object.h
+  src/utils/keccak/keccak.h
   src/utils/memory_buffer.h
   src/utils/stego_config.h
   src/utils/stego_errors.h
@@ -270,17 +272,17 @@ set(UTILS_HDRS
   src/utils/stego_math.h
   src/utils/stego_types.h
   src/utils/thread_pool.h
-  src/utils/keccak/keccak.h
 )
 
 set(UTILS_SRCS
+  src/utils/exceptions.cc
   src/utils/file.cc
+  src/utils/file_impl.cc
   src/utils/file_unix.inc
   src/utils/file_win.inc
-  src/utils/file_impl.cc
+  src/utils/keccak/keccak.cc
   src/utils/memory_buffer.cc
   src/utils/stego_math.cc
-  src/utils/keccak/keccak.cc
 )
 
 # VIRTUAL_STORAGE

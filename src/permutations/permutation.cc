@@ -11,6 +11,8 @@
 
 #include <string.h> // memset
 
+#include "utils/exceptions.h"
+
 namespace stego_disk {
 
 Permutation::Permutation() : size_(0), initialized_(false) {}
@@ -26,7 +28,9 @@ void Permutation::CommonPermuteInputCheck(PermElem index) const {
     throw std::out_of_range("Permutation: element index out of range");
 
   if (!initialized_)
-    throw std::runtime_error("Permutation: permutation must be initialized before use");
+    exception::InvalidState{exception::Operation::commonPermuteInputCheck,
+			                exception::Component::permutation,
+							exception::ComponentState::notInitialized};
 }
 
 } // stego_disk

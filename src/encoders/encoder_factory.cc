@@ -14,6 +14,7 @@
 #include "encoder.h"
 #include "hamming_encoder.h"
 #include "lsb_encoder.h"
+#include "utils/exceptions.h"
 
 namespace stego_disk {
 
@@ -80,14 +81,11 @@ void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
                                          const string &param,
                                          const string &val) {
   if (!encoder)
-    throw std::invalid_argument("EncoderFactory::setEncoderArgByName: "
-                                "arg 'encoder' is null");
-  if (!param.size())
-    throw std::invalid_argument("EncoderFactory::setEncoderArgByName: "
-                                "arg 'param' is empty");
-  if (!val.size())
-    throw std::invalid_argument("EncoderFactory::setEncoderArgByName: "
-                                "arg 'val' is empty");
+    throw exception::NullptrArgument{"encoder"};
+  if (param.empty())
+    throw exception::EmptyArgument{"param"};
+  if (val.empty())
+    throw exception::EmptyArgument{"val"};
 
   try { encoder->SetArgByName(param,val); }
   catch (...) { throw; }

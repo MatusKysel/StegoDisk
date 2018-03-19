@@ -19,6 +19,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include "utils/exceptions.h"
+
 
 namespace stego_disk {
 
@@ -84,7 +86,9 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
     std::unique_lock<std::mutex> lock(queue_mutex);
 
     if(stop)
-      throw std::runtime_error("enqueue on stopped ThreadPool");
+      throw exception::InvalidState{exception::Operation::enqueue,
+	  								exception::Component::threadPool,
+	  								exception::ComponentState::stopped};
 
     tasks.emplace([task](){ (*task)(); });
   }

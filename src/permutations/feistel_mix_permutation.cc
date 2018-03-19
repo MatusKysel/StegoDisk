@@ -11,12 +11,13 @@
 
 #include <algorithm>
 
-#include "utils/stego_math.h"
-#include "utils/keccak/keccak.h"
-#include "utils/config.h"
-#include "utils/stego_errors.h"
-#include "logging/logger.h"
 #include "hash/hash.h"
+#include "logging/logger.h"
+#include "utils/config.h"
+#include "utils/exceptions.h"
+#include "utils/keccak/keccak.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
 
 #define FMP_MIN_REQ_SIZE                        1024
 #define FMP_NUMROUNDS                           5
@@ -41,17 +42,16 @@ FeistelMixPermutation::~FeistelMixPermutation() {
 
 void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
   if (key.GetSize() == 0)
-    throw std::runtime_error("FeistelMixPermutation init: "
-                             "Invalid key (size=0)");
+    throw exception::EmptyArgument{"key"};
 
   if (requested_size < FMP_MIN_REQ_SIZE)
-    throw std::runtime_error("FeistelMixPermutation: "
+    throw std::invalid_argument("FeistelMixPermutation: "
                              "requested_size < FMP_MIN_REQ_SIZE (=1024)");
 
   uint8 bit_len = StegoMath::Log2(requested_size);
 
   if (bit_len < 8)
-    throw std::runtime_error("FeistelMixPermutation: "
+    throw std::invalid_argument("FeistelMixPermutation: "
                              "requested size is too small");
 
   initialized_ = false;
@@ -86,7 +86,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
       //TODO: rewrite these lines - im sure there is a better way of writing this
 
       if (hash.GetStateSize() < 4)
-        throw std::runtime_error("hash size is too small");
+        throw exception::HashSizeTooSmall{};
 
       hash_tables_[t][i] = *((uint32*)hash.GetState().GetConstRawPointer()) % max_hash;
     }
@@ -114,8 +114,7 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
   uint64 permuted_index = (left << right_bits_) + right;
 
   if (permuted_index >= size_)
-    throw std::runtime_error("FeistelMixPermutation: "
-                             "permuted index calculation failed");
+    throw exception::PermutationFailed{};
 
   return permuted_index;
 }
