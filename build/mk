@@ -1,0 +1,124 @@
+#!/bin/bash
+
+
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -s|--static)
+    export static=1
+    shift # past argument
+    shift # past value
+    ;;
+    -8|--gcc8)
+    gcc8=1
+    shift # past argument
+    shift # past value
+    ;;
+    -f|--fuse)
+    fuse=1
+    shift # past argument
+    shift # past value
+    ;;
+    -r|--release)
+    release=1
+    shift # past argument
+    shift # past value
+    ;;
+    -c|--fresh)
+    fresh=1
+    shift # past argument
+    shift # past value
+    ;;
+    -b|--no-test)
+    noTest=1
+    shift # past argument
+    shift # past value
+    ;;
+    -h|--help)
+	echo "Valid arguments are:"
+	echo "    --static"
+	echo "    --gcc8"
+	echo "    --fuse"
+	echo "    --release"
+	echo "    --fresh"
+    exit 0;
+    ;;
+    *)    # unknown option
+	echo "Invalid argument $key"
+	echo "Valid arguments are:"
+	echo "    --static"
+	echo "    --gcc8"
+	echo "    --fuse"
+	echo "    --release"
+	echo "    --fresh"
+    exit 1;
+    ;;
+esac
+done
+
+name="build"
+cmake_flags=""
+
+toolchan_loc="$(pwd)/toolchain_gcc8.cmake" #PSTODO deto
+export GCC_BIN_LOC="$(pwd)/bin/gccbin"  #PSTODO deto
+loc_bin="$(pwd)/bin/" #PSTODO pwd nieje moc chytre, asi by sa hodilo nieco chytrejsie
+
+
+if [ $static ]
+then
+	name="${name}_static";
+	cmake_flags="${cmake_flags} -DBUILD_SHARED=OFF";
+else
+	name="${name}_shared";
+	cmake_flags="${cmake_flags} -DBUILD_SHARED=ON";
+fi;
+
+if [ $fuse ]
+then
+	name="${name}_fuse";
+	cmake_flags="${cmake_flags} -DWITH_FUSE=ON";
+fi;
+
+if [ $release ]
+then
+	name="${name}_release";
+	cmake_flags="${cmake_flags} -DCMAKE_BUILD_TYPE=Release";
+else
+	name="${name}_debug";
+	cmake_flags="${cmake_flags} -DCMAKE_BUILD_TYPE=Debug";
+fi;
+
+
+if [ $gcc8 ]
+then
+	name="${name}_gcc8";
+	cmake_flags="${cmake_flags} -DCMAKE_TOOLCHAIN_FILE=$toolchan_loc";
+	(
+	#PSTODO kontrola chyb
+	cd bin
+	if ! test -e gccbin;
+	then
+		git clone git://gcc.gnu.org/git/gcc.git ;
+		mkdir -p gccbuild;
+		cd gccbuild;
+		../gcc/configure --enable-languages=c,c++ --enable-shared --enable-nls --prefix=$GCC_BIN_LOC;
+		make -j8;
+		make install;
+	fi
+	)
+fi;
+
+
+loc="$(pwd)/bin/$name" #PSTODO pwd nieje moc chytre, asi by sa hodilo nieco chytrejsie
+
+echo "Pouzivam prepinace \"$cmake_flags\""
+echo "Kompilujem do priecinka \"$loc\""
+
+mkdir -p $loc                             &&
+cd $loc                                   &&
+( [ $fresh ] && rm -rf * || exit 0  )     &&
+cmake $cmake_flags ../../..               &&    #PSTODO este hlupejsie ako pwd...
+make -j8                                  &&
+( [ -z $noTest ] && make check || exit 0 )

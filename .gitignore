@@ -11,7 +11,7 @@ Makefile
 cmake_install.cmake
 CTestTestfile.cmake
 
-build/
+build/bin
 bin/
 src/tests/Testing/
 src/tests/test_config.h
