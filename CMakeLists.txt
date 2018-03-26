@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+include(GenerateExportHeader)
 
 project(StegoDisk CXX)
 
@@ -17,6 +18,7 @@ else()
 endif()
 
 cmake_policy(SET CMP0009 NEW)
+cmake_policy(SET CMP0063 NEW)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
@@ -42,6 +44,7 @@ math(EXPR STEGODISK_VERSION_NUMBER "${STEGODISK_MAJOR_VERSION} * 1000000 + ${STE
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
+include_directories(${CMAKE_BINARY_DIR})
 
 
 
@@ -80,6 +83,9 @@ endif()
 #include(CXXCompilerFlags)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_C_VISIBILITY_PRESET hidden) #PSTODO do not work fot libjpeg
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
@@ -295,11 +301,6 @@ set(VIRTUAL_STORAGE_SRCS
   src/virtual_storage/virtual_storage.cc
 )
 
-# LINKER SCRIPT
-set(LINKER_SCRIPTS
-  ${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld
-)
-
 ## STEGODISK_LIBRARY ##
 set(STEGODISK_HDRS
   src/stego_storage.h
@@ -364,6 +365,8 @@ add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_S
 
 target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
 
+generate_export_header(${STEGODISK_LIBRARY})
+
 
 #install(TARGETS ${STEGODISK_LIBRARY}
 #  LIBRARY
@@ -380,13 +383,12 @@ target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
 if(NOT WIN32)
   #PSTODO test under LLVM
   #PSTODO work only on shared library, not on static
-  set(new_link_flags "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/make/export_symbols.ld -s")
+  set(new_link_flags "-s")
   get_target_property(existing_link_flags ${STEGODISK_LIBRARY} LINK_FLAGS_RELEASE)
   if(existing_link_flags)
       set(new_link_flags "${existing_link_flags} ${new_link_flags}")
   endif()
   set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS_RELEASE ${new_link_flags})
-  set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPTS})
 endif()
 
 #if(WIN32)

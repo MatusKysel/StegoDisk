@@ -23,12 +23,13 @@
 
 //#include "fuse_service_delegate.h"
 #include "logging/logger.h"
+#include "stego-disk_export.h"
 #include "stego_storage.h"
 
 static struct fuse_operations stegofs_ops;
 
 //PSTODO add namespace
-class FuseService {
+class STEGO_DISK_EXPORT FuseService {
 
 public:
   FuseService();

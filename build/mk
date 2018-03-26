@@ -9,32 +9,26 @@ case $key in
     -s|--static)
     export static=1
     shift # past argument
-    shift # past value
     ;;
     -8|--gcc8)
     gcc8=1
     shift # past argument
-    shift # past value
     ;;
     -f|--fuse)
     fuse=1
     shift # past argument
-    shift # past value
     ;;
     -r|--release)
     release=1
     shift # past argument
-    shift # past value
     ;;
     -c|--fresh)
     fresh=1
     shift # past argument
-    shift # past value
     ;;
     -b|--no-test)
     noTest=1
     shift # past argument
-    shift # past value
     ;;
     -h|--help)
 	echo "Valid arguments are:"
@@ -43,6 +37,7 @@ case $key in
 	echo "    --fuse"
 	echo "    --release"
 	echo "    --fresh"
+	echo "    --no-test"
     exit 0;
     ;;
     *)    # unknown option
@@ -53,6 +48,7 @@ case $key in
 	echo "    --fuse"
 	echo "    --release"
 	echo "    --fresh"
+	echo "    --no-test"
     exit 1;
     ;;
 esac
@@ -118,7 +114,7 @@ echo "Kompilujem do priecinka \"$loc\""
 
 mkdir -p $loc                             &&
 cd $loc                                   &&
-( [ $fresh ] && rm -rf * || exit 0  )     &&
+( [ -n $fresh ] && rm -rf * || exit 0  )  &&
 cmake $cmake_flags ../../..               &&    #PSTODO este hlupejsie ako pwd...
 make -j8                                  &&
 ( [ -z $noTest ] && make check || exit 0 )

@@ -15,6 +15,7 @@
 #include <stdexcept>
 
 #include "encoders/encoder_factory.h"
+#include "stego-disk_export.h"
 #include "permutations/permutation_factory.h"
 #include "utils/json.h"
 
@@ -24,7 +25,7 @@ class CarrierFilesManager;
 class VirtualStorage;
 
 //PSTODO wtf? preco su vsetky metodi const?
-class StegoStorage {
+class STEGO_DISK_EXPORT StegoStorage {
 
 public:
   StegoStorage();
