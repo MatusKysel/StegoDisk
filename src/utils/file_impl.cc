@@ -1,5 +1,6 @@
 #include "file.h"
 
+#include "api_mask.h"
 #include "utils/include_fs_library.h"
 
 #ifndef HAS_FILESYSTEM_LIBRARY

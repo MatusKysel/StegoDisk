@@ -12,6 +12,7 @@
 
 #include <iostream>
 
+#include "api_mask.h"
 #include "stego-disk_export.h"
 
 typedef enum LoggerVerbosityLevel {

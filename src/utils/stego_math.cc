@@ -15,6 +15,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "api_mask.h"
+
 namespace stego_disk {
 
 uint64 StegoMath::Gcd(uint64 a, uint64 b) {

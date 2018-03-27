@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include "api_mask.h"
 #include "hash/hash.h"
 #include "keys/key.h"
 #include "utils/thread_pool.h"

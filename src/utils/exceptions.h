@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "api_mask.h"
 #include "stego-disk_export.h"
 
 #define DEFINE_GETTER(member_name) \

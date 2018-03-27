@@ -11,6 +11,7 @@
 
 #include <string.h> // memset
 
+#include "api_mask.h"
 #include "hash/hash.h"
 
 namespace stego_disk {

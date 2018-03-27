@@ -14,6 +14,7 @@
 #include <vector>
 #include <stdexcept>
 
+#include "api_mask.h"
 #include "stego_types.h"
 
 namespace stego_disk {

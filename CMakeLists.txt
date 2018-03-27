@@ -1,13 +1,25 @@
 cmake_minimum_required(VERSION 2.8)
 include(GenerateExportHeader)
 
-project(StegoDisk CXX)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" OFF)
 option(BUILD_SHARED "Build this as shared library" OFF)
 option(BUILD_TESTS "Whether to build automatic test suite" ON)
+option(OBFUSCATE_SYMBOLS "Whether to change names in syblols to inocent strings" OFF)
+set(OBFUSCATE_NAMESPACE "RansomwareNG" CACHE STRING "Name of namespace in symbols")
+set(OBFUSCATE_STORAGE "Encryptor" CACHE STRING "Name of main stago disk class in symbols")
+set(OBFUSCATE_PROJECT "RansomwareNG" CACHE STRING "Name of the project")
+set(OBFUSCATE_LIBRARY "enc-lib2" CACHE STRING "Name of the library")
 
+if(NOT OBFUSCATE_SYMBOLS)
+	set(OBFUSCATE_NAMESPACE "stego_disk")
+	set(OBFUSCATE_STORAGE "StegoStorage")
+	set(OBFUSCATE_PROJECT "StegoDisk")
+	set(OBFUSCATE_LIBRARY "stego-disk")
+endif()
+
+project(${OBFUSCATE_PROJECT} CXX)
 
 if(BUILD_SHARED)
   message (STATUS "Build this library as shared")
@@ -43,8 +55,9 @@ endif()
 math(EXPR STEGODISK_VERSION_NUMBER "${STEGODISK_MAJOR_VERSION} * 1000000 + ${STEGODISK_MINOR_VERSION} * 1000 + ${STEGODISK_PATCH_VERSION}")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/api_mask.h.in ${CMAKE_BINARY_DIR}/src/api_mask.h)
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_BINARY_DIR}) #this is for stego-disk_export.h file
 
 
 
@@ -356,16 +369,16 @@ if(APPLE)
 endif(APPLE)
 
 if(VERSION_NAMES)
-  set(STEGODISK_LIBRARY stego-disk.${STEGODISK_VERSION})
+  set(STEGODISK_LIBRARY ${OBFUSCATE_LIBRARY}.${STEGODISK_VERSION})
 else()
-  set(STEGODISK_LIBRARY stego-disk)
+  set(STEGODISK_LIBRARY ${OBFUSCATE_LIBRARY})
 endif()
 
 add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_SRC})
 
 target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
 
-generate_export_header(${STEGODISK_LIBRARY})
+generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")
 
 
 #install(TARGETS ${STEGODISK_LIBRARY}

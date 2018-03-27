@@ -12,7 +12,8 @@
 
 #include <string>
 
-//PSTODO co toto je?
+#include "api_mask.h"
+
 class FuseServiceDelegate {
 public:
     virtual void FuseMounted(bool success) = 0;

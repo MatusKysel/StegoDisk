@@ -12,6 +12,7 @@
 #include <array>
 #include <forward_list>
 
+#include "api_mask.h"
 #include "fitness.h"
 
 namespace stego_disk {

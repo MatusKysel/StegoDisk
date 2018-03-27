@@ -30,6 +30,10 @@ case $key in
     noTest=1
     shift # past argument
     ;;
+    -o|--obfuscate)
+    obfuscate=1
+    shift # past argument
+    ;;
     -h|--help)
 	echo "Valid arguments are:"
 	echo "    --static"
@@ -38,6 +42,7 @@ case $key in
 	echo "    --release"
 	echo "    --fresh"
 	echo "    --no-test"
+	echo "    --obfuscate"
     exit 0;
     ;;
     *)    # unknown option
@@ -49,6 +54,7 @@ case $key in
 	echo "    --release"
 	echo "    --fresh"
 	echo "    --no-test"
+	echo "    --obfuscate"
     exit 1;
     ;;
 esac
@@ -75,6 +81,12 @@ if [ $fuse ]
 then
 	name="${name}_fuse";
 	cmake_flags="${cmake_flags} -DWITH_FUSE=ON";
+fi;
+
+if [ $obfuscate ]
+then
+	name="${name}_obfuscate";
+	cmake_flags="${cmake_flags} -DOBFUSCATE_SYMBOLS=ON";
 fi;
 
 if [ $release ]

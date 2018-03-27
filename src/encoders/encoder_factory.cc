@@ -11,6 +11,7 @@
 
 #include <algorithm>
 
+#include "api_mask.h"
 #include "encoder.h"
 #include "hamming_encoder.h"
 #include "lsb_encoder.h"

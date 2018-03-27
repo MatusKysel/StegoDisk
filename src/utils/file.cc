@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <fstream>
 
+#include "api_mask.h"
 #include "stego_header.h"
 #include "utils/exceptions.h"
 

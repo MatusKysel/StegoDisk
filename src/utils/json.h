@@ -38,6 +38,7 @@
 #include <fstream>
 #include <cstdlib>
 
+#include "api_mask.h"
 #include "utils/json_object.h"
 
 namespace json {

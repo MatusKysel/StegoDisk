@@ -31,14 +31,15 @@
 #include <ctime>
 #include <string>
 
-#include "file_management/carrier_files_manager.h"
-#include "encoders/hamming_encoder.h"
+#include "api_mask.h"
 #include "encoders/encoder.h"
-#include "permutations/permutation.h"
+#include "encoders/hamming_encoder.h"
+#include "file_management/carrier_files_manager.h"
 #include "permutations/affine_permutation.h"
 #include "permutations/feistel_num_permutation.h"
-#include "utils/stego_math.h"
+#include "permutations/permutation.h"
 #include "utils/config.h"
+#include "utils/stego_math.h"
 
 #ifdef __APPLE__
 static const char  *file_path      = "/virtualdisc.dmg";

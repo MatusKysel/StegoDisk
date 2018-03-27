@@ -6,6 +6,7 @@
 *
 */
 
+#include "api_mask.h"
 #include "context_fitness.h"
 #include "carrier_files/carrier_file.h"
 

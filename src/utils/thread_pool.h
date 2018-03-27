@@ -19,6 +19,7 @@
 #include <functional>
 #include <stdexcept>
 
+#include "api_mask.h"
 #include "utils/exceptions.h"
 
 

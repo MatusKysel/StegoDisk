@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "api_mask.h"
 #include "carrier_files/carrier_file.h"
 #include "carrier_files/carrier_file_factory.h"
 #include "logging/logger.h"

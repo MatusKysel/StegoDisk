@@ -11,6 +11,7 @@
 
 #include <stdexcept>
 
+#include "api_mask.h"
 #include "keccak_hash_impl.h"
 #include "utils/exceptions.h"
 #include "utils/stego_types.h"

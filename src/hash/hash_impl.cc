@@ -7,6 +7,7 @@
 *
 */
 
+#include "api_mask.h"
 #include "hash_impl.h"
 
 namespace stego_disk {

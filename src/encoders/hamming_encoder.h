@@ -10,6 +10,7 @@
 #ifndef STEGODISK_ENCODERS_HAMMINGENCODER_H_
 #define STEGODISK_ENCODERS_HAMMINGENCODER_H_
 
+#include "api_mask.h"
 #include "encoder.h"
 
 #define ENCODER_HAMMING_CODE_NAME_DEF "Hamming"

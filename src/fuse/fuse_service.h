@@ -22,6 +22,7 @@
 #include <string>
 
 //#include "fuse_service_delegate.h"
+#include "api_mask.h"
 #include "logging/logger.h"
 #include "stego-disk_export.h"
 #include "stego_storage.h"

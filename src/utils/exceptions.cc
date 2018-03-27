@@ -1,5 +1,7 @@
 #include "exceptions.h"
 
+#include "api_mask.h"
+
 namespace stego_disk {
 namespace exception {
 
@@ -65,11 +67,11 @@ std::string to_string(const InvalidState::Operation & operation) {
 		case InvalidState::Operation::getCapacity:
 			return "Get capacity";
 		case InvalidState::Operation::loadStegoStrorage:
-			return "Load stego storage";
+			return "Load storage";
 		case InvalidState::Operation::saveStegoStrorage:
-			return "Save stego storage";
+			return "Save storage";
 		case InvalidState::Operation::ioStegoStorage:
-			return "IO operation on stego storage";
+			return "IO operation on storage";
 		case InvalidState::Operation::ioVirtualStorage:
 			return "IO operation on virtual storage";
 		case InvalidState::Operation::commonPermuteInputCheck:

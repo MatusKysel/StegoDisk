@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <ctime>
 
+#include "api_mask.h"
 #include "stego_types.h"
 
 using namespace std;
