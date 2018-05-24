@@ -10,7 +10,7 @@
 
 namespace stego_disk {
 
-std::vector<File> File::GetFilesInDir(std::string directory, std::string mask)
+std::vector<File> File::GetFilesInDir(std::string directory, std::string)
 {
 	std::vector<File> ret;
 	for (auto &i: fs::recursive_directory_iterator(directory)) {
