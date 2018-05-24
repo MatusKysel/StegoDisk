@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include "api_mask.h"
+
 class FuseServiceDelegate {
 public:
     virtual void FuseMounted(bool success) = 0;

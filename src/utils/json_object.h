@@ -22,6 +22,8 @@
 #include <iterator>
 #include <type_traits>
 
+#include "api_mask.h"
+
 #ifdef _MSC_VER
 #define SNPRINTF _snprintf_s
 #pragma warning(push)

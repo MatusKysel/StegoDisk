@@ -14,6 +14,7 @@
 #include <string>
 #include <stdexcept>
 
+#include "api_mask.h"
 #include "utils/stego_types.h"
 
 using namespace std;

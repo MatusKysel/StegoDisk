@@ -9,10 +9,11 @@
 
 #include "affine_permutation.h"
 
-#include "utils/stego_math.h"
-#include "utils/stego_errors.h"
-#include "utils/config.h"
 #include "logging/logger.h"
+#include "utils/config.h"
+#include "utils/exceptions.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
 
 namespace stego_disk {
 
@@ -29,7 +30,7 @@ AffinePermutation::~AffinePermutation() {
 PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key,
                                                bool overwrite_members) {
   if (key.GetSize() == 0)
-    throw std::runtime_error("AffinePermutation: Invalid key (size=0)");
+    throw exception::EmptyArgument{"key"};
 
   uint64 prime = requested_size;
 
@@ -91,7 +92,7 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size,
 void AffinePermutation::Init(PermElem requested_size, Key &key)
 {
   if (requested_size > 0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
-    throw std::out_of_range("AffinePermutation: "
+    throw std::invalid_argument("AffinePermutation: "
                             "max requested size is (2^32)-1");
 
   initialized_ = false;

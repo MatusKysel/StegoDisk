@@ -13,13 +13,14 @@
 
 #include <exception>
 
-#include "permutations/permutation.h"
-#include "utils/stego_math.h"
-#include "utils/stego_errors.h"
-#include "utils/config.h"
-#include "utils/keccak/keccak.h"
-#include "logging/logger.h"
 #include "hash/hash.h"
+#include "logging/logger.h"
+#include "permutations/permutation.h"
+#include "utils/config.h"
+#include "utils/exceptions.h"
+#include "utils/keccak/keccak.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
 
 namespace stego_disk {
 
@@ -63,11 +64,13 @@ std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(string permutatio
  */
 uint64 VirtualStorage::GetUsableCapacity() {
   if (!global_permutation_)
-    throw std::invalid_argument("VirtualStorage::GetUsableCapacity: "
-                                "permutation not Set yet");
+    throw exception::InvalidState{exception::Operation::getCapacity,
+                                  exception::Component::permutation,
+                                  exception::ComponentState::notSetted};
   if (!is_set_global_permutation_)
-    throw std::invalid_argument("VirtualStorage::GetUsableCapacity: "
-                                "permutation not applied yet");
+    throw exception::InvalidState{exception::Operation::getCapacity,
+                                  exception::Component::permutation,
+                                  exception::ComponentState::notApplied};
 
   //return (_capacity - SFS_STORAGE_HASH_LENGTH);
   return usable_capacity_;
@@ -81,19 +84,20 @@ uint64 VirtualStorage::GetUsableCapacity() {
  */
 uint64 VirtualStorage::GetRawCapacity() {
   if (!global_permutation_)
-    throw std::invalid_argument("VirtualStorage::GetRawCapacity: "
-                                "permutation not Set yet");
+    throw exception::InvalidState{exception::Operation::getCapacity,
+                                  exception::Component::permutation,
+                                  exception::ComponentState::notSetted};
   if (!is_set_global_permutation_)
-    throw std::invalid_argument("VirtualStorage::GetRawCapacity: "
-                                "permutation not applied yet");
+    throw exception::InvalidState{exception::Operation::getCapacity,
+                                  exception::Component::permutation,
+                                  exception::ComponentState::notApplied};
 
   return raw_capacity_;
 }
 
 void VirtualStorage::SetPermutation(std::shared_ptr<Permutation> permutation) {
   if (!permutation)
-    throw std::invalid_argument("VirtualStorage::SetPermutation: "
-                                "arg 'permutation' is nullptr");
+    throw exception::NullptrArgument{"permutation"};
 
   if (global_permutation_)
     UnSetPermutation();
@@ -112,12 +116,12 @@ void VirtualStorage::UnSetPermutation() {
  * Global permutation is used by readByte/writeByte methods.
  *
  * @param[in] globalPermutation Correctly Initialized permutation
- * @return Error code (NO ERROR)
  */
 void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
   if ( !global_permutation_ )
-    throw std::invalid_argument("VirtualStorage::applyPermutation: "
-                                "permutation not Set yet");
+    throw exception::InvalidState{exception::Operation::getCapacity,
+                                  exception::Component::permutation,
+                                  exception::ComponentState::notSetted};
 
   try { global_permutation_->Init(requested_size, key); }
   catch (...) { throw; }
@@ -151,7 +155,7 @@ void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
  *
  * @param[in]  position  offset of requested byte
  * @param[out] value     byte at position
- * @return Error code (0 = NO ERROR)
+ * @return Requested data
  */
 
 uint8 VirtualStorage::ReadByte(uint64 position) {
@@ -159,7 +163,9 @@ uint8 VirtualStorage::ReadByte(uint64 position) {
     throw std::out_of_range("index out of range");
 
   if (!global_permutation_)
-    throw std::runtime_error("storage not Initialized");
+    throw exception::InvalidState{exception::Operation::ioVirtualStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notInitialized};
 
   return data_[global_permutation_->Permute(position)];
 }
@@ -172,14 +178,15 @@ uint8 VirtualStorage::ReadByte(uint64 position) {
  *
  * @param[in] position  offset
  * @param[in] value     byte at position
- * @return Error code (0 = NO ERROR)
  */
 void VirtualStorage::WriteByte(uint64 position, uint8 value) {
   if (position >= raw_capacity_)
     throw std::out_of_range("index out of range");
 
   if (!global_permutation_)
-    throw std::runtime_error("storage not Initialized");
+    throw exception::InvalidState{exception::Operation::ioVirtualStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notInitialized};
 
   data_[global_permutation_->Permute(position)] = value;
 }
@@ -203,7 +210,9 @@ void VirtualStorage::Read(uint64 offset,
     return;
 
   if (data_.GetConstRawPointer() == nullptr)
-    throw std::out_of_range("storage not Initialized");
+    throw exception::InvalidState{exception::Operation::ioVirtualStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notInitialized};
 
   memcpy(buffer, (void*)(data_.GetConstRawPointer() + offset), length);
 }
@@ -227,7 +236,9 @@ void VirtualStorage::Write(uint64 offset,
     return;
 
   if (data_.GetConstRawPointer() == nullptr)
-    throw std::out_of_range("storage not Initialized");
+    throw exception::InvalidState{exception::Operation::ioVirtualStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notInitialized};
 
   memcpy(data_.GetRawPointer() + offset, buffer, length);
 }
@@ -235,8 +246,6 @@ void VirtualStorage::Write(uint64 offset,
 
 /**
  * @brief Fills the storage with random data_
- *
- * @return Error code (0 = NO ERROR)
  */
 void VirtualStorage::RandomizeBuffer() {
   data_.Randomize();
@@ -244,8 +253,6 @@ void VirtualStorage::RandomizeBuffer() {
 
 /**
  * @brief Fills the storage with zeros
- *
- * @return Error code (0 = NO ERROR)
  */
 void VirtualStorage::ClearBuffer() {
   data_.Clear();
@@ -267,16 +274,14 @@ void VirtualStorage::FillBuffer(uint8 value) {
  *
  * Compares checksum (hash) stored at the end of the storage
  *
- * @return Error code or 0 if integrity check succeeds
+ * @return true if the checksum is valid, false otherwise
  */
 bool VirtualStorage::IsValidChecksum() {
   if (data_.GetSize() == 0)
-    throw std::invalid_argument("VirtualStorage::checkIntegrity: "
-                                "data_ storage is not Set yet");
+    throw exception::EmptyMember{"data"};
 
   if (usable_capacity_ == 0)
-    throw std::invalid_argument("VirtualStorage::checkIntegrity: "
-                                "capacity storage is not Initialized yet");
+    throw exception::EmptyMember{"usable_capacity"};
 
   //TODO:    #warning Sync hash length with SFS_STORAGE_HASH_LENGTH
   Hash checksum(data_.GetConstRawPointer(), usable_capacity_);
@@ -303,7 +308,9 @@ bool VirtualStorage::IsValidChecksum() {
  */
 void VirtualStorage::WriteChecksum() {
   if ((data_.GetSize() == 0) || (usable_capacity_ == 0))
-    throw runtime_error("storage not Initialized");
+    throw exception::InvalidState{exception::Operation::ioVirtualStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notInitialized};
 
   //TODO:    #warning Sync hash length with SFS_STORAGE_HASH_LENGTH
 

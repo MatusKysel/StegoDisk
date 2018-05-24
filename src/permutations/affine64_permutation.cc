@@ -31,7 +31,7 @@ void Affine64Permutation::Init(PermElem requested_size, Key &key)
   initialized_ = false;
 
   if (GetSizeUsingParams(requested_size, key, true) == 0)
-    throw std::runtime_error("Affine64Permutation: "
+    throw std::invalid_argument("Affine64Permutation: "
                              "requested size is too small");
 
   initialized_ = true;

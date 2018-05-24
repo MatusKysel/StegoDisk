@@ -10,16 +10,18 @@
 #ifndef STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_
 #define STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_
 
+#include "permutation.h"
+
 #include <memory>
 #include <vector>
 
-#include "permutation.h"
+#include "stego-disk_export.h"
 
 using namespace std;
 
 namespace stego_disk {
 
-class PermutationFactory final {
+class STEGO_DISK_EXPORT PermutationFactory final {
 private:
   PermutationFactory();
 public:

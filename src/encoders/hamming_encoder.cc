@@ -12,9 +12,10 @@
 #include <string.h>
 #include <algorithm>
 
-#include "utils/stego_math.h"
-#include "utils/stego_errors.h"
 #include "logging/logger.h"
+#include "utils/exceptions.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
 
 namespace stego_disk {
 
@@ -197,11 +198,10 @@ void HammingEncoder::SetArgByName(const string &param, const string &val) {
   bool is_valid_param = false;
   string p = param;
 
-  if (!param.size())
-    throw std::invalid_argument("HammingEncoder::setArgByName: "
-                                "'param' is empty");
-  if (!val.size())
-    throw std::invalid_argument("HammingEncoder::setArgByName: 'val' is empty");
+  if (param.empty())
+    throw exception::EmptyArgument{"param"};
+  if (val.empty())
+    throw exception::EmptyArgument{"val"};
 
   std::transform(p.begin(), p.end(), p.begin(), ::tolower);
 
@@ -215,7 +215,7 @@ void HammingEncoder::SetArgByName(const string &param, const string &val) {
     catch (const std::out_of_range& ) { throw; }
 
     if (parity_bits < 0)
-      throw std::out_of_range("HammingEncoder::setArgByName: "
+      throw std::invalid_argument("HammingEncoder::setArgByName: "
                               "'parity_bits' should be positive, is "
                               + std::to_string(
                                 static_cast<uint64>(parity_bits)));
@@ -273,9 +273,9 @@ int HammingEncoder::Embed(uint8 *codeword, const uint8 *data) {
   int bit_offset = 0;
 
   if ( !codeword )
-    throw std::invalid_argument("HammingEncoder::embed: 'codeword' is NULL");
+    throw exception::NullptrArgument{"codeword"};
   if ( !data )
-    throw std::invalid_argument("HammingEncoder::embed: 'data' is NULL");
+    throw exception::NullptrArgument{"data"};
 
   for (uint32 i = 0; i < codewords_in_block_; ++i) {
     h = ComputeH(&codeword[i * codeword_buffer_size_]);
@@ -307,9 +307,9 @@ int HammingEncoder::Embed(uint8 *codeword, const uint8 *data) {
  */
 int HammingEncoder::Extract(const uint8 *codeword, uint8 *data) {
   if ( !codeword )
-    throw std::invalid_argument("HammingEncoder::extract: 'codeword' is NULL");
+    throw exception::NullptrArgument{"codeword"};
   if ( !data )
-    throw std::invalid_argument("HammingEncoder::extract: 'data' is NULL");
+    throw exception::NullptrArgument{"data"};
 
   memset(data, 0, data_block_size_);
 

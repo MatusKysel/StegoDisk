@@ -12,6 +12,9 @@
 
 #include <iostream>
 
+#include "api_mask.h"
+#include "stego-disk_export.h"
+
 typedef enum LoggerVerbosityLevel {
   kLoggerVerbosityDisabled = 0,
   kLoggerVerbosityFatal = 1,
@@ -22,7 +25,7 @@ typedef enum LoggerVerbosityLevel {
   kLoggerVerbosityTrace = 6
 } LoggerVerbosityLevel;
 
-class Logger {
+class STEGO_DISK_EXPORT Logger {
 public:
   static void SetVerbosityLevel(LoggerVerbosityLevel verbosity_level,
                                 std::string out = "");

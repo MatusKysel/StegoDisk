@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 
+#include "api_mask.h"
 
 LoggerVerbosityLevel Logger::verbosity_level_ = kLoggerVerbosityDisabled;
 std::ostream *Logger::ofs_ = &std::cout;

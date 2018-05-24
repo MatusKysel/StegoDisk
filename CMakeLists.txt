@@ -1,12 +1,25 @@
 cmake_minimum_required(VERSION 2.8)
+include(GenerateExportHeader)
 
-project(StegoDisk CXX)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" OFF)
 option(BUILD_SHARED "Build this as shared library" OFF)
 option(BUILD_TESTS "Whether to build automatic test suite" ON)
+option(OBFUSCATE_SYMBOLS "Whether to change names in syblols to inocent strings" OFF)
+set(OBFUSCATE_NAMESPACE "RansomwareNG" CACHE STRING "Name of namespace in symbols")
+set(OBFUSCATE_STORAGE "Encryptor" CACHE STRING "Name of main stago disk class in symbols")
+set(OBFUSCATE_PROJECT "RansomwareNG" CACHE STRING "Name of the project")
+set(OBFUSCATE_LIBRARY "enc-lib2" CACHE STRING "Name of the library")
 
+if(NOT OBFUSCATE_SYMBOLS)
+	set(OBFUSCATE_NAMESPACE "stego_disk")
+	set(OBFUSCATE_STORAGE "StegoStorage")
+	set(OBFUSCATE_PROJECT "StegoDisk")
+	set(OBFUSCATE_LIBRARY "stego-disk")
+endif()
+
+project(${OBFUSCATE_PROJECT} CXX)
 
 if(BUILD_SHARED)
   message (STATUS "Build this library as shared")
@@ -17,6 +30,7 @@ else()
 endif()
 
 cmake_policy(SET CMP0009 NEW)
+cmake_policy(SET CMP0063 NEW)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
@@ -41,7 +55,9 @@ endif()
 math(EXPR STEGODISK_VERSION_NUMBER "${STEGODISK_MAJOR_VERSION} * 1000000 + ${STEGODISK_MINOR_VERSION} * 1000 + ${STEGODISK_PATCH_VERSION}")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/src/version.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/api_mask.h.in ${CMAKE_BINARY_DIR}/src/api_mask.h)
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
+include_directories(${CMAKE_BINARY_DIR}) #this is for stego-disk_export.h file
 
 
 
@@ -78,10 +94,15 @@ endif()
 
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_C_VISIBILITY_PRESET hidden) #PSTODO do not work fot libjpeg
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC -std=c++11 -pthread ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pthread ${warnings}")
 endif()
 
 if(WIN32)
@@ -98,7 +119,7 @@ option(WITH_TURBOJPEG OFF)
 option(WITH_SIMD OFF)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_subdirectory(lib/libjpeg-turbo)
-set(LIBJPEGTURBO_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
+set(LIBJPEGTURBO_LIBRARIES jpeg-static)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 ################ LIBJPEGTURBO ##################
@@ -258,9 +279,11 @@ set(PERMUTATIONS_SRCS
 
 set(UTILS_HDRS
   src/utils/config.h
+  src/utils/exceptions.h
   src/utils/file.h
   src/utils/json.h
   src/utils/json_object.h
+  src/utils/keccak/keccak.h
   src/utils/memory_buffer.h
   src/utils/stego_config.h
   src/utils/stego_errors.h
@@ -268,16 +291,17 @@ set(UTILS_HDRS
   src/utils/stego_math.h
   src/utils/stego_types.h
   src/utils/thread_pool.h
-  src/utils/keccak/keccak.h
 )
 
 set(UTILS_SRCS
+  src/utils/exceptions.cc
   src/utils/file.cc
-  src/utils/file_unix.cc
-  src/utils/file_win.cc
+  src/utils/file_impl.cc
+  src/utils/file_unix.inc
+  src/utils/file_win.inc
+  src/utils/keccak/keccak.cc
   src/utils/memory_buffer.cc
   src/utils/stego_math.cc
-  src/utils/keccak/keccak.cc
 )
 
 # VIRTUAL_STORAGE
@@ -330,11 +354,14 @@ endif()
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(FUSE_FOUND)
-  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${LODEPNG_LIBRARIES} ${FUSE_LIBRARIES})
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${FUSE_LIBRARIES})
 else()
-  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES} ${LODEPNG_LIBRARIES})
+  set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
 endif()
 
+if(NOT WIN32)
+  list(APPEND THIRD_LIBRARIES "stdc++fs")
+endif()
 
 if(APPLE)
    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
@@ -342,16 +369,16 @@ if(APPLE)
 endif(APPLE)
 
 if(VERSION_NAMES)
-  set(STEGODISK_LIBRARY stego-disk.${STEGODISK_VERSION})
+  set(STEGODISK_LIBRARY ${OBFUSCATE_LIBRARY}.${STEGODISK_VERSION})
 else()
-  set(STEGODISK_LIBRARY stego-disk)
+  set(STEGODISK_LIBRARY ${OBFUSCATE_LIBRARY})
 endif()
 
 add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_SRC})
 
-if(REQUIRE_LIB_SYMBOL)
-  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
-endif()
+target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
+
+generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")
 
 
 #install(TARGETS ${STEGODISK_LIBRARY}
@@ -363,6 +390,25 @@ endif()
 ##############################################################################################################################
 ##############################################################################################################################
 ##############################################################################################################################
+
+
+################ LD FLAGS ##################
+if(NOT WIN32)
+  #PSTODO test under LLVM
+  #PSTODO work only on shared library, not on static
+  set(new_link_flags "-s")
+  get_target_property(existing_link_flags ${STEGODISK_LIBRARY} LINK_FLAGS_RELEASE)
+  if(existing_link_flags)
+      set(new_link_flags "${existing_link_flags} ${new_link_flags}")
+  endif()
+  set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS_RELEASE ${new_link_flags})
+endif()
+
+#if(WIN32)
+#  #PSTODO
+#endif()
+################ LD FLAGS ##################
+
 # TESTING
 
 if(BUILD_TESTS)

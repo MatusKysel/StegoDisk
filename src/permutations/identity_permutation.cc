@@ -9,6 +9,7 @@
 
 #include "identity_permutation.h"
 
+#include "utils/exceptions.h"
 #include "utils/stego_header.h"
 
 namespace stego_disk {
@@ -26,8 +27,7 @@ IdentityPermutation::~IdentityPermutation() {
 void IdentityPermutation::Init(PermElem requested_size, Key& /*key*/) {
 
   if (requested_size == 0)
-    throw std::invalid_argument("IdentityPermutation: "
-                                "requestedSize cannot be 0");
+    throw exception::EmptyArgument("requested_size");
 
   size_ = requested_size;
   initialized_ = true;

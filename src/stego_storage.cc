@@ -11,9 +11,11 @@
 
 #include <fstream>
 
-#include "virtual_storage/virtual_storage.h"
+#include "api_mask.h"
 #include "file_management/carrier_files_manager.h"
+#include "utils/exceptions.h"
 #include "utils/stego_config.h"
+#include "virtual_storage/virtual_storage.h"
 
 namespace stego_disk {
 
@@ -35,7 +37,7 @@ void StegoStorage::Open(const std::string &storage_base_path,
 void StegoStorage::Configure(const std::string &config_path) const {
   std::ifstream ifs(config_path.c_str());
   if (!ifs.is_open()) {
-    throw std::runtime_error("Failed to open config file " + config_path);
+    throw exception::ErrorOpenFIle{config_path};
   }
 
   std::string json_string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
@@ -45,7 +47,7 @@ void StegoStorage::Configure(const std::string &config_path) const {
   std::string parse_error = json::Parse(json_string, &config);
 
   if (!parse_error.empty()) {
-    throw std::runtime_error("Failed to parse config file " + parse_error);
+    throw exception::ParseError{config_path, parse_error};
   }
   StegoConfig::Init(config);
 }
@@ -70,10 +72,14 @@ void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
 void StegoStorage::Load() {
 
   if (!StegoConfig::initialized()) {
-    throw std::runtime_error("Storage must be configured before opening");
+    throw exception::InvalidState{exception::Operation::loadStegoStrorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notConfigured};
   }
   if (!opened_) {
-    throw std::runtime_error("Storage must be opened_ before loading");
+    throw exception::InvalidState{exception::Operation::loadStegoStrorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notOpened};
   }
   
   try {
@@ -91,10 +97,14 @@ void StegoStorage::Load() {
 
 void StegoStorage::Save() {
   if (!opened_)
-    throw std::runtime_error("Storage must be opened_ before saving");
+    throw exception::InvalidState{exception::Operation::saveStegoStrorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notOpened};
 
   if (virtual_storage_ == nullptr)
-    throw std::runtime_error("Storage must be loaded before saving");
+    throw exception::InvalidState{exception::Operation::saveStegoStrorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notLoaded};
 
   try {
     carrier_files_manager_->SaveVirtualStorage();
@@ -105,7 +115,9 @@ void StegoStorage::Save() {
 void StegoStorage::Read(void* destination, const std::size_t offSet,
                         const std::size_t length) const {
   if (virtual_storage_ == nullptr)
-    throw std::runtime_error("Storage must be loaded before use");
+    throw exception::InvalidState{exception::Operation::ioStegoStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notLoaded};
 
   try {
     virtual_storage_->Read(offSet, length, (uint8*)destination);
@@ -116,7 +128,9 @@ void StegoStorage::Read(void* destination, const std::size_t offSet,
 void StegoStorage::Write(const void* source, const std::size_t offSet,
                          const std::size_t length) const {
   if (virtual_storage_ == nullptr)
-    throw std::runtime_error("Storage must be loaded before use");
+    throw exception::InvalidState{exception::Operation::ioStegoStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notLoaded};
 
   try {
     virtual_storage_->Write(offSet, length, (uint8*)source);
@@ -140,7 +154,7 @@ void StegoStorage::ChangeEncoder(std::string &config) const {
   std::string parse_error = json::Parse(config, &json_config);
 
   if (!parse_error.empty()) {
-    throw std::runtime_error("Failed to parse config file " + parse_error);
+    throw exception::ParseError{config, parse_error};
   }
 
   try {

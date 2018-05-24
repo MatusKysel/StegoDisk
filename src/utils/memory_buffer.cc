@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <ctime>
 
+#include "api_mask.h"
 #include "stego_types.h"
 
 using namespace std;
@@ -212,7 +213,7 @@ void MemoryBuffer::Randomize() {
 
   srand(static_cast<unsigned int>(time(NULL)));
   for (std::size_t i = 0; i < size_; ++i) {
-    buffer_[i] = static_cast<uint8>(rand());
+    buffer_[i] = static_cast<uint8>(rand()); //PSTODO naozaj? nepiseme nahodou kniznicu ktora sluzi na security...?
   }
 }
 

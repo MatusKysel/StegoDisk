@@ -10,16 +10,18 @@
 #ifndef STEGODISK_ENCODERS_ENCODERFACTORY_H_
 #define STEGODISK_ENCODERS_ENCODERFACTORY_H_
 
+#include "encoder.h"
+
 #include <memory>
 #include <vector>
 
-#include "encoder.h"
+#include "stego-disk_export.h"
 
 using namespace std;
 
 namespace stego_disk {
 
-class EncoderFactory final
+class STEGO_DISK_EXPORT EncoderFactory final
 {
 private: 
   EncoderFactory();

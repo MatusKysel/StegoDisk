@@ -16,6 +16,9 @@
 #include <fstream>
 #include <iostream>
 
+#include "utils/exceptions.h"
+#include "utils/include_fs_library.h"
+
 
 class FileManager {
 public:
@@ -36,6 +39,8 @@ public:
 	  return out;
   }
 
+#ifndef HAS_FILESYSTEM_LIBRARY
+  //PSTODO change to filesystem
   inline static void CopyDirectory(const std::string &src, const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
@@ -45,9 +50,11 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str()) < 0) throw std::runtime_error("Failed to execute: " + cmd);
+    if(system(cmd.c_str()) < 0)
+      throw stego_disk::exception::ExecFailed{cmd};
   }
 
+  //PSTODO change to filesystem
   inline static void RemoveDirectory(const std::string &path) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
@@ -57,8 +64,23 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str()) < 0) throw std::runtime_error("Failed to execute: " + cmd);
+    if(system(cmd.c_str()) < 0)
+      throw stego_disk::exception::ExecFailed{cmd};
   }
+#else //HAS_FILESYSTEM_LIBRARY
+  inline static void CopyDirectory(const std::string &src, const std::string &dst) {
+    std::cout << "copy '" << src << "' to '" << dst << "'" << std::endl;
+	if (fs::exists(src))
+      fs::copy(src, dst, fs::copy_options::overwrite_existing|fs::copy_options::recursive);
+  }
+
+  inline static void RemoveDirectory(const std::string &path) {
+    std::cout << "Remove '" << path << "'" << std::endl;
+	if (fs::exists(path))
+      fs::remove_all(path);
+  }
+#endif //HAS_FILESYSTEM_LIBRARY
+
 };
 
 #endif // FILE_MANAGER_H

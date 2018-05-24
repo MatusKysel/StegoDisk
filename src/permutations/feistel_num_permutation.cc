@@ -10,14 +10,16 @@
 #include "feistel_num_permutation.h"
 
 #include <math.h>       /* sqrt */
+
 #include <algorithm>
 
-#include "utils/stego_math.h"
-#include "utils/keccak/keccak.h"
-#include "utils/config.h"
-#include "utils/stego_errors.h"
-#include "logging/logger.h"
 #include "hash/hash.h"
+#include "logging/logger.h"
+#include "utils/config.h"
+#include "utils/exceptions.h"
+#include "utils/keccak/keccak.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
 
 #define FNP_MIN_REQ_SIZE                        1024
 #define FNP_NUMROUNDS                           5
@@ -37,11 +39,10 @@ FeistelNumPermutation::~FeistelNumPermutation() {
 
 void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
   if (key.GetSize() == 0)
-    throw std::runtime_error("FeistelNumPermutation init: "
-                             "Invalid key (size=0)");
+    throw exception::EmptyArgument{"key"};
 
   if (requested_size < FNP_MIN_REQ_SIZE)
-    throw std::runtime_error("FeistelNumPermutation: "
+    throw std::invalid_argument("FeistelNumPermutation: "
                              "requestedSize < FNP_MIN_REQ_SIZE");
 
   initialized_ = false;
@@ -71,7 +72,7 @@ void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
       //TODO: rewrite these lines - im sure there is a better way of writing this
 
       if (hash.GetStateSize() < 4)
-        throw std::runtime_error("hash size is too small");
+        throw exception::HashSizeTooSmall{};
 
       uint32 hash_val = *((uint32*)hash.GetState().GetConstRawPointer());
       hash_tables_[t][i] = hash_val % modulus_;
@@ -99,8 +100,7 @@ PermElem FeistelNumPermutation::Permute(PermElem index) const {
   uint64 permuted_index = (left * modulus_) + right;
 
   if (permuted_index >= size_)
-    throw std::runtime_error("FeistelNumPermutation: "
-                             "permuted index calculation failed");
+    throw exception::PermutationFailed{};
 
   return permuted_index;
 }

@@ -12,11 +12,12 @@
 #include <algorithm>
 
 
-#include "identity_permutation.h"
-#include "affine_permutation.h"
 #include "affine64_permutation.h"
-#include "feistel_num_permutation.h"
+#include "affine_permutation.h"
 #include "feistel_mix_permutation.h"
+#include "feistel_num_permutation.h"
+#include "identity_permutation.h"
+#include "utils/exceptions.h"
 
 namespace stego_disk {
 
@@ -76,9 +77,8 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
   std::shared_ptr<Permutation> permutation(nullptr);
   string str, name;
 
-  if (permutation_name.length() == 0)
-    throw std::invalid_argument("PermutationFactory::getPermutationByName: '"
-                                "permutationName' is empty");
+  if (permutation_name.empty())
+    throw exception::EmptyArgument{"permutationName"};
   name = permutation_name;
 
   std::transform(name.begin(), name.end(), name.begin(), ::tolower);

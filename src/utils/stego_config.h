@@ -15,6 +15,7 @@
 #include <tuple>
 #include <memory>
 
+#include "api_mask.h"
 #include "encoders/encoder_factory.h"
 #include "permutations/permutation_factory.h"
 #include "utils/json.h"

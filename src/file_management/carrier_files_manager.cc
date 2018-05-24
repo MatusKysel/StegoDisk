@@ -9,26 +9,29 @@
 
 #include "carrier_files_manager.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-#include <iostream>
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
-#include "carrier_files/carrier_file_factory.h"
-#include "virtual_storage/virtual_storage.h"
+#include "api_mask.h"
 #include "carrier_files/carrier_file.h"
-#include "utils/keccak/keccak.h"
-#include "utils/stego_errors.h"
-#include "utils/stego_config.h"
-#include "utils/config.h"
-#include "utils/stego_math.h"
-#include "utils/file.h"
+#include "carrier_files/carrier_file_factory.h"
 #include "logging/logger.h"
+#include "utils/config.h"
+#include "utils/exceptions.h"
+#include "utils/file.h"
+#include "utils/keccak/keccak.h"
+#include "utils/stego_config.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
+#include "utils/thread_pool.h"
+#include "virtual_storage/virtual_storage.h"
 
 using namespace std;
 
@@ -39,7 +42,7 @@ CarrierFilesManager::CarrierFilesManager() :
   files_in_directory_(0),
   virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
-  thread_pool_(new ThreadPool(0)), //std::make_unique<ThreadPool>(0) c++14
+  thread_pool_(std::make_unique<ThreadPool>(0)),
   is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
@@ -50,7 +53,7 @@ std::string CarrierFilesManager::GetPath() const {
   return base_path_;
 }
 
-int CarrierFilesManager::LoadDirectory(const std::string &directory) {
+void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   carrier_files_.clear();
   capacity_ = 0;
@@ -58,7 +61,7 @@ int CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   base_path_ = directory;
 
-  vector<File> files = File::GetFilesInDir(directory, "");
+  vector<File> files = File::GetFilesInDir(directory, ""); //PSTODO neskodila by nejaka filtracia
 
   files_in_directory_ = files.size();
 
@@ -92,22 +95,23 @@ int CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   std::sort(carrier_files_.begin(), carrier_files_.end(),
             CarrierFile::CompareBySharedPointers);
-
-  return STEGO_NO_ERROR;
 }
 
 // return false, if checksum is not valid, true otherwise
 // TODO mY check PERMUTATION init by PASSWORD
 bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage) {
   if (!storage)
-    throw std::invalid_argument("CarrierFilesManager::loadVirtualStorage: "
-                                "arg 'storage' is nullptr");
+    throw exception::InvalidState{exception::Operation::loadVirtualStorage,
+                                  exception::Component::storage,
+								  exception::ComponentState::notInitialized};
   if (!encoder_)
-    throw std::invalid_argument("CarrierFilesManager::loadVirtualStorage: "
-                                "encoder is not Set yet");
+    throw exception::InvalidState(exception::Operation::loadVirtualStorage,
+                                  exception::Component::encoder,
+								  exception::ComponentState::notSetted);
   if (!is_active_encoder_)
-    throw std::invalid_argument("CarrierFilesManager::loadVirtualStorage: "
-                                "encoder is not applied yet");
+    throw exception::InvalidState(exception::Operation::loadVirtualStorage,
+                                  exception::Component::encoder,
+								  exception::ComponentState::notActive);
 
   try { storage->ApplyPermutation(this->GetCapacity(), master_key_); }
   catch (...) { throw; }
@@ -154,25 +158,27 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   return true;
 }
 
-int CarrierFilesManager::SaveVirtualStorage() {
-  if (!virtual_storage_) return SE_UNINITIALIZED;
+void CarrierFilesManager::SaveVirtualStorage() {
+  if (!virtual_storage_)
+	  throw exception::InvalidState(exception::Operation::saveVirtualStorage,
+			                        exception::Component::virtualStorage,
+									exception::ComponentState::notInitialized);
 
   virtual_storage_->WriteChecksum();
 
   SaveAllFiles();
-
-  return STEGO_NO_ERROR;
 }
 
 void CarrierFilesManager::SetEncoderArg(const string &param,
                                         const string &val) {
   if (!encoder_)
-    throw std::invalid_argument("CarrierFilesManager::SetEncoderArgByName: "
-                                "encoder is not Set yet");
+    throw exception::InvalidState(exception::Operation::setEncoderArg,
+                                  exception::Component::encoder,
+                                  exception::ComponentState::notSetted);
   if (is_active_encoder_)
-    throw std::invalid_argument("CarrierFilesManager::SetEncoderArgByName: "
-                                "another encoder is active; please first unSet "
-                                "this encoder");
+    throw exception::InvalidState(exception::Operation::setEncoderArg,
+                                  exception::Component::encoder,
+                                  exception::ComponentState::isActive);
 
   try { EncoderFactory::SetEncoderArg(encoder_, param, val); }
   catch (...) { throw; }
@@ -189,8 +195,7 @@ void CarrierFilesManager::UnSetEncoder() {
 
 void CarrierFilesManager::SetEncoder(std::shared_ptr<Encoder> encoder) {
   if (!encoder)
-    throw std::invalid_argument("CarrierFilesManager::SetEncoder: "
-                                "input arg 'encoder' is nullptr");
+    throw exception::NullptrArgument{"encoder"};
   if (encoder_)
     UnSetEncoder();
   encoder_ = encoder;
@@ -199,7 +204,9 @@ void CarrierFilesManager::SetEncoder(std::shared_ptr<Encoder> encoder) {
 
 void CarrierFilesManager::ApplyEncoder() {
   if (!encoder_)
-    throw std::invalid_argument("CarrierFilesManager::applyEncoder: encoder is not Set yet");
+    throw exception::InvalidState(exception::Operation::applyEncoder,
+                                  exception::Component::encoder,
+                                  exception::ComponentState::notSetted);
 
   uint64 capacity = 0;
   uint64 raw_cap = 0;
@@ -218,8 +225,7 @@ void CarrierFilesManager::ApplyEncoder() {
               ", cap=" << carrier_files_[i]->GetCapacity());
   }
   if (capacity == 0)
-    throw std::out_of_range("CarrierFilesManager::applyEncoder: "
-                            "not enough stego space in carrier files");
+    throw exception::ZeroAllocatedSize{};
 
   capacity_ = capacity;
   is_active_encoder_ = true;
@@ -237,12 +243,11 @@ void CarrierFilesManager::SetPassword(const std::string &password) {
 
 /**
  * @brief Generates Master Key hash from password (hash) and keys generated from individual carrier files
- * @return Error code (0 = NO ERROR)
  */
 void CarrierFilesManager::GenerateMasterKey() {
   if (carrier_files_.size() < 1) {
     LOG_ERROR("Nothing to hash, no files loaded...");
-	throw std::runtime_error("Nothing to hash, no files loaded...");
+	throw exception::EmptyMember{"carrier_files"};
   }
 
   LOG_DEBUG("CarrierFilesManager::generateMasterKey: PSWD HASH is "
@@ -304,11 +309,13 @@ void CarrierFilesManager::SaveAllFiles() {
 
 uint64 CarrierFilesManager::GetCapacity() {
   if (!encoder_)
-    throw std::invalid_argument("CarrierFilesManager::GetCapacity: "
-                                "encoder is not Set yet");
+    throw exception::InvalidState(exception::Operation::getCapacity,
+                                  exception::Component::encoder,
+                                  exception::ComponentState::notSetted);
   if (!is_active_encoder_)
-    throw std::invalid_argument("CarrierFilesManager::GetCapacity: "
-                                "encoder is not applied yet");
+    throw exception::InvalidState(exception::Operation::getCapacity,
+                                  exception::Component::encoder,
+                                  exception::ComponentState::notActive);
   return capacity_;
 }
 
@@ -323,8 +330,9 @@ uint64 CarrierFilesManager::GetRawCapacity() {
 uint64 CarrierFilesManager::GetCapacityUsingEncoder(
     std::shared_ptr<Encoder> encoder) {
   if (!encoder)
-    throw std::invalid_argument("CarrierFilesManager::GetCapacity: arg "
-                                "'encoder' is nullptr");
+    throw exception::InvalidState(exception::Operation::getCapacity,
+                                  exception::Component::encoder,
+                                  exception::ComponentState::notSetted);
   uint64 capacity = 0;
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     capacity += carrier_files_.at(i)->GetCapacityUsingEncoder(encoder);

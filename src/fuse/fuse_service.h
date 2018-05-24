@@ -22,12 +22,15 @@
 #include <string>
 
 //#include "fuse_service_delegate.h"
+#include "api_mask.h"
 #include "logging/logger.h"
+#include "stego-disk_export.h"
 #include "stego_storage.h"
 
 static struct fuse_operations stegofs_ops;
 
-class FuseService {
+//PSTODO add namespace
+class STEGO_DISK_EXPORT FuseService {
 
 public:
   FuseService();
