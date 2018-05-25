@@ -35,6 +35,8 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
     throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
   }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
   uint32_t bmp_file_size = *((uint32_t*)&bmp_header[2]);
   if (bmp_file_size != file_.GetSize()) {
     throw exception::ParseError{file_.GetFileName(), "Wrong size of file"};
@@ -54,6 +56,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
 
   width_ = abs(*((int32_t*)&bmp_info[4]));
   height_ = abs(*((int32_t*)&bmp_info[8]));
+#pragma GCC diagnostic pop
 
   bmp_size_ = (((bmp_bits_per_pixel * width_ + 31) / 32) * 4) *
               height_;
