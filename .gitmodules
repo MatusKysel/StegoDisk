@@ -1,9 +1,9 @@
 [submodule "lib/libjpeg-turbo"]
 	path = lib/libjpeg-turbo
 	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git
-[submodule "lib/zlib"]
-	path = lib/zlib
-	url = https://github.com/madler/zlib.git
+	ignore = dirty
+	branch = master
 [submodule "lib/lodepng"]
 	path = lib/lodepng
 	url = https://github.com/lvandeve/lodepng.git
+	branch = master
