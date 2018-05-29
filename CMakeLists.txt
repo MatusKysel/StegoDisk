@@ -361,7 +361,11 @@ else()
 endif()
 
 if(NOT WIN32)
-  list(APPEND THIRD_LIBRARIES "stdc++fs")
+  if(APPLE)
+    list(APPEND THIRD_LIBRARIES "stdc++experimental")
+  else()
+    list(APPEND THIRD_LIBRARIES "stdc++fs")
+  endif()
 endif()
 
 if(APPLE)
@@ -394,6 +398,7 @@ generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")
 
 
 ################ LD FLAGS ##################
+
 if(NOT WIN32)
   #PSTODO test under LLVM
   #PSTODO work only on shared library, not on static
@@ -405,9 +410,6 @@ if(NOT WIN32)
   set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS_RELEASE ${new_link_flags})
 endif()
 
-#if(WIN32)
-#  #PSTODO
-#endif()
 ################ LD FLAGS ##################
 
 # TESTING
