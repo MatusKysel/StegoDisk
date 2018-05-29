@@ -362,7 +362,7 @@ endif()
 
 if(NOT WIN32)
   if(APPLE)
-    list(APPEND THIRD_LIBRARIES "stdc++experimental")
+    list(APPEND THIRD_LIBRARIES "c++experimental")
   else()
     list(APPEND THIRD_LIBRARIES "stdc++fs")
   endif()

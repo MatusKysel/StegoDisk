@@ -14,18 +14,18 @@ before_install:
 
 install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-7" CC="gcc-7"; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-4.0" CC="clang-4.0"; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
 
 addons:
   apt:
     update: true
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-4.0
+    - llvm-toolchain-trusty-5.0
     packages:
     - gcc-7
     - g++-7
-    - clang-4.0
+    - clang-5.0
     - libfuse-dev
 
 before_script:
