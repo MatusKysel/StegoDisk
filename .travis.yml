@@ -48,4 +48,3 @@ notifications:
 branches:
   only:
     - master
-    - feature/travis-fix
