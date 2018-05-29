@@ -360,12 +360,8 @@ else()
   set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
 endif()
 
-if(NOT WIN32)
-  if(APPLE)
-    list(APPEND THIRD_LIBRARIES "c++experimental")
-  else()
-    list(APPEND THIRD_LIBRARIES "stdc++fs")
-  endif()
+if(NOT WIN32 AND NOT APPLE) #xcode9.3 is still not supporting this feature
+  list(APPEND THIRD_LIBRARIES "stdc++fs")
 endif()
 
 if(APPLE)
