@@ -360,7 +360,7 @@ else()
   set(THIRD_LIBRARIES ${PLATFORM_LIBS} ${LIBJPEGTURBO_LIBRARIES})
 endif()
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT APPLE) #xcode9.3 is still not supporting this feature
   list(APPEND THIRD_LIBRARIES "stdc++fs")
 endif()
 
@@ -394,6 +394,7 @@ generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")
 
 
 ################ LD FLAGS ##################
+
 if(NOT WIN32)
   #PSTODO test under LLVM
   #PSTODO work only on shared library, not on static
@@ -405,9 +406,6 @@ if(NOT WIN32)
   set_target_properties(${STEGODISK_LIBRARY} PROPERTIES LINK_FLAGS_RELEASE ${new_link_flags})
 endif()
 
-#if(WIN32)
-#  #PSTODO
-#endif()
 ################ LD FLAGS ##################
 
 # TESTING
