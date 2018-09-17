@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <regex>
 
 #include "api_mask.h"
 #include "stego_types.h"
@@ -50,8 +51,7 @@ public:
 
   static std::string NormalizePath(std::string platform_specific_path);
 
-  static std::vector<File> GetFilesInDir(std::string directory,
-                                         std::string mask);
+  static std::vector<File> GetFilesInDir(const std::string &directory, const std::string &filter = "");
 
   FilePtr Open();
 

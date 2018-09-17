@@ -31,7 +31,7 @@ public:
   StegoStorage();
   ~StegoStorage();
 
-  void Open(const std::string &storage_base_path, const std::string &password);
+  void Open(const std::string &storage_base_path, const std::string &password, const std::string &filter = "");
   void Load();
   void Save();
 

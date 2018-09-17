@@ -10,8 +10,10 @@
 
 namespace stego_disk {
 
-std::vector<File> File::GetFilesInDir(std::string directory, std::string)
+std::vector<File> File::GetFilesInDir(const std::string &directory, const std::string &filter)
 {
+	std::regex rx(".*\\.(" + filter + ")$", std::regex_constants::icase);
+
 	std::vector<File> ret;
 	for (auto &i: fs::recursive_directory_iterator(directory)) {
 		const fs::path & i_path = i.path();
@@ -19,9 +21,20 @@ std::vector<File> File::GetFilesInDir(std::string directory, std::string)
 		if (fs::status(i).type() != fs::file_type::regular) //PSTODO chceme aj nejake ine?
 			continue;
 
-		//PSTODO add chceck for mask
+		auto parent_path = i_path.parent_path().string();
+		auto filename = i_path.filename().string();
 
-		ret.emplace_back(File(i_path.parent_path().string(), i_path.filename().string()));
+		if (filter == "")
+		{
+			ret.emplace_back(File(parent_path, filename));
+		}
+		else
+		{
+			if (std::regex_match(filename, rx))
+			{
+				ret.emplace_back(File(parent_path, filename));
+			}
+		}
 	}
 	return ret;
 }

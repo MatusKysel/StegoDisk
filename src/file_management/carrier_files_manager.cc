@@ -53,7 +53,7 @@ std::string CarrierFilesManager::GetPath() const {
   return base_path_;
 }
 
-void CarrierFilesManager::LoadDirectory(const std::string &directory) {
+void CarrierFilesManager::LoadDirectory(const std::string &directory, const std::string &filter) {
 
   carrier_files_.clear();
   capacity_ = 0;
@@ -61,7 +61,7 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   base_path_ = directory;
 
-  vector<File> files = File::GetFilesInDir(directory, ""); //PSTODO neskodila by nejaka filtracia
+  vector<File> files = File::GetFilesInDir(directory, filter);
 
   files_in_directory_ = files.size();
 

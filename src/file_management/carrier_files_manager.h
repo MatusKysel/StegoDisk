@@ -31,7 +31,7 @@ class CarrierFilesManager {
 public:
   CarrierFilesManager();
   ~CarrierFilesManager();
-  void LoadDirectory(const std::string &directory);
+  void LoadDirectory(const std::string &directory, const std::string &filter = "");
   void SaveAllFiles();
 
   uint64 GetCapacity();

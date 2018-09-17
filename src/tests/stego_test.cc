@@ -47,6 +47,7 @@ static void PrintHelp(char *name) {
             << "\t-t,--test_directory \tSpecify that this directory is only for"
                " testing and it will create copy of it\n"
             << "\t-p,--password \tSpecify if the password sould be used\n"
+			<< "\t-f,--filter FILTER \tSpecify file types to use, i.e. jpg|bmp|...\n"
             << std::endl;
 }
 
@@ -92,6 +93,7 @@ int main(int argc, char *argv[]) {
   std::string permutation;
   std::string file_type;
   std::string dir;
+  std::string filter{ "" };
   bool test_directory = false;
   bool password = false;
   bool invert = false;
@@ -164,7 +166,18 @@ int main(int argc, char *argv[]) {
         LOG_ERROR("--password option requires one argument.");
         return -1;
       }
-    } else {
+	}
+	else if ((arg == "-f") ||(arg == "--filter")) {
+		if (++i < argc) {
+			filter = argv[i];
+		}
+		else
+		{
+			LOG_ERROR("--filter option requires one argument.");
+			return -1;
+		}
+	}
+	else {
       LOG_ERROR("Unknown argument: " << argv[i]);
     }
   }
@@ -187,7 +200,7 @@ int main(int argc, char *argv[]) {
   stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
                            StrToPermutation(permutation));
   LOG_DEBUG("Opening storage");
-  stego_storage->Open(dir, (password) ? PASSWORD : "");
+  stego_storage->Open(dir, (password) ? PASSWORD : "", filter);
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
   size = stego_storage->GetSize() * static_cast<size_t>(static_cast<double>(percent) / 100.0);
@@ -216,7 +229,7 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Opening storage");
   stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
                            StrToPermutation(permutation));
-  stego_storage->Open(dir, (password) ? PASSWORD : "");
+  stego_storage->Open(dir, (password) ? PASSWORD : "", filter);
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
   output.resize(input.size());

@@ -25,11 +25,12 @@ StegoStorage::StegoStorage() :
 StegoStorage::~StegoStorage() {}
 
 void StegoStorage::Open(const std::string &storage_base_path,
-                        const std::string &password) {
+                        const std::string &password,
+						const std::string &filter) {
   opened_ = false;
 
   carrier_files_manager_->SetPassword(password);
-  carrier_files_manager_->LoadDirectory(storage_base_path);
+  carrier_files_manager_->LoadDirectory(storage_base_path, filter);
 
   opened_ = true;
 }
