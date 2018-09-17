@@ -39,8 +39,8 @@ public:
                   std::shared_ptr<Permutation> permutation,
                   std::unique_ptr<Fitness> fitness);
 
-  void LoadFile();
-  void SaveFile();
+  virtual void LoadFile() override;
+  virtual void SaveFile() override;
 
   int GetHistogram();
 

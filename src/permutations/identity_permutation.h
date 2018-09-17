@@ -20,9 +20,9 @@ public:
   IdentityPermutation();
   ~IdentityPermutation();
 
-  virtual void Init(PermElem requested_size, Key &key);
-  virtual PermElem Permute(PermElem index) const;
-  virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key);
+  virtual void Init(PermElem requested_size, Key &key) override;
+  virtual PermElem Permute(PermElem index) const override;
+  virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key) override;
 
   const std::string GetNameInstance() const { return "Identity"; }
 };

@@ -24,8 +24,8 @@ public:
   ContextFitness(std::shared_ptr<CarrierFile> file);
   ~ContextFitness();
 
-  uint64 SelectBytes(const MemoryBuffer &in, MemoryBuffer *out);
-  void InsertBytes(const MemoryBuffer &in, MemoryBuffer *out) const;
+  virtual uint64 SelectBytes(const MemoryBuffer &in, MemoryBuffer *out) override;
+  virtual void InsertBytes(const MemoryBuffer &in, MemoryBuffer *out) const override;
 
 private:
   bool CheckSubboxValidity(const std::array<unsigned char, 4> &subbox) const;

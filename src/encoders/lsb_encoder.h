@@ -22,15 +22,15 @@ public:
     LsbEncoder();
     LsbEncoder(uint32 block_size);
 
-    int Embed(uint8 *codeword, const uint8 *data);
-    int Extract(const uint8 *codeword, uint8 *data);
+	virtual int Embed(uint8 *codeword, const uint8 *data) override;
+	virtual int Extract(const uint8 *codeword, uint8 *data) override;
 
-    void SetArgByName(const string &arg, const string &val);
+	virtual void SetArgByName(const string &arg, const string &val) override;
 
     static shared_ptr<Encoder> GetNew();
-    shared_ptr<Encoder> GetNewInstance();
+	virtual shared_ptr<Encoder> GetNewInstance() override;
     static const string GetName();
-    const string GetNameInstance() const;
+	virtual const string GetNameInstance() const override;
 
     static uint32 GetBlockSizeMin();
     static uint32 GetBlockSizeMax();

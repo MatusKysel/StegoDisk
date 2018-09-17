@@ -20,8 +20,8 @@ public:
   Affine64Permutation();
   ~Affine64Permutation();
 
-  virtual void Init(PermElem requested_size, Key &key);
-  virtual PermElem Permute(PermElem index) const;
+  virtual void Init(PermElem requested_size, Key &key) override;
+  virtual PermElem Permute(PermElem index) const override;
 
   const std::string GetNameInstance() const { return "Affine64"; }
 };
