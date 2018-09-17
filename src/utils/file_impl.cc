@@ -21,9 +21,8 @@ std::vector<File> File::GetFilesInDir(std::string directory, std::string)
 
 		//PSTODO add chceck for mask
 
-		ret.emplace_back(i_path.parent_path(), i_path.filename());
+		ret.emplace_back(File(i_path.parent_path().string(), i_path.filename().string()));
 	}
-
 	return ret;
 }
 
