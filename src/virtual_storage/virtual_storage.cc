@@ -62,7 +62,8 @@ std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(string permutatio
  *
  * @return the capacity
  */
-uint64 VirtualStorage::GetUsableCapacity() {
+uint64 VirtualStorage::GetUsableCapacity() const
+{
   if (!global_permutation_)
     throw exception::InvalidState{exception::Operation::getCapacity,
                                   exception::Component::permutation,
@@ -82,7 +83,8 @@ uint64 VirtualStorage::GetUsableCapacity() {
  *
  * @return the capacity
  */
-uint64 VirtualStorage::GetRawCapacity() {
+uint64 VirtualStorage::GetRawCapacity() const
+{
   if (!global_permutation_)
     throw exception::InvalidState{exception::Operation::getCapacity,
                                   exception::Component::permutation,

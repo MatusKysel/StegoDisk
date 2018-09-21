@@ -307,7 +307,8 @@ void CarrierFilesManager::SaveAllFiles() {
 }
 
 
-uint64 CarrierFilesManager::GetCapacity() {
+uint64 CarrierFilesManager::GetCapacity() const
+{
   if (!encoder_)
     throw exception::InvalidState(exception::Operation::getCapacity,
                                   exception::Component::encoder,
@@ -319,7 +320,8 @@ uint64 CarrierFilesManager::GetCapacity() {
   return capacity_;
 }
 
-uint64 CarrierFilesManager::GetRawCapacity() {
+uint64 CarrierFilesManager::GetRawCapacity() const
+{
   uint64 capacity = 0;
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     capacity += carrier_files_.at(i)->GetRawCapacity();
@@ -328,7 +330,7 @@ uint64 CarrierFilesManager::GetRawCapacity() {
 }
 
 uint64 CarrierFilesManager::GetCapacityUsingEncoder(
-    std::shared_ptr<Encoder> encoder) {
+    std::shared_ptr<Encoder> encoder) const {
   if (!encoder)
     throw exception::InvalidState(exception::Operation::getCapacity,
                                   exception::Component::encoder,

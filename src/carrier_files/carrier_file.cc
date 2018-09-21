@@ -96,7 +96,8 @@ uint32 CarrierFile::GetBlockCount() {
   return block_count_;
 }
 
-Key CarrierFile::GetPermKey() {
+Key CarrierFile::GetPermKey() const
+{
   string buf = "";
   buf.append(file_.GetNormalizedPath());
   LOG_TRACE("CarrierFile::GetPermKeyHash: hashing file attributes: " << buf);
@@ -266,15 +267,18 @@ int CarrierFile::EmbedBufferUsingEncoder() {
 }
 
 
-uint32 CarrierFile::GetWidth() {
+uint32 CarrierFile::GetWidth() const
+{
   return width_;
 }
 
-uint32 CarrierFile::GetHeight() {
+uint32 CarrierFile::GetHeight() const
+{
   return height_;
 }
 
-bool CarrierFile::IsGrayscale() {
+bool CarrierFile::IsGrayscale() const
+{
   return is_grayscale_;
 }
 } // stego_disk

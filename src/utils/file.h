@@ -45,9 +45,9 @@ public:
   std::string GetNormalizedPath() const;
 
   std::string GetExtension(bool conver_to_lowercase = true) const;
-  std::string GetFileName();
+  std::string GetFileName() const;
 
-  uint64 GetSize();
+  uint64 GetSize() const;
 
   static std::string NormalizePath(std::string platform_specific_path);
 

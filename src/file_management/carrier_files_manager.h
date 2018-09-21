@@ -34,10 +34,10 @@ public:
   void LoadDirectory(const std::string &directory, const std::string &filter = "");
   void SaveAllFiles();
 
-  uint64 GetCapacity();
-  uint64 GetRawCapacity();
+  uint64 GetCapacity() const;
+  uint64 GetRawCapacity() const;
   std::string GetPath() const;
-  uint64 GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder);
+  uint64 GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) const;
 
   void ApplyEncoder();
   void SetEncoder(std::shared_ptr<Encoder> encoder);

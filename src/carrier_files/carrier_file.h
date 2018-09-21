@@ -70,10 +70,10 @@ public:
   int AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage, uint64 offSet,
                           uint64 bytes_used);
 
-  Key GetPermKey();
-  uint32 GetWidth();
-  uint32 GetHeight();
-  bool IsGrayscale();
+  Key GetPermKey() const;
+  uint32 GetWidth() const;
+  uint32 GetHeight() const;
+  bool IsGrayscale() const;
 
   bool operator< (const CarrierFile& val) const;
 

@@ -50,8 +50,8 @@ public:
   void Read(uint64 offSet, std::size_t length, uint8* buffer) const;
   void Write(uint64 offSet, std::size_t length, const uint8* buffer);
 
-  uint64 GetRawCapacity();
-  uint64 GetUsableCapacity();
+  uint64 GetRawCapacity() const;
+  uint64 GetUsableCapacity() const;
 
   void RandomizeBuffer();
   void ClearBuffer();

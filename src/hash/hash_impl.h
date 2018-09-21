@@ -30,7 +30,7 @@ public:
   virtual void Append(MemoryBuffer& state,
                       const uint8* data, std::size_t length);
 
-  std::size_t GetStateSize() { return state_size_; }
+  std::size_t GetStateSize() const { return state_size_; }
 
 protected:
   size_t state_size_;

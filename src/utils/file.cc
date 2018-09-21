@@ -57,7 +57,8 @@ std::string File::NormalizePath(std::string platform_specific_path) {
   return platform_specific_path;
 }
 
-uint64 File::GetSize() {
+uint64 File::GetSize() const
+{
   struct stat stat_buf;
   int rc = stat(GetAbsolutePath().c_str(), &stat_buf);
   return rc == 0 ? static_cast<uint64>(stat_buf.st_size) : 0;
@@ -100,7 +101,8 @@ std::string File::GetExtension(bool convert_to_lowercase) const {
   return ext;
 }
 
-std::string File::GetFileName() {
+std::string File::GetFileName() const
+{
   //TODO: implement this
   throw exception::FuctionNotImplementad{};
   return "";
