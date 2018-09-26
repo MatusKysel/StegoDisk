@@ -40,15 +40,13 @@ VirtualStorage::~VirtualStorage() {
 }
 
 std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance() {
-  std::shared_ptr<VirtualStorage> virtual_storage =
-      shared_ptr<VirtualStorage>(new VirtualStorage());
+  auto virtual_storage = std::make_shared<VirtualStorage>();
   virtual_storage->SetPermutation(PermutationFactory::GetDefaultPermutation());
   return virtual_storage;
 }
 
 std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(string permutation) {
-  std::shared_ptr<VirtualStorage> virtual_storage =
-      shared_ptr<VirtualStorage>(new VirtualStorage());
+  auto virtual_storage = std::make_shared<VirtualStorage>();
   try {
     virtual_storage->SetPermutation(
           PermutationFactory::GetPermutation(permutation));

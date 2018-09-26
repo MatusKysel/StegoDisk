@@ -183,8 +183,7 @@ int main(int argc, char *argv[]) {
   }
 
   size_t size;
-  std::unique_ptr<stego_disk::StegoStorage>
-      stego_storage(new stego_disk::StegoStorage());
+  auto stego_storage = std::make_unique<stego_disk::StegoStorage>();
 
   if(!dir.empty() && test_directory) {
     std::cout << dir << std::endl;

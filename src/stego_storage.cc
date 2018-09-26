@@ -19,8 +19,11 @@
 
 namespace stego_disk {
 
-StegoStorage::StegoStorage() :
-  carrier_files_manager_(new CarrierFilesManager()), opened_(false) {}
+StegoStorage::StegoStorage()
+	:opened_(false)
+{
+	carrier_files_manager_ = std::make_unique<CarrierFilesManager>();
+}
 
 StegoStorage::~StegoStorage() {}
 

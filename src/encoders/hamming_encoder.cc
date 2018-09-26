@@ -56,7 +56,8 @@ int HammingEncoder::GetParityBitsMin() {
  * @return New instance of Hamming encoder class
  */
 shared_ptr<Encoder> HammingEncoder::GetNew() {
-  return shared_ptr<Encoder>(new HammingEncoder());
+	auto encoder = std::make_shared<HammingEncoder>();
+	return encoder;
 }
 
 /**

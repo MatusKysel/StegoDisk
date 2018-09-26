@@ -56,7 +56,8 @@ uint32 LsbEncoder::GetBlockSizeMax() {
  * @return New instance of Lsb encoder class
  */
 shared_ptr<Encoder> LsbEncoder::GetNew() {
-  return shared_ptr<Encoder>(new LsbEncoder());
+  auto encoder = std::make_shared<LsbEncoder>();
+  return encoder;
 }
 
 /**

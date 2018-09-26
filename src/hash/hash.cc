@@ -18,7 +18,7 @@
 
 namespace stego_disk {
 
-std::unique_ptr<HashImpl> Hash::default_hash_impl_ = std::unique_ptr<HashImpl>(new KeccakHashImpl());
+	std::unique_ptr<HashImpl> Hash::default_hash_impl_ = std::make_unique<KeccakHashImpl>();
 
 
 void Hash::Init() {
