@@ -31,20 +31,34 @@
 
 namespace stego_disk {
 
+#ifdef HAS_FILESYSTEM_LIBRARY
 std::string File::GetAbsolutePath() const {
-  return base_path_ + relative_path_;
+	return path_.string();
 }
 
 std::string File::GetRelativePath() const {
-  return relative_path_;
+	return path_.filename().string();
 }
 
 std::string File::GetBasePath() const {
-  return base_path_;
+	return path_.parent_path().string();
 }
+#else
+	std::string File::GetAbsolutePath() const {
+		return base_path_ + relative_path_;
+	}
+
+	std::string File::GetRelativePath() const {
+		return relative_path_;
+	}
+
+	std::string File::GetBasePath() const {
+		return base_path_;
+	}
+#endif
 
 std::string File::GetNormalizedPath() const {
-  return NormalizePath(relative_path_);
+  return NormalizePath(GetRelativePath());
 }
 
 std::string File::NormalizePath(std::string platform_specific_path) {
@@ -55,13 +69,21 @@ std::string File::NormalizePath(std::string platform_specific_path) {
   return platform_specific_path;
 }
 
+#ifdef HAS_FILESYSTEM_LIBRARY
 uint64 File::GetSize() const
 {
-  struct stat stat_buf;
-  int rc = stat(GetAbsolutePath().c_str(), &stat_buf);
-  return rc == 0 ? static_cast<uint64>(stat_buf.st_size) : 0;
+	return fs::file_size(path_);
 }
+#else
+uint64 File::GetSize() const
+{
+	struct stat stat_buf;
+	int rc = stat(GetAbsolutePath().c_str(), &stat_buf);
+	return rc == 0 ? static_cast<uint64>(stat_buf.st_size) : 0;
+}
+#endif
 
+#ifndef HAS_FILESYSTEM_LIBRARY
 File::File(std::string base_path, std::string relative_path) {
   std::string base_path_safe = base_path;
 
@@ -80,11 +102,37 @@ File::File(std::string base_path, std::string relative_path) {
 
   relative_path_ = relative_path_safe;
 }
+#else
+File::File(const fs::path &path)
+	:path_(path)
+{
+
+}
+#endif
 
 FilePtr File::Open() {
   return FilePtr(*this);
 }
 
+#ifdef HAS_FILESYSTEM_LIBRARY
+std::string File::GetExtension(bool convert_to_lowercase) const
+{
+	if (path_.has_extension())
+	{
+		auto ext = path_.extension().string();
+		ext.erase(std::remove(ext.begin(), ext.end(), '.'), ext.end());
+
+		if (convert_to_lowercase)
+		{
+			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		}
+
+		return ext;
+	}
+
+	return "";
+}
+#else
 std::string File::GetExtension(bool convert_to_lowercase) const {
   unsigned long ext_pos = static_cast<unsigned long>(
                             relative_path_.find_last_of("."));
@@ -98,14 +146,26 @@ std::string File::GetExtension(bool convert_to_lowercase) const {
 
   return ext;
 }
+#endif
 
+#ifdef HAS_FILESYSTEM_LIBRARY
+std::string File::GetFileName() const
+{
+	if (path_.has_filename())
+	{
+		return path_.filename().string();
+	}
+
+	return "";
+}
+#else
 std::string File::GetFileName() const
 {
   //TODO: implement this
   throw exception::FuctionNotImplementad{};
   return "";
 }
-
+#endif
 
 FilePtr::FilePtr(const File& file) {
   int ret = 0;

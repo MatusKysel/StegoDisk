@@ -26,13 +26,21 @@ std::vector<File> File::GetFilesInDir(const std::string &directory, const std::s
 
 		if (filter == "")
 		{
+#ifndef HAS_FILESYSTEM_LIBRARY
 			ret.emplace_back(File(parent_path, filename));
+#else
+			ret.emplace_back(File(i_path));
+#endif
 		}
 		else
 		{
 			if (std::regex_match(filename, rx))
 			{
+#ifndef HAS_FILESYSTEM_LIBRARY
 				ret.emplace_back(File(parent_path, filename));
+#else
+				ret.emplace_back(File(i_path));
+#endif
 			}
 		}
 	}
