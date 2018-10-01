@@ -19,7 +19,7 @@
 
 namespace stego_disk {
 
-const string LsbEncoder::kEncoderLsbCodeName = ENCODER_LSB_CODE_NAME_DEF;
+const std::string LsbEncoder::kEncoderLsbCodeName = ENCODER_LSB_CODE_NAME_DEF;
 
 /**
  * @brief Get minimal value for parameter 'block_size'
@@ -55,7 +55,7 @@ uint32 LsbEncoder::GetBlockSizeMax() {
  *
  * @return New instance of Lsb encoder class
  */
-shared_ptr<Encoder> LsbEncoder::GetNew() {
+std::shared_ptr<Encoder> LsbEncoder::GetNew() {
   auto encoder = std::make_shared<LsbEncoder>();
   return encoder;
 }
@@ -70,7 +70,7 @@ shared_ptr<Encoder> LsbEncoder::GetNew() {
  *
  * @return New instance of Lsb encoder class
  */
-shared_ptr<Encoder> LsbEncoder::GetNewInstance() {
+std::shared_ptr<Encoder> LsbEncoder::GetNewInstance() {
   return GetNew();
 }
 
@@ -97,7 +97,7 @@ void LsbEncoder::Init(uint32 block_size) {
   // is block_size in range
   if ((block_size < kEncoderLsbBlockSizeMin) ||
       (block_size > kEncoderLsbBlockSizeMax)) {
-    string err = "LsbEncoder::init: 'block_size' is "
+    std::string err = "LsbEncoder::init: 'block_size' is "
                  + std::to_string(static_cast<uint64>(block_size));
     err += ", but should be in range <" + kEncoderLsbBlockSizeMin;
     err += "," + std::to_string(static_cast<uint64>(kEncoderLsbBlockSizeMax));
@@ -149,7 +149,7 @@ LsbEncoder::LsbEncoder(uint32 block_size) {
  *
  * @return Code name of Lsb encoder class
  */
-const string LsbEncoder::GetName() {
+const std::string LsbEncoder::GetName() {
   return kEncoderLsbCodeName;
 }
 
@@ -161,7 +161,7 @@ const string LsbEncoder::GetName() {
  *
  * @return Code name of Lsb encoder class
  */
-const string LsbEncoder::GetNameInstance() const {
+const std::string LsbEncoder::GetNameInstance() const {
   return LsbEncoder::GetName();
 }
 
@@ -226,9 +226,9 @@ int LsbEncoder::Extract(const uint8 *codeword, uint8 *data) {
  *     - std::invalid_argument, if 'val' is not a number
  *     - std::out_of_range, if 'val' is not from range <GetBlockSizeMin(); GetBlockSizeMax()>, or is not a power of two
  */
-void LsbEncoder::SetArgByName(const string &param, const string &val) {
+void LsbEncoder::SetArgByName(const std::string &param, const std::string &val) {
   bool is_valid_param = false;
-  string p = param;
+  std::string p = param;
 
   if (param.empty())
     exception::EmptyArgument{"param"};
@@ -249,7 +249,7 @@ void LsbEncoder::SetArgByName(const string &param, const string &val) {
     if (block_size < 0)
       throw std::invalid_argument("LsbEncoder::setArgByName: 'block_size' "
                               "should be positive, but is " +
-                              to_string(static_cast<uint64>(block_size)));
+                              std::to_string(static_cast<uint64>(block_size)));
 
     try { Init(block_size); }
     catch (const std::out_of_range& ) { throw; }

@@ -18,8 +18,6 @@
 #include "carrier_file.h"
 #include "logging/logger.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 class CarrierFileBMP : public CarrierFile {

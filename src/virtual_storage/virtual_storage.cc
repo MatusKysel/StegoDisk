@@ -42,7 +42,7 @@ std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance() {
   return virtual_storage;
 }
 
-std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(string permutation) {
+std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(std::string permutation) {
   auto virtual_storage = std::make_shared<VirtualStorage>();
   try {
     virtual_storage->SetPermutation(
@@ -124,7 +124,7 @@ void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
   catch (...) { throw; }
 
   if ( global_permutation_->GetSize() == 0 ) {
-    string str = "VirtualStorage::applyPermutation: size of ";
+    std::string str = "VirtualStorage::applyPermutation: size of ";
     str += global_permutation_->GetNameInstance();
     str += " is Initialized by requested size (";
     str += std::to_string(requested_size);

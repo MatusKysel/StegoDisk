@@ -17,8 +17,6 @@
 
 #include "stego-disk_export.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 class STEGO_DISK_EXPORT EncoderFactory final
@@ -34,16 +32,16 @@ public:
   };
 
   // Get vector of all encoders (each encoder with all possible settings)
-  static vector<std::shared_ptr<Encoder>> GetAllEncoders();
+  static std::vector<std::shared_ptr<Encoder>> GetAllEncoders();
   // Get vector of all encoders (each encoder once with default settings)
-  static vector<std::shared_ptr<Encoder>> GetEncoders();
+  static std::vector<std::shared_ptr<Encoder>> GetEncoders();
   // Get names of all encoders supported by this library
-  static vector<string> GetEncoderNames();
+  static std::vector<std::string> GetEncoderNames();
   // Get instance of encoder based on the his type
   static std::shared_ptr<Encoder> GetEncoder(const EncoderType encoder);
   // set encoder param by name
   static void SetEncoderArg(std::shared_ptr<Encoder> encoder,
-                                  const string &param, const string &val);
+                                  const std::string &param, const std::string &val);
   // Get instance of the default encoder
   static std::shared_ptr<Encoder> GetDefaultEncoder();
 

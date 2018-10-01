@@ -17,8 +17,6 @@
 
 #include "stego-disk_export.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 class STEGO_DISK_EXPORT PermutationFactory final {
@@ -35,10 +33,10 @@ public:
   };
 
   // get vector of all permutations (each permutation once)
-  static vector<std::shared_ptr<Permutation>> GetPermutations();
+  static std::vector<std::shared_ptr<Permutation>> GetPermutations();
   // get instance of permutation based on the code name
   static std::shared_ptr<Permutation> GetPermutation(
-      const string &permutation_name);
+      const std::string &permutation_name);
   // get instance of permutation based on type
   static std::shared_ptr<Permutation> GetPermutation(
       const PermutationType permutation);

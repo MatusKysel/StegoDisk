@@ -25,12 +25,12 @@ public:
 	virtual int Embed(uint8 *codeword, const uint8 *data) override;
 	virtual int Extract(const uint8 *codeword, uint8 *data) override;
 
-	virtual void SetArgByName(const string &arg, const string &val) override;
+	virtual void SetArgByName(const std::string &arg, const std::string &val) override;
 
-    static shared_ptr<Encoder> GetNew();
-	virtual shared_ptr<Encoder> GetNewInstance() override;
-    static const string GetName();
-	virtual const string GetNameInstance() const override;
+    static std::shared_ptr<Encoder> GetNew();
+	virtual std::shared_ptr<Encoder> GetNewInstance() override;
+    static const std::string GetName();
+	virtual const std::string GetNameInstance() const override;
 
     static uint32 GetBlockSizeMin();
     static uint32 GetBlockSizeMax();
@@ -41,7 +41,7 @@ private:
     static const uint32 kEncoderLsbBlockSizeMin = 1;
     static const uint32 kEncoderLsbBlockSizeMax = 1024;
     static const uint32 kEncoderLsbDefaultBlockSize = 1;
-    static const string kEncoderLsbCodeName;
+    static const std::string kEncoderLsbCodeName;
 };
 
 } // stego_disk

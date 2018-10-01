@@ -19,7 +19,7 @@
 
 namespace stego_disk {
 
-const string HammingEncoder::kEncoderHammingCodeName = ENCODER_HAMMING_CODE_NAME_DEF;
+const std::string HammingEncoder::kEncoderHammingCodeName = ENCODER_HAMMING_CODE_NAME_DEF;
 
 /**
  * @brief Get minimal value for parameter 'parity_bits'
@@ -55,7 +55,7 @@ int HammingEncoder::GetParityBitsMin() {
  *
  * @return New instance of Hamming encoder class
  */
-shared_ptr<Encoder> HammingEncoder::GetNew() {
+std::shared_ptr<Encoder> HammingEncoder::GetNew() {
 	auto encoder = std::make_shared<HammingEncoder>();
 	return encoder;
 }
@@ -70,7 +70,7 @@ shared_ptr<Encoder> HammingEncoder::GetNew() {
  *
  * @return New instance of Hamming encoder class
  */
-shared_ptr<Encoder> HammingEncoder::GetNewInstance() {
+std::shared_ptr<Encoder> HammingEncoder::GetNewInstance() {
   return GetNew();
 }
 
@@ -99,7 +99,7 @@ shared_ptr<Encoder> HammingEncoder::GetNewInstance() {
 void HammingEncoder::Init(uint32 parity_bits) {
   if ((parity_bits < kEncoderHammingParityBitsMin) ||
       (parity_bits > kEncoderHammingParityBitsMax)) {
-    string err = "HammingEncoder::init: 'parity_bits' is " +
+    std::string err = "HammingEncoder::init: 'parity_bits' is " +
                  std::to_string(static_cast<uint64>(parity_bits));
     err += ", should be in <" + kEncoderHammingParityBitsMin;
     err += "," + std::to_string(
@@ -195,9 +195,9 @@ HammingEncoder::HammingEncoder(uint32 parity_bits) {
  *     - std::invalid_argument, if 'val' is not a number
  *     - std::out_of_range, if 'val' is not from range <GetParityBitsMin(); GetParityBitsMax()>
  */
-void HammingEncoder::SetArgByName(const string &param, const string &val) {
+void HammingEncoder::SetArgByName(const std::string &param, const std::string &val) {
   bool is_valid_param = false;
-  string p = param;
+  std::string p = param;
 
   if (param.empty())
     throw exception::EmptyArgument{"param"};
@@ -241,7 +241,7 @@ void HammingEncoder::SetArgByName(const string &param, const string &val) {
  *
  * @return Code name of Hamming encoder class
  */
-const string HammingEncoder::GetName() {
+const std::string HammingEncoder::GetName() {
   return kEncoderHammingCodeName;
 }
 
@@ -253,7 +253,7 @@ const string HammingEncoder::GetName() {
  *
  * @return Code name of Hamming encoder class
  */
-const string HammingEncoder::GetNameInstance() const {
+const std::string HammingEncoder::GetNameInstance() const {
   return HammingEncoder::GetName();
 }
 

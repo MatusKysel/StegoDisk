@@ -28,14 +28,12 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace stego_disk {
 
 static void AddFilesInDir(std::string basePath, std::string currentPath, std::string mask, std::vector<File>& fileList) {
-    string basePathSafe = basePath;
+    std::string basePathSafe = basePath;
 
-    string currentPathSafe = currentPath;
+    std::string currentPathSafe = currentPath;
     if (currentPathSafe.length() > 0) {
       if (currentPathSafe[currentPathSafe.length() - 1] == '\\')
         currentPathSafe = currentPathSafe.substr(0, currentPathSafe.length() - 1);
@@ -44,7 +42,7 @@ static void AddFilesInDir(std::string basePath, std::string currentPath, std::st
     if (currentPathSafe[0] == '\\')
       currentPathSafe = currentPathSafe.substr(1);
 
-    string path = basePathSafe;
+    std::string path = basePathSafe;
     if (currentPathSafe.length() > 0)
       path = path.append("\\" + currentPathSafe);
 
@@ -67,8 +65,8 @@ static void AddFilesInDir(std::string basePath, std::string currentPath, std::st
     }
     do
     {
-      string newCurrentPath = currentPath + "\\" + string(ffd.cFileName);
-      string newPath = basePath + newCurrentPath;
+      std::string newCurrentPath = currentPath + "\\" + string(ffd.cFileName);
+      std::string newPath = basePath + newCurrentPath;
 
       if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {

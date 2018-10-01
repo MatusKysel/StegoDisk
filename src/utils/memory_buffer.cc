@@ -21,8 +21,6 @@
 #include "api_mask.h"
 #include "stego_types.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 void MemoryBuffer::Init(std::size_t new_size) {

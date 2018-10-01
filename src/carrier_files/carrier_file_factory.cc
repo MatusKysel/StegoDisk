@@ -22,7 +22,7 @@
 namespace stego_disk {
 
 CarrierFilePtr CarrierFileFactory::CreateCarrierFile(const File& file) {
-  shared_ptr<CarrierFile> carrier_file;
+  std::shared_ptr<CarrierFile> carrier_file;
 
   std::string ext = file.GetExtension();
   if (ext.compare("bmp") == 0) {

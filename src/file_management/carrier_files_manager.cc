@@ -33,8 +33,6 @@
 #include "utils/thread_pool.h"
 #include "virtual_storage/virtual_storage.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 CarrierFilesManager::CarrierFilesManager() :
@@ -59,7 +57,7 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory, const std:
 
   base_path_ = directory;
 
-  vector<File> files = File::GetFilesInDir(directory, filter);
+  std::vector<File> files = File::GetFilesInDir(directory, filter);
 
   files_in_directory_ = files.size();
 
@@ -167,8 +165,8 @@ void CarrierFilesManager::SaveVirtualStorage() {
   SaveAllFiles();
 }
 
-void CarrierFilesManager::SetEncoderArg(const string &param,
-                                        const string &val) {
+void CarrierFilesManager::SetEncoderArg(const std::string &param,
+                                        const std::string &val) {
   if (!encoder_)
     throw exception::InvalidState(exception::Operation::setEncoderArg,
                                   exception::Component::encoder,

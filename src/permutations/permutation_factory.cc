@@ -47,14 +47,14 @@ PermutationFactory::PermutationType PermutationFactory::GetDefaultPermutationTyp
  *
  * @return Vector of supported permutations
  */
-vector<std::shared_ptr<Permutation>> PermutationFactory::GetPermutations() {
-  vector<std::shared_ptr<Permutation>> list;
+std::vector<std::shared_ptr<Permutation>> PermutationFactory::GetPermutations() {
+  std::vector<std::shared_ptr<Permutation>> list;
 
-  list.push_back(make_shared<IdentityPermutation>());
-  list.push_back(make_shared<AffinePermutation>());
-  list.push_back(make_shared<Affine64Permutation>());
-  list.push_back(make_shared<FeistelNumPermutation>());
-  list.push_back(make_shared<FeistelMixPermutation>());
+  list.push_back(std::make_shared<IdentityPermutation>());
+  list.push_back(std::make_shared<AffinePermutation>());
+  list.push_back(std::make_shared<Affine64Permutation>());
+  list.push_back(std::make_shared<FeistelNumPermutation>());
+  list.push_back(std::make_shared<FeistelMixPermutation>());
 
   return list;
 }
@@ -71,11 +71,11 @@ vector<std::shared_ptr<Permutation>> PermutationFactory::GetPermutations() {
  * @return On success instance of permutation, exception std::invalid_argument otherwise
  */
 std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
-    const string &permutation_name) {
+    const std::string &permutation_name) {
 
-  vector<std::shared_ptr<Permutation> > list;
+  std::vector<std::shared_ptr<Permutation> > list;
   std::shared_ptr<Permutation> permutation(nullptr);
-  string str, name;
+  std::string str, name;
 
   if (permutation_name.empty())
     throw exception::EmptyArgument{"permutationName"};

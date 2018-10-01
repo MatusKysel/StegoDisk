@@ -29,8 +29,6 @@
 #include "stego_header.h"
 #include "utils/exceptions.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 std::string File::GetAbsolutePath() const {
@@ -65,7 +63,7 @@ uint64 File::GetSize() const
 }
 
 File::File(std::string base_path, std::string relative_path) {
-  string base_path_safe = base_path;
+  std::string base_path_safe = base_path;
 
   if (base_path_safe.empty())
     base_path_safe = ".";
@@ -75,7 +73,7 @@ File::File(std::string base_path, std::string relative_path) {
 
   base_path_ = base_path_safe;
 
-  string relative_path_safe = relative_path;
+  std::string relative_path_safe = relative_path;
   if (relative_path_safe.length() > 0)
     if (relative_path_safe.front() == PATH_SEPARATOR)
       relative_path_safe = relative_path_safe.substr(1);
@@ -91,10 +89,10 @@ std::string File::GetExtension(bool convert_to_lowercase) const {
   unsigned long ext_pos = static_cast<unsigned long>(
                             relative_path_.find_last_of("."));
 
-  if (ext_pos == string::npos) return "";
+  if (ext_pos == std::string::npos) return "";
   if ((relative_path_.length() - ext_pos) > 5) return "";
 
-  string ext = relative_path_.substr(ext_pos + 1);
+  std::string ext = relative_path_.substr(ext_pos + 1);
   if (convert_to_lowercase)
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 

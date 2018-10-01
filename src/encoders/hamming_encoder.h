@@ -26,12 +26,12 @@ public:
   virtual int Embed(uint8 *codeword, const uint8 *data) override;
   virtual int Extract(const uint8 *codeword, uint8 *data) override;
 
-  virtual void SetArgByName(const string &arg, const string &val) override;
+  virtual void SetArgByName(const std::string &arg, const std::string &val) override;
 
-  static const string GetName();
-  virtual const string GetNameInstance() const override;
-  static shared_ptr<Encoder> GetNew();
-  virtual shared_ptr<Encoder> GetNewInstance() override;
+  static const std::string GetName();
+  virtual const std::string GetNameInstance() const override;
+  static std::shared_ptr<Encoder> GetNew();
+  virtual std::shared_ptr<Encoder> GetNewInstance() override;
 
   static int GetParityBitsMin();
   static int GetParityBitsMax();
@@ -51,7 +51,7 @@ private:
 
   static const uint32 kEncoderHammingParityBitsMin = 3;
   static const uint32 kEncoderHammingParityBitsMax = 8;
-  static const string kEncoderHammingCodeName;
+  static const std::string kEncoderHammingCodeName;
   // default block size
   static const uint32 kEncoderHammingDefaultParityBits = 5;
 };

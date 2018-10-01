@@ -24,8 +24,6 @@
 #include <jpeglib.h>
 #include <jerror.h>
 
-using namespace std;
-
 namespace stego_disk {
 
 class CarrierFileJPEG : public CarrierFile {

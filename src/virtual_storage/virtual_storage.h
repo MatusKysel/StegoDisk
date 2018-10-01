@@ -34,7 +34,7 @@ public:
   ~VirtualStorage();
 
   static std::shared_ptr<VirtualStorage> GetNewInstance();
-  static std::shared_ptr<VirtualStorage> GetNewInstance(string permutation);
+  static std::shared_ptr<VirtualStorage> GetNewInstance(std::string permutation);
 
   // Initialization of the VirtualStorage depends on permutation
   void SetPermutation(std::shared_ptr<Permutation> permutation);

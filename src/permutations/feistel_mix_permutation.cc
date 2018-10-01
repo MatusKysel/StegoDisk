@@ -89,7 +89,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
     }
   }
   LOG_TRACE("FeistelMixPermutation::init: HT ready; left_mod_ = "
-            << left_mod_ << ", right_mask_ = " << right_mask_ << endl);
+            << left_mod_ << ", right_mask_ = " << right_mask_ << std::endl);
 
   initialized_ = true;
 }

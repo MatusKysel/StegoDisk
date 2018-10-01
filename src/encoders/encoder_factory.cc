@@ -47,20 +47,20 @@ EncoderFactory::EncoderType EncoderFactory::GetDefaultEncoderType() {
  *
  * @return Vector of all supported encoders
  */
-vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
-  vector<std::shared_ptr<Encoder>> list;
+std::vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
+  std::vector<std::shared_ptr<Encoder>> list;
 
   // HammingEncoder
   // Create instances of HammingEncoder using all possible settings
   for (int i = HammingEncoder::GetParityBitsMin();
        i <= HammingEncoder::GetParityBitsMax(); ++i) {
-    list.push_back(make_shared<HammingEncoder>(i));
+    list.push_back(std::make_shared<HammingEncoder>(i));
   }
   // LsbEncoder
   // Create instance of LsbEncoder, blockLength = 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
   for (unsigned int i = LsbEncoder::GetBlockSizeMin();
        i <= LsbEncoder::GetBlockSizeMax(); i <<= 1) {
-    list.push_back(make_shared<LsbEncoder>(i));
+    list.push_back(std::make_shared<LsbEncoder>(i));
   }
 
   // Other encoders ...
@@ -79,8 +79,8 @@ vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
  * @return A std::exception if some error occurs in encoder->setArgByName()
  */
 void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
-                                         const string &param,
-                                         const string &val) {
+                                         const std::string &param,
+                                         const std::string &val) {
   if (!encoder)
     throw exception::NullptrArgument{"encoder"};
   if (param.empty())
@@ -101,10 +101,10 @@ void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
  *
  * @return Vector of supported encoders
  */
-vector<std::shared_ptr<Encoder>> EncoderFactory::GetEncoders() {
-  vector<std::shared_ptr<Encoder>> list;
-  list.push_back(make_shared<LsbEncoder>());
-  list.push_back(make_shared<HammingEncoder>());
+std::vector<std::shared_ptr<Encoder>> EncoderFactory::GetEncoders() {
+  std::vector<std::shared_ptr<Encoder>> list;
+  list.push_back(std::make_shared<LsbEncoder>());
+  list.push_back(std::make_shared<HammingEncoder>());
   return list;
 }
 
@@ -121,8 +121,8 @@ vector<std::shared_ptr<Encoder>> EncoderFactory::GetEncoders() {
  *
  * @return vector of names
  */
-vector<string> EncoderFactory::GetEncoderNames() {
-  vector<string> list;
+std::vector<std::string> EncoderFactory::GetEncoderNames() {
+  std::vector<std::string> list;
 
   list.push_back(HammingEncoder::GetName());
   list.push_back(LsbEncoder::GetName());

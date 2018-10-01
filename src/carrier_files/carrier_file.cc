@@ -87,7 +87,7 @@ uint32 CarrierFile::GetBlockCount() {
 
 Key CarrierFile::GetPermKey() const
 {
-  string buf = "";
+  std::string buf = "";
   buf.append(file_.GetNormalizedPath());
   LOG_TRACE("CarrierFile::GetPermKeyHash: hashing file attributes: " << buf);
   return Key::FromString(buf);
@@ -114,8 +114,8 @@ int CarrierFile::AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage,
 
 bool CarrierFile::operator< (const CarrierFile& val) const {
 
-  string str_a = file_.GetRelativePath();
-  string str_b = val.file_.GetRelativePath();
+  std::string str_a = file_.GetRelativePath();
+  std::string str_b = val.file_.GetRelativePath();
 
   std::transform(str_a.begin(), str_a.end(), str_a.begin(), ::tolower);
   std::transform(str_b.begin(), str_b.end(), str_b.begin(), ::tolower);

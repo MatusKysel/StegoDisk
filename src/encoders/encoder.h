@@ -17,8 +17,6 @@
 #include "api_mask.h"
 #include "utils/stego_types.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 class Encoder {
@@ -31,11 +29,11 @@ public:
 
   virtual uint32 GetDataBlockSize();
   virtual uint32 GetCodewordBlockSize();
-  virtual void SetArgByName(const string &arg, const string &val) = 0;
+  virtual void SetArgByName(const std::string &arg, const std::string &val) = 0;
 
-  virtual const string GetNameInstance() const = 0;
+  virtual const std::string GetNameInstance() const = 0;
   //static const string getName();
-  virtual shared_ptr<Encoder> GetNewInstance() = 0;
+  virtual std::shared_ptr<Encoder> GetNewInstance() = 0;
   //static shared_ptr<Encoder> getNew();
 
 protected:

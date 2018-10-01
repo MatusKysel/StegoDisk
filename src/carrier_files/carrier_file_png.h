@@ -19,8 +19,6 @@
 
 #include "lodepng.h"
 
-using namespace std;
-
 namespace stego_disk {
 
 class CarrierFilePNG : public CarrierFile {

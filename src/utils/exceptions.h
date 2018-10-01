@@ -13,9 +13,7 @@
 #define DEFINE_STRING_GETTER(member_name) \
 	const char * get_ ## member_name() const { return member_name ## _.c_str(); }
 
-namespace stego_disk {
-namespace exception {
-
+namespace stego_disk::exception {
 
 class STEGO_DISK_EXPORT InvalidState : public std::runtime_error {
 public:
@@ -251,8 +249,6 @@ public:
 private:
 	const std::string file_;
 };
-
-} // exception
-} // stego_disk
+}
 
 #endif // STEGODISK_UTILS_EXCEPTIONS_H_

@@ -151,7 +151,7 @@ void StegoMath::PrintHexBuffer(const uint8 *buffer, std::size_t length) {
 }
 
 
-string StegoMath::HexBufferToStr(const uint8 *buffer, std::size_t length) {
+std::string StegoMath::HexBufferToStr(const uint8 *buffer, std::size_t length) {
   std::stringstream buf;
   buf << std::hex;
 
@@ -170,7 +170,7 @@ string StegoMath::HexBufferToStr(const uint8 *buffer, std::size_t length) {
 }
 
 
-string StegoMath::HexBufferToStr(const MemoryBuffer& buffer) {
+std::string StegoMath::HexBufferToStr(const MemoryBuffer& buffer) {
   return HexBufferToStr(buffer.GetConstRawPointer(), buffer.GetSize());
 }
 
