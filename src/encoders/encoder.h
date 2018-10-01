@@ -39,8 +39,8 @@ public:
   //static shared_ptr<Encoder> getNew();
 
 protected:
-  uint32 codeword_block_size_;
-  uint32 data_block_size_;
+	uint32 codeword_block_size_{ 0 };
+	uint32 data_block_size_{ 0 };
 };
 
 } // stego_disk

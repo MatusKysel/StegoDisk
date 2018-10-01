@@ -91,23 +91,23 @@ protected:
   int EmbedBufferUsingEncoder();
 
   MemoryBuffer buffer_;
-  uint32 width_;
-  uint32 height_;
-  bool is_grayscale_;
-  uint32 codeword_block_size_;
-  uint32 data_block_size_;
-  uint32 block_count_;
-  uint64 capacity_;
-  uint64 raw_capacity_;
-  uint32 blocks_used_;
-  uint64 virtual_storage_offset_;
-  bool file_loaded_;
+  uint32 width_{ 0 };
+  uint32 height_{ 0 };
+  bool is_grayscale_{ false };
+  uint32 codeword_block_size_{ 0 };
+  uint32 data_block_size_{ 0 };
+  uint32 block_count_{ 0 };
+  uint64 capacity_{ 0 };
+  uint64 raw_capacity_{ 0 };
+  uint32 blocks_used_{ 0 };
+  uint64 virtual_storage_offset_{ 0 };
+  bool file_loaded_{ false };
   Key subkey_;
   File file_;
-  std::shared_ptr<Encoder> encoder_;
-  std::shared_ptr<Permutation> permutation_;
-  std::unique_ptr<Fitness> fitness_;
-  std::shared_ptr<VirtualStorage> virtual_storage_;
+  std::shared_ptr<Encoder> encoder_{ nullptr };
+  std::shared_ptr<Permutation> permutation_{ nullptr };
+  std::unique_ptr<Fitness> fitness_{ nullptr };
+  std::shared_ptr<VirtualStorage> virtual_storage_{ nullptr };
 };
 
 } // stego_disk

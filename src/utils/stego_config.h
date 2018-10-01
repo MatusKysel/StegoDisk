@@ -66,7 +66,6 @@ public:
 
 private:
   StegoConfig() :
-    stego_config_loaded_(false),
     exclude_list_(),
     file_config_()
   {}
@@ -78,7 +77,7 @@ private:
     return stego_config;
   }
 
-  bool stego_config_loaded_;
+  bool stego_config_loaded_{ false };
   EncoderFactory::EncoderType encoder_;
   PermutationFactory::PermutationType global_perm_;
   PermutationFactory::PermutationType local_perm_;

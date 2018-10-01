@@ -26,7 +26,7 @@
 
 namespace stego_disk {
 
-FeistelNumPermutation::FeistelNumPermutation() : modulus_(0) {
+FeistelNumPermutation::FeistelNumPermutation() {
   LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
             GetNameInstance());
 }

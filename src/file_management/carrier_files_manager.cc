@@ -38,12 +38,10 @@ using namespace std;
 namespace stego_disk {
 
 CarrierFilesManager::CarrierFilesManager() :
-  capacity_(0),
-  files_in_directory_(0),
   virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
-  thread_pool_(std::make_unique<ThreadPool>(0)),
-  is_active_encoder_(false) {}
+  thread_pool_(std::make_unique<ThreadPool>(0))
+  {}
 
 CarrierFilesManager::~CarrierFilesManager() {
   carrier_files_.clear();

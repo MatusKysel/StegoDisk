@@ -37,7 +37,7 @@ public:
   virtual void InsertBytes(const MemoryBuffer &in, MemoryBuffer *out) const = 0;
 
 protected:
-  std::shared_ptr<CarrierFile> file_;
+	std::shared_ptr<CarrierFile> file_{ nullptr };
 
 };
 

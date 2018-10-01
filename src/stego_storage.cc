@@ -20,7 +20,6 @@
 namespace stego_disk {
 
 StegoStorage::StegoStorage()
-	:opened_(false)
 {
 	carrier_files_manager_ = std::make_unique<CarrierFilesManager>();
 }

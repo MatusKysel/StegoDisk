@@ -60,17 +60,16 @@ private:
   std::string base_path_;
 
   std::vector<std::shared_ptr<CarrierFile>> carrier_files_;
-  uint64 capacity_;
-
-  uint64 files_in_directory_;
+  uint64 capacity_{ 0 };
+  uint64 files_in_directory_{ 0 };
 
   Hash password_hash_;
   Key master_key_;
 
-  std::shared_ptr<VirtualStorage> virtual_storage_;
-  std::shared_ptr<Encoder> encoder_;
-  std::unique_ptr<ThreadPool> thread_pool_;
-  bool is_active_encoder_;
+  std::shared_ptr<VirtualStorage> virtual_storage_{ nullptr };
+  std::shared_ptr<Encoder> encoder_{ nullptr };
+  std::unique_ptr<ThreadPool> thread_pool_{ nullptr };
+  bool is_active_encoder_{ false };
 };
 
 } // stego_disk

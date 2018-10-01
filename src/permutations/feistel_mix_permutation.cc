@@ -24,11 +24,8 @@
 
 namespace stego_disk {
 
-FeistelMixPermutation::FeistelMixPermutation() :
-  left_bits_(0),
-  left_mod_(0),
-  right_mask_(0),
-  right_bits_(0) {
+FeistelMixPermutation::FeistelMixPermutation() 
+{
 
   LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
             GetNameInstance());

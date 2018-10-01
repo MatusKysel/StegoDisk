@@ -25,9 +25,6 @@
 namespace stego_disk {
 
 void VirtualStorage::Init() {
-  raw_capacity_ = 0;
-  usable_capacity_ = 0;
-  is_set_global_permutation_ = false;
   global_permutation_ = std::shared_ptr<Permutation>(nullptr);
 }
 

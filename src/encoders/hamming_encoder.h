@@ -43,11 +43,11 @@ private:
   void WriteBitsToBuffer(uint64 value, int offset, uint8 *buffer);
   uint64 ReadBitsFromBuffer(const uint8 *buffer, int offset, int length);
 
-  uint32 parity_bits_;
-  uint32 total_bits_;
+  uint32 parity_bits_{ 0 };
+  uint32 total_bits_{ 0 };
 
-  uint32 codewords_in_block_;
-  uint32 codeword_buffer_size_;
+  uint32 codewords_in_block_{ 0 };
+  uint32 codeword_buffer_size_{ 0 };
 
   static const uint32 kEncoderHammingParityBitsMin = 3;
   static const uint32 kEncoderHammingParityBitsMax = 8;

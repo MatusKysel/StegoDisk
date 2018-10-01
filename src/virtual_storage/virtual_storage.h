@@ -61,11 +61,11 @@ public:
   void WriteChecksum();
 
 private:
-  std::shared_ptr<Permutation> global_permutation_;
-  bool   is_set_global_permutation_;
-  uint64 raw_capacity_;                // raw capacity (hash + storage)
-  uint64 usable_capacity_;             // usable capacity (storage only)
-  MemoryBuffer data_;
+	std::shared_ptr<Permutation> global_permutation_{ nullptr };
+	bool   is_set_global_permutation_{ false };
+	uint64 raw_capacity_{ 0 };               // raw capacity (hash + storage)
+	uint64 usable_capacity_{ 0 };          // usable capacity (storage only)
+	MemoryBuffer data_;
 };
 
 } // stego_disk

@@ -52,9 +52,9 @@ public:
 
 private:
 
-  std::unique_ptr<CarrierFilesManager> carrier_files_manager_;
-  std::shared_ptr<VirtualStorage> virtual_storage_;
-  bool opened_;
+	std::unique_ptr<CarrierFilesManager> carrier_files_manager_{ nullptr };
+	std::shared_ptr<VirtualStorage> virtual_storage_{ nullptr };
+	bool opened_{ false };
 };
 
 } // stego_disk

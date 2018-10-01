@@ -35,8 +35,8 @@ public:
 
 
 private:
-  uint32 bmp_offset_;
-  uint64 bmp_size_;
+	uint32 bmp_offset_{ 0 };
+	uint64 bmp_size_{ 0 };
 };
 
 } // stego_disk

@@ -33,7 +33,7 @@ public:
 private:
   std::vector< std::vector<uint32> > hash_tables_;
 
-  uint32 modulus_;
+  uint32 modulus_{ 0 };
 };
 
 } // stego_disk

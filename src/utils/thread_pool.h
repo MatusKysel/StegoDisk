@@ -38,11 +38,10 @@ private:
 
   std::mutex queue_mutex;
   std::condition_variable condition;
-  bool stop;
+  bool stop{ false };
 };
 
 inline ThreadPool::ThreadPool(size_t threads)
-  :   stop(false)
 {
 
   if (threads == 0)

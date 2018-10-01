@@ -42,8 +42,8 @@ public:
 protected:
   void CommonPermuteInputCheck(PermElem index) const; // throws exceptions (out_of_range, runtime - not initialized)
 
-  PermElem size_;
-  bool initialized_;
+  PermElem size_{ 0 };
+  bool initialized_{ false };
 };
 
 } // stego_disk

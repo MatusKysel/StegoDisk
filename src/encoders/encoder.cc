@@ -18,8 +18,6 @@ namespace stego_disk {
  * Initialize member variables. It is invoked from constructors of derived classes.
  */
 Encoder::Encoder() {
-  codeword_block_size_ = 0;
-  data_block_size_ = 0;
 }
 
 /**

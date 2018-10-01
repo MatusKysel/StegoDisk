@@ -15,7 +15,7 @@
 
 namespace stego_disk {
 
-Permutation::Permutation() : size_(0), initialized_(false) {}
+Permutation::Permutation() {}
 
 Permutation::~Permutation() {}
 

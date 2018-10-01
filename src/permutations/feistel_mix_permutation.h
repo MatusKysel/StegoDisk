@@ -37,11 +37,11 @@ private:
 
   std::vector< std::vector<uint32> > hash_tables_;
 
-  uint8 left_bits_;
-  uint64 left_mod_;
+  uint8 left_bits_{ 0 };
+  uint64 left_mod_{ 0 };
 
-  uint64 right_mask_;
-  uint8 right_bits_;
+  uint64 right_mask_{ 0 };
+  uint8 right_bits_{ 0 };
 };
 
 } // stego_disk
