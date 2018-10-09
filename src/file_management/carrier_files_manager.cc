@@ -165,6 +165,30 @@ void CarrierFilesManager::SaveVirtualStorage() {
   SaveAllFiles();
 }
 
+std::string CarrierFilesManager::CreateFilterFromConfig() const
+{
+	std::string new_filter{ "" };
+
+	if (StegoConfig::initialized())
+	{
+		auto all_formats = SupportedFormats;
+
+		for (auto &format : StegoConfig::exclude_list())
+		{
+			all_formats.erase(format);
+		}
+
+		for (auto &format : all_formats)
+		{
+			new_filter += format + "|";
+		}
+
+		new_filter.erase(new_filter.length() - 1);
+	}
+
+	return new_filter;
+}
+
 void CarrierFilesManager::SetEncoderArg(const std::string &param,
                                         const std::string &val) {
   if (!encoder_)

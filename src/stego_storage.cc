@@ -30,9 +30,15 @@ void StegoStorage::Open(const std::string &storage_base_path,
                         const std::string &password,
 						const std::string &filter) {
   opened_ = false;
+  auto used_filter = filter;
+
+  if (used_filter == "")
+  {
+	  used_filter = carrier_files_manager_->CreateFilterFromConfig();
+  }
 
   carrier_files_manager_->SetPassword(password);
-  carrier_files_manager_->LoadDirectory(storage_base_path, filter);
+  carrier_files_manager_->LoadDirectory(storage_base_path, used_filter);
 
   opened_ = true;
 }

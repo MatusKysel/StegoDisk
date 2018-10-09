@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 #include "api_mask.h"
 #include "hash/hash.h"
@@ -25,6 +26,10 @@ namespace stego_disk {
 class Encoder;
 class VirtualStorage;
 class CarrierFile;
+
+static std::unordered_set<std::string> SupportedFormats {
+	"jpg", "bmp", "png"
+};
 
 class CarrierFilesManager {
 
@@ -48,6 +53,8 @@ public:
 
   bool LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage);
   void SaveVirtualStorage();
+
+  std::string CreateFilterFromConfig() const;
 
 private:
   void Init();
