@@ -33,11 +33,11 @@ public:
     Instance().local_perm_ = PermutationFactory::GetPermutationType(config["local_perm"].ToString());
     Instance().stego_config_loaded_ = true;
 
-    if(config["exclude_types"].IsArray()) {
-      json::JsonObject exclude_list = config["exclude_types"];
-      for (size_t i = 0; i < exclude_list.ArraySize(); ++i) {
-         if(exclude_list[i].IsString()) {
-           Instance().exclude_list_.insert(exclude_list[i].ToString());
+    if(config["include_types"].IsArray()) {
+      json::JsonObject include_list = config["include_types"];
+      for (size_t i = 0; i < include_list.ArraySize(); ++i) {
+         if(include_list[i].IsString()) {
+           Instance().include_list_.insert(include_list[i].ToString());
          }
        }
     }
@@ -59,14 +59,14 @@ public:
   inline static PermutationFactory::PermutationType &global_perm() { return Instance().global_perm_; }
   inline static PermutationFactory::PermutationType &local_perm() { return Instance().local_perm_; }
   inline static EncoderFactory::EncoderType &encoder() { return Instance().encoder_; }
-  inline static std::set<std::string> &exclude_list() { return Instance().exclude_list_; }
+  inline static std::set<std::string> &include_list() { return Instance().include_list_; }
   inline static std::map<std::string, std::pair<EncoderFactory::EncoderType, PermutationFactory::PermutationType> >
   &file_config() { return Instance().file_config_; }
 
 
 private:
   StegoConfig() :
-    exclude_list_(),
+	include_list_(),
     file_config_()
   {}
 
@@ -81,7 +81,7 @@ private:
   EncoderFactory::EncoderType encoder_;
   PermutationFactory::PermutationType global_perm_;
   PermutationFactory::PermutationType local_perm_;
-  std::set<std::string> exclude_list_;
+  std::set<std::string> include_list_;
   std::map<std::string, std::pair<EncoderFactory::EncoderType, PermutationFactory::PermutationType> > file_config_;
 
   static StegoConfig stego_config_;

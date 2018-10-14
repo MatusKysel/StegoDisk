@@ -67,12 +67,9 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory, const std:
 
   std::vector<std::future<CarrierFilePtr>> carrier_files;
 
-  for(auto &file: files) {
-    if(StegoConfig::exclude_list().find(file.GetExtension()) == StegoConfig::exclude_list().end()) {
-      carrier_files.emplace_back(thread_pool_->enqueue(
-                                   &CarrierFileFactory::CreateCarrierFile,
-                                   file));
-    }
+  for (auto &file : files)
+  {
+	  carrier_files.emplace_back(thread_pool_->enqueue(&CarrierFileFactory::CreateCarrierFile, file));
   }
 
   for(auto &&file: carrier_files) {
@@ -171,19 +168,18 @@ std::string CarrierFilesManager::CreateFilterFromConfig() const
 
 	if (StegoConfig::initialized())
 	{
-		auto all_formats = SupportedFormats;
-
-		for (auto &format : StegoConfig::exclude_list())
+		for (auto &format : StegoConfig::include_list())
 		{
-			all_formats.erase(format);
+			if (SupportedFormats.find(format) != SupportedFormats.end())
+			{
+				new_filter += format + "|";
+			}
 		}
 
-		for (auto &format : all_formats)
+		if (!new_filter.empty())
 		{
-			new_filter += format + "|";
+			new_filter.erase(new_filter.length() - 1);
 		}
-
-		new_filter.erase(new_filter.length() - 1);
 	}
 
 	return new_filter;

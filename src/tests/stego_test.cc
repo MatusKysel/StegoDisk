@@ -48,6 +48,7 @@ static void PrintHelp(char *name) {
                " testing and it will create copy of it\n"
             << "\t-p,--password \tSpecify if the password sould be used\n"
 			<< "\t-f,--filter FILTER \tSpecify file types to use, i.e. jpg|bmp|...\n"
+			<< "\t-c,--config PATH \tLoad configuration from file"
             << std::endl;
 }
 
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]) {
   std::string file_type;
   std::string dir;
   std::string filter{ "" };
+  std::string config_path{ "" };
   bool test_directory = false;
   bool password = false;
   bool invert = false;
@@ -167,13 +169,25 @@ int main(int argc, char *argv[]) {
         return -1;
       }
 	}
-	else if ((arg == "-f") ||(arg == "--filter")) {
+	else if ((arg == "-f") || (arg == "--filter")) {
 		if (++i < argc) {
 			filter = argv[i];
 		}
 		else
 		{
 			LOG_ERROR("--filter option requires one argument.");
+			return -1;
+		}
+	}
+	else if ((arg == "-c") || (arg == "--config"))
+	{
+		if (++i < argc)
+		{
+			config_path = argv[i];
+		}
+		else
+		{
+			LOG_ERROR("--config option requires one argument.");
 			return -1;
 		}
 	}
@@ -196,8 +210,17 @@ int main(int argc, char *argv[]) {
     LOG_ERROR("directory was not set");
     return false;
   }
-  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
-                           StrToPermutation(permutation));
+
+  if (config_path == "")
+  {
+	  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
+		  StrToPermutation(permutation));
+  }
+  else
+  {
+	  stego_storage->Configure(config_path);
+  }
+
   LOG_DEBUG("Opening storage");
   stego_storage->Open(dir, (password) ? PASSWORD : "", filter);
   LOG_DEBUG("Loading storage");
@@ -226,8 +249,17 @@ int main(int argc, char *argv[]) {
   stego_storage->Save();
 
   LOG_DEBUG("Opening storage");
-  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
-                           StrToPermutation(permutation));
+
+  if (config_path == "")
+  {
+	  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
+		  StrToPermutation(permutation));
+  }
+  else
+  {
+	  stego_storage->Configure(config_path);
+  }
+
   stego_storage->Open(dir, (password) ? PASSWORD : "", filter);
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
