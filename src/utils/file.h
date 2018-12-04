@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_FILE_H_
-#define STEGODISK_UTILS_FILE_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -69,5 +68,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_UTILS_FILE_H_

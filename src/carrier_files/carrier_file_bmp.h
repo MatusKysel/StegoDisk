@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_CARRIERFILES_CARRIERFILEBMP_H_
-#define STEGODISK_CARRIERFILES_CARRIERFILEBMP_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -38,5 +37,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_CARRIERFILES_CARRIERFILEBMP_H_

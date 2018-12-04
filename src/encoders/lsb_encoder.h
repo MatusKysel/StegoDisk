@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_ENCODERS_LSBENCODER_H_
-#define STEGODISK_ENCODERS_LSBENCODER_H_
+#pragma once
 
 #include "encoder.h"
 
@@ -45,5 +44,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_ENCODERS_LSBENCODER_H_

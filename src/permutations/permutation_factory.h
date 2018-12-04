@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_
-#define STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_
+#pragma once
 
 #include "permutation.h"
 
@@ -54,5 +53,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_PERMUTATIONS_PERMUTATIONFACTORY_H_

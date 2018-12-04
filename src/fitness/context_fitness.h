@@ -6,8 +6,7 @@
 *
 */
 
-#ifndef STEGODISK_FITNESS_CONTEXTFITNESS_H_
-#define STEGODISK_FITNESS_CONTEXTFITNESS_H_
+#pragma once
 
 #include <array>
 #include <forward_list>
@@ -36,5 +35,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_FITNESS_CONTEXTFITNESS_H_

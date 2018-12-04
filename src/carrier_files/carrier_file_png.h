@@ -6,8 +6,7 @@
 *
 */
 
-#ifndef STEGODISK_CARRIERFILES_CARRIERFILEPNG_H_
-#define STEGODISK_CARRIERFILES_CARRIERFILEPNG_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -37,5 +36,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_CARRIERFILES_CARRIERFILEPNG_H_

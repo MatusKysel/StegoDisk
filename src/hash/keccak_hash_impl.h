@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_HASH_KECCAKHASHIMPL_H_
-#define STEGODISK_HASH_KECCAKHASHIMPL_H_
+#pragma once
 
 #include <memory>
 
@@ -30,4 +29,3 @@ public:
 
 } // stego_disk
 
-#endif // STEGODISK_HASH_KECCAKHASHIMPL_H_

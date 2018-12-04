@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_CARRIERFILES_CARRIERFILEFACTORY_H_
-#define STEGODISK_CARRIERFILES_CARRIERFILEFACTORY_H_
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -31,5 +30,3 @@ public:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_CARRIERFILES_CARRIERFILEFACTORY_H_

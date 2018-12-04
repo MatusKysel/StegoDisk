@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_STEGOSTORAGE_H_
-#define STEGODISK_STEGOSTORAGE_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -58,5 +57,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_STEGOSTORAGE_H_

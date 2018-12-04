@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_KEYS_KEY_H_
-#define STEGODISK_KEYS_KEY_H_
+#pragma once
 
 #include <string>
 #include <memory>
@@ -39,4 +38,3 @@ private:
 };
 } // stego_disk
 
-#endif // STEGODISK_KEYS_KEY_H_

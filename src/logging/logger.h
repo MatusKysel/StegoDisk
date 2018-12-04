@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_LOGGING_LOGGER_H_
-#define STEGODISK_LOGGING_LOGGER_H_
+#pragma once
 
 #include <iostream>
 
@@ -51,4 +50,3 @@ public:
 #define LOG_FATAL(expression) if (Logger::ShouldPrint(kLoggerVerbosityFatal)) \
 { *Logger::ofs_ << "FATAL: " << expression << std::endl; }
 
-#endif // STEGODISK_LOGGING_LOGGER_H_

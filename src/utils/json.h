@@ -28,8 +28,7 @@
  *
  */
 
-#ifndef JSON_H
-#define JSON_H
+#pragma once
 
 #include <algorithm>
 #include <iostream>
@@ -441,5 +440,3 @@ inline static std::string Parse(const std::string &json, JsonObject *root) {
 }
 
 } // json
-
-#endif // JSON_H

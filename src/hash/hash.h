@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_HASH_HASH_H_
-#define STEGODISK_HASH_HASH_H_
+#pragma once
 
 #include <memory>
 
@@ -52,4 +51,3 @@ private:
 
 } // stego_disk
 
-#endif // STEGODISK_HASH_HASH_H_

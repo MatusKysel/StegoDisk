@@ -1,5 +1,4 @@
-#ifndef STEGODISK_UTILS_EXCEPTIONS_H_
-#define STEGODISK_UTILS_EXCEPTIONS_H_
+#pragma once
 
 #include <exception>
 #include <stdexcept>
@@ -250,5 +249,3 @@ private:
 	const std::string file_;
 };
 }
-
-#endif // STEGODISK_UTILS_EXCEPTIONS_H_

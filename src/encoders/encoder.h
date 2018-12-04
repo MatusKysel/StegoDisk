@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_ENCODERS_ENCODER_H_
-#define STEGODISK_ENCODERS_ENCODER_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -42,5 +41,3 @@ protected:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_ENCODERS_ENCODER_H_

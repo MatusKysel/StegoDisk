@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_PERMUTATIONS_PERMUTATION_H_
-#define STEGODISK_PERMUTATIONS_PERMUTATION_H_
+#pragma once
 
 #include <string>
 #include <memory>
@@ -47,5 +46,3 @@ protected:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_PERMUTATIONS_PERMUTATION_H_

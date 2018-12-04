@@ -5,8 +5,7 @@
 *
 */
 
-#ifndef JSON_OBJECT_H
-#define JSON_OBJECT_H
+#pragma once
 
 #include <math.h>
 #include <cstdlib>
@@ -533,5 +532,3 @@ inline std::ostream &operator<<(std::ostream &os, const JsonObject &o) {
 }
 
 } // json
-
-#endif // JSON_OBJECT_H

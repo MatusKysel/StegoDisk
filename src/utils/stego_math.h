@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_STEGOMATH_H_
-#define STEGODISK_UTILS_STEGOMATH_H_
+#pragma once
 
 #include <string>
 
@@ -36,5 +35,3 @@ public:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_UTILS_STEGOMATH_H_

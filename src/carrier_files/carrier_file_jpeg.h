@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_CARRIERFILES_CARRIERFILEJPEG_H_
-#define STEGODISK_CARRIERFILES_CARRIERFILEJPEG_H_
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -45,5 +44,3 @@ public:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_CARRIERFILES_CARRIERFILEJPEG_H_

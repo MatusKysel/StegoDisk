@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_CARRIERFILES_CARRIERFILE_H_
-#define STEGODISK_CARRIERFILES_CARRIERFILE_H_
+#pragma once
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -111,5 +110,3 @@ protected:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_CARRIERFILES_CARRIERFILE_H_

@@ -1,8 +1,7 @@
 // keccak.h
 // 19-Nov-11  Markku-Juhani O. Saarinen <mjos@iki.fi>
 
-#ifndef STEGODISK_UTILS_KECCAK_KECCAK_H_
-#define STEGODISK_UTILS_KECCAK_KECCAK_H_
+#pragma once
 
 #include <stdint.h>
 #include <string.h>
@@ -20,6 +19,4 @@ int keccak(const uint8_t *in, int inlen, uint8_t *md, int mdlen);
 
 // update the state
 void keccakf(uint64_t st[25], int norounds);
-
-#endif // STEGODISK_UTILS_KECCAK_KECCAK_H_
 

@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_ENCODERS_HAMMINGENCODER_H_
-#define STEGODISK_ENCODERS_HAMMINGENCODER_H_
+#pragma once
 
 #include "api_mask.h"
 #include "encoder.h"
@@ -57,5 +56,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_ENCODERS_HAMMINGENCODER_H_

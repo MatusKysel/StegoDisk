@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_STEGOTYPES_H_
-#define STEGODISK_UTILS_STEGOTYPES_H_
+#pragma once
 
 #include <cstdint>
 
@@ -27,5 +26,3 @@ typedef std::int32_t int32;
 typedef std::int64_t int64;
 
 } //stego_disk
-
-#endif // STEGODISK_UTILS_STEGOTYPES_H_

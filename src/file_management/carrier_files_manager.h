@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_FILEMANAGEMENT_CARRIERFILESMANAGER_H_
-#define STEGODISK_FILEMANAGEMENT_CARRIERFILESMANAGER_H_
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -80,5 +79,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_FILEMANAGEMENT_CARRIERFILESMANAGER_H_

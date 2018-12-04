@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_STEGOHEADER_H_
-#define STEGODISK_UTILS_STEGOHEADER_H_
+#pragma once
 
 #if defined(__unix__) || defined(__APPLE__)
 #define STEGO_OS_UNIX   1
@@ -29,5 +28,3 @@
 #include "stego_types.h"
 #include "config.h"
 #include "logging/logger.h"
-
-#endif // STEGODISK_UTILS_STEGO_HEADER_H_

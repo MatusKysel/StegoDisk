@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_PERMUTATIONS_FEISTELMIXPERMUTATION_H_
-#define STEGODISK_PERMUTATIONS_FEISTELMIXPERMUTATION_H_
+#pragma once
 
 #include <vector>
 
@@ -45,5 +44,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_PERMUTATIONS_FEISTELMIXPERMUTATION_H_

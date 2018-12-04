@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_VIRTUALSTORAGE_VIRTUALSTORAGE_H_
-#define STEGODISK_VIRTUALSTORAGE_VIRTUALSTORAGE_H_
+#pragma once
 
 #include <memory>
 
@@ -69,5 +68,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_VIRTUALSTORAGE_VIRTUALSTORAGE_H_

@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_PERMUTATIONS_AFFINE64PERMUTATION_H_
-#define STEGODISK_PERMUTATIONS_AFFINE64PERMUTATION_H_
+#pragma once
 
 #include "affine_permutation.h"
 
@@ -27,5 +26,3 @@ public:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_PERMUTATIONS_AFFINE64PERMUTATION_H_

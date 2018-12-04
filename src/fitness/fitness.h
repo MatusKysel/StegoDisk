@@ -6,8 +6,7 @@
 *
 */
 
-#ifndef STEGODISK_FITNESS_FITNESS_H_
-#define STEGODISK_FITNESS_FITNESS_H_
+#pragma once
 
 #include <string>
 #include <memory>
@@ -42,5 +41,3 @@ protected:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_FITNESS_FITNESS_H_

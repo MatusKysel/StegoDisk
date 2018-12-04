@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_HASH_HASHIMPL_H_
-#define STEGODISK_HASH_HASHIMPL_H_
+#pragma once
 
 #include <memory>
 #include <stdexcept>
@@ -38,5 +37,3 @@ protected:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_HASH_HASHIMPL_H_

@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_PERMUTATIONS_IDENTITYPERMUTATION_H_
-#define STEGODISK_PERMUTATIONS_IDENTITYPERMUTATION_H_
+#pragma once
 
 #include "permutation.h"
 
@@ -28,5 +27,3 @@ public:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_PERMUTATIONS_IDENTITYPERMUTATION_H_

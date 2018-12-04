@@ -6,8 +6,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_STEGOCONFIG_H_
-#define STEGODISK_UTILS_STEGOCONFIG_H_
+#pragma once
 
 #include <string>
 #include <set>
@@ -88,5 +87,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_UTILS_STEGOCONFIG_H_

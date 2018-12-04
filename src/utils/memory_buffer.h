@@ -7,8 +7,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_MEMORYBUFFER_H_
-#define STEGODISK_UTILS_MEMORYBUFFER_H_
+#pragma once
 
 #include <string>
 
@@ -62,4 +61,3 @@ private:
 
 } // stego_disk
 
-#endif // STEGODISK_UTILS_MEMORYBUFFER_H_

@@ -9,8 +9,7 @@
 
 //TODO(matus) unnecessary, because everthing will be rewrited to exceptions
 
-#ifndef STEGODISK_UTILS_STEGOERRORS_H_
-#define STEGODISK_UTILS_STEGOERRORS_H_
+#pragma once
 
 #define EXIT_SUCCESS 0
 
@@ -49,5 +48,3 @@
 #define E_GET_CWD       (-13)	// zlyhanie otvorenie adresara
 #define E_WAIT          (-14)	// zlyhanie pri cakani na ukoncenie detskeho procesu
 
-
-#endif // STEGODISK_UTILS_STEGOERRORS_H_

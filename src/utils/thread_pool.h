@@ -5,8 +5,7 @@
 *
 */
 
-#ifndef STEGODISK_UTILS_THREAD_POOL_H_
-#define STEGODISK_UTILS_THREAD_POOL_H_
+#pragma once
 
 #include <vector>
 #include <queue>
@@ -108,5 +107,3 @@ inline ThreadPool::~ThreadPool()
 }
 
 } //stego_disk
-
-#endif //STEGODISK_UTILS_THREAD_POOL_H_

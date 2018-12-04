@@ -7,14 +7,12 @@
 *
 */
 
-#ifndef STEGODISK_PERMUTATIONS_FEISTELNUMPERMUTATION_H_
-#define STEGODISK_PERMUTATIONS_FEISTELNUMPERMUTATION_H_
+#pragma once
 
 #include <vector>
 
 #include "permutation.h"
 #include "utils/stego_types.h"
-
 
 namespace stego_disk {
 
@@ -37,5 +35,3 @@ private:
 };
 
 } // stego_disk
-
-#endif // STEGODISK_PERMUTATIONS_FEISTELNUMPERMUTATION_H_
