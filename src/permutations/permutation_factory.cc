@@ -83,13 +83,15 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
 
   std::transform(name.begin(), name.end(), name.begin(), ::tolower);
   list = GetPermutations();
-  for (unsigned int i = 0; i < list.size(); ++i) {
-    str = list[i]->GetNameInstance();
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    if (name.compare(str) == 0) {
-      permutation = list[i];
-      break;
-    }
+  for (const auto &p : list) 
+  {
+		str = p->GetNameInstance();
+		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+		if (name.compare(str) == 0) 
+		{
+			permutation = p;
+			break;
+		}
   }
 
   if (permutation)

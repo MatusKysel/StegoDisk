@@ -235,7 +235,7 @@ void CarrierFileJPEG::SaveFile() {
   bool should_read = true;
 
 
-  uint32 bits_to_modify = static_cast<uint32>(permutation_->GetSize());
+  auto bits_to_modify = static_cast<uint32>(permutation_->GetSize());
 
   // LOG_INFO(_relativePath << ", bits to modify: " << bits_to_modify);
 
@@ -331,7 +331,7 @@ void CarrierFileJPEG::SaveFile() {
   // write markers
   jpeg_saved_marker_ptr marker;
   for(marker = cinfo_decompress.marker_list;
-      marker != NULL;
+      marker != nullptr;
       marker = marker->next) {
     jpeg_write_marker(&cinfo_compress, marker->marker, marker->data,
                       marker->data_length);

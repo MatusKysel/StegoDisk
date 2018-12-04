@@ -56,10 +56,6 @@ public:
   std::string CreateFilterFromConfig() const;
 
 private:
-  void Init();
-
-  void AddFileAtPath(std::string &path);
-
   void GenerateMasterKey();
   void DeriveSubkeys();
 

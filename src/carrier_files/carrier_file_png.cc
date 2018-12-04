@@ -28,7 +28,7 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
   unsigned char png_header[64];
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  int read_cnt = static_cast<int>(fread(&png_header, 1, 64, file_ptr.Get()));
+  auto read_cnt = static_cast<int>(fread(&png_header, 1, 64, file_ptr.Get()));
 
 
   if (read_cnt < 64) {
@@ -67,7 +67,7 @@ void CarrierFilePNG::LoadFile() {
 
 
     fseek(file_ptr.Get(), 0, SEEK_SET);
-    uint32 read_cnt = static_cast<uint32>(fread(png_buffer.GetRawPointer(), 1,
+    auto read_cnt = static_cast<uint32>(fread(png_buffer.GetRawPointer(), 1,
                                                 file_.GetSize(),
                                                 file_ptr.Get()));
 
@@ -123,7 +123,7 @@ void CarrierFilePNG::SaveFile() {
   uint64 bits_to_modify = permutation_->GetSize();
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(fread(png_buffer.GetRawPointer(), 1,
+  auto read_cnt = static_cast<uint32>(fread(png_buffer.GetRawPointer(), 1,
                                               file_.GetSize(),
                                               file_ptr.Get()));
 
@@ -164,7 +164,7 @@ void CarrierFilePNG::SaveFile() {
   // write data
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  uint32 write_cnt = static_cast<uint32>(fwrite(image_out,
+  auto write_cnt = static_cast<uint32>(fwrite(image_out,
                                                 1, size_out,
                                                 file_ptr.Get()));
 

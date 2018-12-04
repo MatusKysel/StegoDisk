@@ -31,9 +31,7 @@ public:
   virtual void SetArgByName(const std::string &arg, const std::string &val) = 0;
 
   virtual const std::string GetNameInstance() const = 0;
-  //static const string getName();
   virtual std::shared_ptr<Encoder> GetNewInstance() = 0;
-  //static shared_ptr<Encoder> getNew();
 
 protected:
 	uint32 codeword_block_size_{ 0 };

@@ -24,7 +24,7 @@ std::vector<File> File::GetFilesInDir(const std::string &directory, const std::s
 		auto parent_path = i_path.parent_path().string();
 		auto filename = i_path.filename().string();
 
-		if (filter == "")
+		if (filter.empty())
 		{
 #ifndef HAS_FILESYSTEM_LIBRARY
 			ret.emplace_back(File(parent_path, filename));

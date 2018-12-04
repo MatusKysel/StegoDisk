@@ -43,6 +43,11 @@ PermElem Affine64Permutation::Permute(PermElem index) const {
   return (StegoMath::Mulmod(index, key_param_a_, size_) + key_param_b_) % size_;
 }
 
+const std::string Affine64Permutation::GetNameInstance() const
+{
+	return "Affine64";
+}
+
 } // stego_disk
 
 

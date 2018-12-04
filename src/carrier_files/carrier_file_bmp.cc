@@ -28,7 +28,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   char bmp_info[40];
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  int read_cnt = static_cast<int>(fread(&bmp_header, 1, 14, file_ptr.Get()));
+  auto read_cnt = static_cast<int>(fread(&bmp_header, 1, 14, file_ptr.Get()));
   read_cnt += static_cast<int>(fread(&bmp_info, 1, 40, file_ptr.Get()));
 
   if (read_cnt < 54) {
@@ -80,7 +80,7 @@ void CarrierFileBMP::LoadFile() {
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
+  auto read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
                                               raw_capacity_ * 8,
                                               file_ptr.Get()));
 
@@ -90,7 +90,7 @@ void CarrierFileBMP::LoadFile() {
   }
 
   uint64 usable_capacity = raw_capacity_;
-  MemoryBuffer* usable_buffer = new MemoryBuffer();
+  auto* usable_buffer = new MemoryBuffer();
 
   if(fitness_ != nullptr) {
     usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
@@ -137,7 +137,7 @@ void CarrierFileBMP::SaveFile() {
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
+  auto read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
                                               raw_capacity_ * 8,
                                               file_ptr.Get()));
 
@@ -147,7 +147,7 @@ void CarrierFileBMP::SaveFile() {
   }
 
   uint64 usable_capacity = raw_capacity_;
-  MemoryBuffer* usable_buffer = new MemoryBuffer();
+  auto* usable_buffer = new MemoryBuffer();
 
   if(fitness_ != nullptr) {
     usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
@@ -175,7 +175,7 @@ void CarrierFileBMP::SaveFile() {
     (*usable_buffer)[i] = ((*usable_buffer)[i] & 0xFE) | GetBitInBufferPermuted(i);
   }
 
-  MemoryBuffer *output_buffer = new MemoryBuffer();
+  auto *output_buffer = new MemoryBuffer();
   if(fitness_ != nullptr) {
     fitness_->InsertBytes((*usable_buffer), output_buffer);
   } else {
@@ -184,7 +184,7 @@ void CarrierFileBMP::SaveFile() {
   }
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 write_cnt = static_cast<uint32>(fwrite(output_buffer->GetRawPointer(),
+  auto write_cnt = static_cast<uint32>(fwrite(output_buffer->GetRawPointer(),
                                                 1, raw_capacity_ * 8,
                                                 file_ptr.Get()));
 

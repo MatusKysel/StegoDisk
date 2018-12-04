@@ -22,7 +22,7 @@ public:
   virtual void Init(PermElem requested_size, Key &key) override;
   virtual PermElem Permute(PermElem index) const override;
 
-  const std::string GetNameInstance() const { return "Affine64"; }
+  const std::string GetNameInstance() const override;
 };
 
 } // stego_disk

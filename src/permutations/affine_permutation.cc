@@ -36,8 +36,7 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key
 
   uint64 a, b;
 
-  while(1) {
-
+  while(true) {
     prime = StegoMath::ClosestSmallerPrime(prime);
     if (prime < 1) {
       return 0;
@@ -88,6 +87,10 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size,
   return GetSizeUsingParams(requested_size, key, false);
 }
 
+const std::string AffinePermutation::GetNameInstance() const
+{
+	return "Affine";
+}
 
 void AffinePermutation::Init(PermElem requested_size, Key &key)
 {

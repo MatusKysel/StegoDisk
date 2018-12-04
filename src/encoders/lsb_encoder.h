@@ -11,7 +11,7 @@
 
 #include "encoder.h"
 
-#define ENCODER_LSB_CODE_NAME_DEF "Lsb"
+constexpr auto EncoderLsbCodeNameDef = "Lsb";
 
 namespace stego_disk {
 

@@ -21,7 +21,7 @@ namespace stego_disk {
 #ifndef __SHARED_PTR_CARRIER_FILE__
 #define __SHARED_PTR_CARRIER_FILE__
 class CarrierFile;
-typedef std::shared_ptr<CarrierFile> CarrierFilePtr;
+using CarrierFilePtr = std::shared_ptr<CarrierFile>;
 #endif // __SHARED_PTR_CARRIER_FILE__
 
 class CarrierFileFactory {

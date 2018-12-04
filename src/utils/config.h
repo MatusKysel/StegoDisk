@@ -9,9 +9,7 @@
 
 #pragma once
 
-#define SFS_KEY_HASH_LENGTH        32
-#define SFS_BLOCK_SIZE             4*1024
-
-#define SFS_STORAGE_HASH_LENGTH    32
-
-#define SFS_LOGGER_CONFIGFILE      "logger.xml"
+constexpr auto KeyHashLength = 32u;
+constexpr auto BlockSize = 4u * 1024u;
+constexpr auto StorageHashLenght = 32u;
+constexpr auto LoggerConfigFile = "logger.xml";

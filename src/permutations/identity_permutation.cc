@@ -44,4 +44,9 @@ PermElem IdentityPermutation::GetSizeUsingParams(PermElem requested_size,
   return requested_size;
 }
 
+const std::string IdentityPermutation::GetNameInstance() const
+{
+	return "Identity";
+}
+
 } // stego_disk

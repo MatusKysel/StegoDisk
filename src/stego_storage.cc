@@ -32,7 +32,7 @@ void StegoStorage::Open(const std::string &storage_base_path,
   opened_ = false;
   auto used_filter = filter;
 
-  if (used_filter == "")
+  if (used_filter.empty())
   {
 	  used_filter = carrier_files_manager_->CreateFilterFromConfig();
   }

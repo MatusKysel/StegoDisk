@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <time.h>
-
 #include <algorithm>
+#include <assert.h>
 
 #include "encoders/encoder.h"
 #include "permutations/permutation_factory.h"
@@ -126,26 +126,16 @@ bool CarrierFile::operator< (const CarrierFile& val) const {
 }
 
 bool CarrierFile::CompareByPointers(CarrierFile* a, CarrierFile* b) {
-  if (a == nullptr)
-    return 0;
-
-
-  if (b == nullptr)
-    return 0;
-
-  return (*a < *b);
+	assert(a != nullptr);
+	assert(b != nullptr);
+	return (*a < *b);
 }
 
 bool CarrierFile::CompareBySharedPointers(std::shared_ptr<CarrierFile> a,
                                           std::shared_ptr<CarrierFile> b) {
-  if (a == nullptr)
-    return 0;
-
-
-  if (b == nullptr)
-    return 0;
-
-  return (*(a.get()) < *(b.get()));
+	assert(a != nullptr);
+	assert(b != nullptr);
+	return (*(a.get()) < *(b.get()));
 }
 
 

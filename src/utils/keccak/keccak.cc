@@ -89,7 +89,7 @@ int keccak(const uint8_t *in, int inlen, uint8_t *md, int mdlen)
     for ( ; inlen >= rsiz; inlen -= rsiz, in += rsiz) {
         for (i = 0; i < rsizw; i++)
             st[i] ^= ((uint64_t *) in)[i];
-        keccakf(st, KECCAK_ROUNDS);
+        keccakf(st, KeccakRounds);
     }
 
     // last block and padding
@@ -101,7 +101,7 @@ int keccak(const uint8_t *in, int inlen, uint8_t *md, int mdlen)
     for (i = 0; i < rsizw; i++)
         st[i] ^= ((uint64_t *) temp)[i];
 
-    keccakf(st, KECCAK_ROUNDS);
+    keccakf(st, KeccakRounds);
 
     memcpy(md, st, (size_t)mdlen);
 

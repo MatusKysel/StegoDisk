@@ -60,7 +60,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
 
   size_ = left_mod_ << right_bits_;
 
-  uint32 max_hash = static_cast<uint32>(right_mask_ + 1);
+  auto max_hash = static_cast<uint32>(right_mask_ + 1);
 
   hash_tables_ = std::vector<std::vector<uint32> >(
                    FMP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
@@ -127,6 +127,11 @@ PermElem FeistelMixPermutation::GetSizeUsingParams(PermElem requested_size,
 
   uint8 right_bits = bit_len - bit_len / 2;
   return (requested_size >> right_bits) << right_bits;
+}
+
+const std::string FeistelMixPermutation::GetNameInstance() const
+{
+	return "MixedFeistel";
 }
 
 } // stego_disk

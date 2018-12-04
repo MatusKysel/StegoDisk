@@ -26,7 +26,7 @@ public:
   virtual PermElem Permute(PermElem index) const override;
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key) override;
 
-  const std::string GetNameInstance() const { return "NumericFeistel"; }
+  const std::string GetNameInstance() const override;
 
 private:
   std::vector< std::vector<uint32> > hash_tables_;

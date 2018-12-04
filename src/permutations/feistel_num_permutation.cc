@@ -21,8 +21,8 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
-#define FNP_MIN_REQ_SIZE                        1024
-#define FNP_NUMROUNDS                           5
+constexpr auto MinReqSize = 1024;
+constexpr auto NumRounds = 5;
 
 namespace stego_disk {
 
@@ -41,7 +41,7 @@ void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
   if (key.GetSize() == 0)
     throw exception::EmptyArgument{"key"};
 
-  if (requested_size < FNP_MIN_REQ_SIZE)
+  if (requested_size < MinReqSize)
     throw std::invalid_argument("FeistelNumPermutation: "
                              "requestedSize < FNP_MIN_REQ_SIZE");
 
@@ -55,7 +55,7 @@ void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
   uint32 max_hash = modulus_;
 
   hash_tables_ = std::vector<std::vector<uint32> >
-                 (FNP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
+                 (NumRounds, std::vector<uint32>(max_hash, 0));
 
   //TODO: hash could be initialized by key and then just append "i" in each iteration - or not?
   //      sth like: Hash hash(key.getData());
@@ -63,7 +63,7 @@ void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
 
   Hash hash;
 
-  for (uint32 t = 0; t < FNP_NUMROUNDS; ++t) {
+  for (uint32 t = 0; t < NumRounds; ++t) {
     for (uint32 i = 0; i < max_hash; ++i) {
       hash.Process(key.GetData());
       hash.Append((uint8*)&i, sizeof(uint32));
@@ -89,7 +89,7 @@ PermElem FeistelNumPermutation::Permute(PermElem index) const {
   uint64 left = index / modulus_;
 
   // feistel rounds
-  for (std::size_t r = 0; r < FNP_NUMROUNDS; ++r) {
+  for (std::size_t r = 0; r < NumRounds; ++r) {
     if (r % 2) {
       right = (right + hash_tables_[r][left]) % modulus_;
     } else {
@@ -107,11 +107,16 @@ PermElem FeistelNumPermutation::Permute(PermElem index) const {
 
 PermElem FeistelNumPermutation::GetSizeUsingParams(PermElem requested_size,
                                                    Key& /*key*/) {
-  if (requested_size < FNP_MIN_REQ_SIZE) return 0;
+  if (requested_size < MinReqSize) return 0;
 
-  uint32 mod = static_cast<uint32>(sqrt(static_cast<double>(requested_size)));
+  auto mod = static_cast<uint32>(sqrt(static_cast<double>(requested_size)));
   return static_cast<std::size_t>(static_cast<uint64>(mod) *
                                   static_cast<uint64>(mod));
+}
+
+const std::string FeistelNumPermutation::GetNameInstance() const
+{
+	return "NumericFeistel";
 }
 
 } // stego_disk

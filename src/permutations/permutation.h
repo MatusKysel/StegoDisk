@@ -19,8 +19,7 @@
 
 namespace stego_disk {
 
-typedef uint64 PermutationElement;
-typedef PermutationElement PermElem;
+using PermElem = uint64;
 
 class Permutation {
 
@@ -33,8 +32,6 @@ public:
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key) = 0;
   virtual const std::string GetNameInstance() const = 0;
 
-  PermElem& operator[](PermElem index);
-  const PermElem& operator[](PermElem index) const;
   PermElem GetSize() const;
   bool IsInitialized() const { return initialized_; }
 

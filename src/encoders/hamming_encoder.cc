@@ -19,7 +19,7 @@
 
 namespace stego_disk {
 
-const std::string HammingEncoder::kEncoderHammingCodeName = ENCODER_HAMMING_CODE_NAME_DEF;
+const std::string HammingEncoder::kEncoderHammingCodeName = EncoderHammingCodeNameDef;
 
 /**
  * @brief Get minimal value for parameter 'parity_bits'

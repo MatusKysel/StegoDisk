@@ -123,7 +123,7 @@ void MemoryBuffer::Resize(std::size_t new_size) {
   uint8* original_buffer = buffer_;
   std::size_t original_size = size_;
 
-  uint8* new_buffer = new uint8[new_size];
+  auto* new_buffer = new uint8[new_size];
 
   memset(new_buffer, 0, new_size);
   if (original_buffer != nullptr) {
@@ -209,7 +209,7 @@ void MemoryBuffer::Randomize() {
   memset(buffer_, 0, size_);
   memset(buffer_, 0xFF, size_); //TODO(Matus) naco je toto dobre
 
-  srand(static_cast<unsigned int>(time(NULL)));
+  srand(static_cast<unsigned int>(time(nullptr)));
   for (std::size_t i = 0; i < size_; ++i) {
     buffer_[i] = static_cast<uint8>(rand()); //PSTODO naozaj? nepiseme nahodou kniznicu ktora sluzi na security...?
   }

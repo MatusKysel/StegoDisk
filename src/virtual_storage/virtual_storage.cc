@@ -133,14 +133,14 @@ void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
   }
 
   uint64 raw_capacity = global_permutation_->GetSize();
-  if (raw_capacity <= SFS_STORAGE_HASH_LENGTH)
+  if (raw_capacity <= StorageHashLenght)
     throw std::out_of_range("VirtualStorage::applyPermutation: "
                             "capacity ot the storage is too low");
 
   data_ = MemoryBuffer(raw_capacity);
 
   raw_capacity_ = raw_capacity;
-  usable_capacity_ = raw_capacity - SFS_STORAGE_HASH_LENGTH;
+  usable_capacity_ = raw_capacity - StorageHashLenght;
   is_set_global_permutation_ = true;
 }
 
@@ -283,8 +283,7 @@ bool VirtualStorage::IsValidChecksum() {
   //TODO:    #warning Sync hash length with SFS_STORAGE_HASH_LENGTH
   Hash checksum(data_.GetConstRawPointer(), usable_capacity_);
 
-  MemoryBuffer stored_checksum(data_.GetConstRawPointer() + usable_capacity_,
-                               SFS_STORAGE_HASH_LENGTH);
+  MemoryBuffer stored_checksum(data_.GetConstRawPointer() + usable_capacity_, StorageHashLenght);
 
   LOG_DEBUG("VirtualStorage::isValidChecksum:   Stored CHECKSUM: "
             << StegoMath::HexBufferToStr(stored_checksum));

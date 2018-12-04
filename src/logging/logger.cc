@@ -16,11 +16,11 @@
 
 #include "api_mask.h"
 
-LoggerVerbosityLevel Logger::verbosity_level_ = kLoggerVerbosityDisabled;
+LoggerVerbosityLevel Logger::verbosity_level_ = LoggerVerbosityLevel::kLoggerVerbosityDisabled;
 std::ostream *Logger::ofs_ = &std::cout;
 
 bool Logger::ShouldPrint(LoggerVerbosityLevel verbosity_level) {
-  if (verbosity_level_ == kLoggerVerbosityDisabled) return false;
+  if (verbosity_level_ == LoggerVerbosityLevel::kLoggerVerbosityDisabled) return false;
   if (verbosity_level <= verbosity_level_) return true;
   return false;
 }
@@ -50,19 +50,19 @@ void Logger::SetVerbosityLevel(std::string &verbosity_level, std::string out) {
                  verbosity_level.begin(), ::toupper);
 
   if (verbosity_level == "FATAL") {
-    Logger::SetVerbosityLevel(kLoggerVerbosityFatal);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityFatal);
   } else if (verbosity_level == "ERROR" ) {
-    Logger::SetVerbosityLevel(kLoggerVerbosityError);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityError);
   } else if (verbosity_level == "WARN" ) {
-    Logger::SetVerbosityLevel(kLoggerVerbosityWarning);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityWarning);
   } else if (verbosity_level == "INFO" ) {
-    Logger::SetVerbosityLevel(kLoggerVerbosityInfo);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityInfo);
   } else if (verbosity_level == "DEBUG" ) {
-    Logger::SetVerbosityLevel(kLoggerVerbosityDebug);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityDebug);
   } else if (verbosity_level == "TRACE" ) {
-    Logger::SetVerbosityLevel(kLoggerVerbosityTrace);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityTrace);
   } else {
-    Logger::SetVerbosityLevel(kLoggerVerbosityDisabled);
+    Logger::SetVerbosityLevel(LoggerVerbosityLevel::kLoggerVerbosityDisabled);
   }
 
   if ( out.length() != 0 ) {

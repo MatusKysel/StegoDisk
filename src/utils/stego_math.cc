@@ -20,7 +20,7 @@
 namespace stego_disk {
 
 uint64 StegoMath::Gcd(uint64 a, uint64 b) {
-  while ( 1 ) {
+  while (true) {
     a = a % b;
     if( a == 0 )
       return b;

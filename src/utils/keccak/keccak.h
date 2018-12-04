@@ -6,9 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifndef KECCAK_ROUNDS
-#define KECCAK_ROUNDS 24
-#endif
+constexpr auto KeccakRounds = 24;
 
 #ifndef ROTL64
 #define ROTL64(x, y) (((x) << (y)) | ((x) >> (64 - (y))))

@@ -23,7 +23,7 @@ public:
   virtual PermElem Permute(PermElem index) const override;
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key) override;
 
-  const std::string GetNameInstance() const { return "Affine"; }
+  const std::string GetNameInstance() const override;
 protected:
   PermElem GetSizeUsingParams(PermElem requested_size, Key &key,
                               bool overwrite_members);

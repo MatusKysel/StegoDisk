@@ -55,8 +55,6 @@ public:
 
   File GetFile();
 
-  void SetPermutation(std::shared_ptr<Permutation> permutation);
-  void UnSetPermutation();
   void SetEncoder(std::shared_ptr<Encoder> encoder);
   void UnSetEncoder();
   uint64 GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder);
@@ -81,8 +79,6 @@ public:
                                       std::shared_ptr<CarrierFile> b);
 
 protected:
-  int SetDatesBack();
-
   void SetBitInBufferPermuted(uint64 index);
   uint8 GetBitInBufferPermuted(uint64 index);
 

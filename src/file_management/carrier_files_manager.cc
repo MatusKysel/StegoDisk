@@ -79,11 +79,11 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory, const std:
     }
   }
 
-
-  for (uint64 i = 0; i < carrier_files_.size(); ++i) {
-    LOG_TRACE("CarrierFilesManager::loadDirectory: '" <<
-              carrier_files_[i]->GetFile().GetRelativePath() <<
-              "' has raw capacity " << carrier_files_[i]->GetRawCapacity());
+  for (const auto &file : carrier_files_)
+  {
+	  LOG_TRACE("CarrierFilesManager::loadDirectory: '" <<
+		  file->GetFile().GetRelativePath() <<
+		  "' has raw capacity " << file->GetRawCapacity());
   }
 
   std::sort(carrier_files_.begin(), carrier_files_.end(),
@@ -115,23 +115,23 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
 
   uint64 bytes_used;
 
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    if (remaining_capacity > carrier_files_[i]->GetCapacity()) {
-      remaining_capacity -= carrier_files_[i]->GetCapacity();
-      bytes_used = carrier_files_[i]->GetCapacity();
+  for (const auto &file : carrier_files_) 
+  {
+    if (remaining_capacity > file->GetCapacity()) {
+      remaining_capacity -= file->GetCapacity();
+      bytes_used = file->GetCapacity();
     } else {
       bytes_used = remaining_capacity;
       remaining_capacity = 0;
     }
-    carrier_files_[i]->AddToVirtualStorage(storage, offset, bytes_used);
-    offset += carrier_files_[i]->GetCapacity();
+    file->AddToVirtualStorage(storage, offset, bytes_used);
+    offset += file->GetCapacity();
   }
 
   std::vector<std::future<void>> load_results;
 
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    load_results.emplace_back(thread_pool_->enqueue(&CarrierFile::LoadFile,
-                                                    carrier_files_[i]));
+  for (const auto &file : carrier_files_) {
+    load_results.emplace_back(thread_pool_->enqueue(&CarrierFile::LoadFile, file));
   }
 
   for(auto &&result: load_results) {
@@ -201,12 +201,13 @@ void CarrierFilesManager::SetEncoderArg(const std::string &param,
 }
 
 void CarrierFilesManager::UnSetEncoder() {
+	for (const auto &file : carrier_files_)
+	{
+		file->UnSetEncoder();
+	}
 
-  for (size_t i = 0; i < carrier_files_.size(); ++i)
-    carrier_files_[i]->UnSetEncoder();
-
-  encoder_ = std::shared_ptr<Encoder>(nullptr);
-  is_active_encoder_ = false;
+	encoder_ = std::shared_ptr<Encoder>(nullptr);
+	is_active_encoder_ = false;
 }
 
 void CarrierFilesManager::SetEncoder(std::shared_ptr<Encoder> encoder) {
@@ -231,14 +232,14 @@ void CarrierFilesManager::ApplyEncoder() {
   GenerateMasterKey();
   DeriveSubkeys();
 
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    carrier_files_[i]->SetEncoder(encoder_);
-    capacity += carrier_files_[i]->GetCapacity();
-    raw_cap += carrier_files_[i]->GetRawCapacity();
+  for (const auto &file : carrier_files_) {
+    file->SetEncoder(encoder_);
+    capacity += file->GetCapacity();
+    raw_cap += file->GetRawCapacity();
     LOG_DEBUG("CarrierFilesManager::applyEncoder: file '" <<
-              carrier_files_[i]->GetFile().GetRelativePath() <<
-              "': raw=" << carrier_files_[i]->GetRawCapacity() <<
-              ", cap=" << carrier_files_[i]->GetCapacity());
+              file->GetFile().GetRelativePath() <<
+              "': raw=" << file->GetRawCapacity() <<
+              ", cap=" << file->GetCapacity());
   }
   if (capacity == 0)
     throw exception::ZeroAllocatedSize{};
@@ -261,7 +262,7 @@ void CarrierFilesManager::SetPassword(const std::string &password) {
  * @brief Generates Master Key hash from password (hash) and keys generated from individual carrier files
  */
 void CarrierFilesManager::GenerateMasterKey() {
-  if (carrier_files_.size() < 1) {
+  if (carrier_files_.empty()) {
     LOG_ERROR("Nothing to hash, no files loaded...");
 	throw exception::EmptyMember{"carrier_files"};
   }
@@ -272,15 +273,15 @@ void CarrierFilesManager::GenerateMasterKey() {
   Hash master_hey_hash(password_hash_);
 
   // add keys generated from params of individual carrier files
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    master_hey_hash.Append(carrier_files_[i]->GetPermKey().GetData());
+  for (const auto &file : carrier_files_) {
+    master_hey_hash.Append(file->GetPermKey().GetData());
   }
 
   master_key_ = Key(master_hey_hash.GetState());
 }
 
 void CarrierFilesManager::DeriveSubkeys() {
-  if (carrier_files_.size() < 1) {
+  if (carrier_files_.empty()) {
     LOG_ERROR("There is no carrier loaded...");
     return;
   }
@@ -311,9 +312,9 @@ void CarrierFilesManager::DeriveSubkeys() {
 void CarrierFilesManager::SaveAllFiles() {
   std::vector<std::future<void>> save_results;
 
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
+  for (const auto &file : carrier_files_) {
     save_results.emplace_back(
-          thread_pool_->enqueue(&CarrierFile::SaveFile, carrier_files_[i]));
+          thread_pool_->enqueue(&CarrierFile::SaveFile, file));
   }
 
   for(auto &&result: save_results) {
@@ -339,8 +340,8 @@ uint64 CarrierFilesManager::GetCapacity() const
 uint64 CarrierFilesManager::GetRawCapacity() const
 {
   uint64 capacity = 0;
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    capacity += carrier_files_.at(i)->GetRawCapacity();
+  for (const auto &file : carrier_files_) {
+    capacity += file->GetRawCapacity();
   }
   return capacity;
 }
@@ -352,8 +353,8 @@ uint64 CarrierFilesManager::GetCapacityUsingEncoder(
                                   exception::Component::encoder,
                                   exception::ComponentState::notSetted);
   uint64 capacity = 0;
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    capacity += carrier_files_.at(i)->GetCapacityUsingEncoder(encoder);
+  for (const auto &file : carrier_files_) {
+    capacity += file->GetCapacityUsingEncoder(encoder);
   }
   return capacity;
 }

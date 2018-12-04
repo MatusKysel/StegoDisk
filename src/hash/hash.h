@@ -40,10 +40,6 @@ private:
 
   //TODO: implementation could be stored as shared ptr in each hash instance
   //  std::shared_ptr<HashImpl> hashImpl;
-
-  // static stuff
-public:
-  static void SetDefaultHashImpl(std::unique_ptr<HashImpl> new_hash_impl);
 private:
   static std::unique_ptr<HashImpl> default_hash_impl_;
 

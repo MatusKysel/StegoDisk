@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
     return false;
   }
 
-  if (config_path == "")
+  if (config_path.empty())
   {
 	  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
 		  StrToPermutation(permutation));
@@ -238,8 +238,8 @@ int main(int argc, char *argv[]) {
     LOG_DEBUG("Creating inverted DCT string");
     input.resize(gen_file_size);
     stego_storage->Read(&(input[0]), 0, input.size());
-    for (size_t i = 0; i < input.size(); ++i) {
-      input[i] = ~(input[i]);
+    for (auto &s : input) {
+      s = ~(s);
     }
   }
 
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
 
   LOG_DEBUG("Opening storage");
 
-  if (config_path == "")
+  if (config_path.empty())
   {
 	  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
 		  StrToPermutation(permutation));

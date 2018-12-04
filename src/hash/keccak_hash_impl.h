@@ -24,7 +24,7 @@ public:
     KeccakHashImpl(std::size_t state_size = 32);
     virtual ~KeccakHashImpl();
 
-    virtual void Process(MemoryBuffer& state, const uint8* data, std::size_t length);
+	virtual void Process(MemoryBuffer& state, const uint8* data, std::size_t length) override;
 };
 
 } // stego_disk

@@ -23,7 +23,7 @@ public:
   virtual PermElem Permute(PermElem index) const override;
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key) override;
 
-  const std::string GetNameInstance() const { return "Identity"; }
+  const std::string GetNameInstance() const override;
 };
 
 } // stego_disk

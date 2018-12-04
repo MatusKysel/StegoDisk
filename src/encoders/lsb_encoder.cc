@@ -19,7 +19,7 @@
 
 namespace stego_disk {
 
-const std::string LsbEncoder::kEncoderLsbCodeName = ENCODER_LSB_CODE_NAME_DEF;
+const std::string LsbEncoder::kEncoderLsbCodeName = EncoderLsbCodeNameDef;
 
 /**
  * @brief Get minimal value for parameter 'block_size'

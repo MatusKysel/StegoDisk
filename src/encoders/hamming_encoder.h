@@ -12,7 +12,7 @@
 #include "api_mask.h"
 #include "encoder.h"
 
-#define ENCODER_HAMMING_CODE_NAME_DEF "Hamming"
+constexpr auto EncoderHammingCodeNameDef = "Hamming";
 
 namespace stego_disk {
 
