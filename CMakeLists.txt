@@ -159,6 +159,8 @@ set(CARRIER_FILES_HDRS
   src/carrier_files/carrier_file_factory.h
   src/carrier_files/carrier_file_jpeg.h
   src/carrier_files/carrier_file_png.h
+  src/carrier_files/carrier_file_mkv.h
+  src/carrier_files/carrier_file_mpeg.h
 )
 
 set(CARRIER_FILES_SRCS
@@ -167,6 +169,8 @@ set(CARRIER_FILES_SRCS
   src/carrier_files/carrier_file_factory.cc
   src/carrier_files/carrier_file_jpeg.cc
   src/carrier_files/carrier_file_png.cc
+  src/carrier_files/carrier_file_mkv.cc
+  src/carrier_files/carrier_file_mpeg.cc
 )
 
 # ENCODERS
