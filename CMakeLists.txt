@@ -111,6 +111,10 @@ if(WIN32)
   if (BUILD_SHARED_LIBS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS ")
   endif()
+  
+  if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+  endif()
 endif()
 ################ CXX FLAGS ##################
 
