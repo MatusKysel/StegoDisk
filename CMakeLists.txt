@@ -144,6 +144,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng)
 set(LODEPNG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.cpp ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.h)
 ################ LodePNG ##################
 
+################ FFMPEG ##################
+find_path(FFMPEG_INCLUDE_DIR ffmpeg/include)
+
+find_library(AVCODEC_LIBRARY avcodec)
+find_library(AVFORMAT_LIBRARY avformat)
+find_library(AVUTIL_LIBRARY avutil)
+
+include_directories(${FFMPEG_INCLUDE_DIR})
+link_libraries(${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY})
+################ FFMPEG ##################
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) #this makes src root dir
 
 ##############################################################################################################################
