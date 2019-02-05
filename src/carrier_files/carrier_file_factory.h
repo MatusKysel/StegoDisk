@@ -24,9 +24,13 @@ class CarrierFile;
 using CarrierFilePtr = std::shared_ptr<CarrierFile>;
 #endif // __SHARED_PTR_CARRIER_FILE__
 
+class Permutation;
+
 class CarrierFileFactory {
 public:
-  static CarrierFilePtr CreateCarrierFile(const File& file);
+	static CarrierFilePtr CreateCarrierFile(const File& file);
+private:
+	static std::shared_ptr<Permutation> CreatePermutation(const std::string &ext);
 };
 
 } // stego_disk
