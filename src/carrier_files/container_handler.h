@@ -12,6 +12,8 @@ extern "C"
 
 namespace stego_disk
 {
+	class ContainerHandler;
+
 	enum class StreamType : unsigned 
 	{
 		Unknown		= 0,
@@ -22,6 +24,7 @@ namespace stego_disk
 
 	using PacketUPtr = std::unique_ptr<AVPacket>;
 	using StreamData = std::map<StreamType, std::vector<std::reference_wrapper<AVPacket>>>;
+	using ContainerHandlerUPtr = std::unique_ptr<ContainerHandler>;
 
 	class ContainerHandler {
 	public:
@@ -43,6 +46,7 @@ namespace stego_disk
 		void Save();
 
 		StreamData GetStreamData();
+		std::vector<PacketUPtr>& GetData();
 	private:
 		void Close();
 		StreamType GetStreamType(int type) const;

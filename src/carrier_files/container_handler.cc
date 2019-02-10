@@ -85,7 +85,7 @@ namespace stego_disk
 
 		for (auto &packet : data_)
 		{
-			if (av_interleaved_write_frame(output_context_, packet.get()) < 0)
+			if (av_write_frame(output_context_, packet.get()) < 0)
 			{
 				// TODO error
 			}
@@ -100,6 +100,11 @@ namespace stego_disk
 	stego_disk::StreamData ContainerHandler::GetStreamData()
 	{
 		return stream_data_;
+	}
+
+	std::vector<stego_disk::PacketUPtr>& ContainerHandler::GetData()
+	{
+		return data_;
 	}
 
 	void ContainerHandler::Init()
