@@ -1,5 +1,7 @@
 #include "carrier_file_mkv.h"
 #include "utils/memory_buffer.h"
+#include "utils/exceptions.h"
+#include "logging/logger.h"
 
 namespace stego_disk
 {
@@ -14,10 +16,13 @@ namespace stego_disk
 		}
 
 		raw_capacity_ = this->CalculateCapacity();
+		LOG_DEBUG("File: " + file.GetAbsolutePath() + " raw capacity: " + std::to_string(raw_capacity_));
 	}
 
 	void CarrierFileMKV::LoadFile()
 	{
+		LOG_INFO("Loading mkv carrier file: " + this->GetFile().GetAbsolutePath());
+
 		if (container_handler_)
 		{
 			auto data_buffer = MemoryBuffer(); 
@@ -45,6 +50,8 @@ namespace stego_disk
 
 	void CarrierFileMKV::SaveFile()
 	{
+		LOG_INFO("Saving mkv carrier file: " + this->GetFile().GetAbsolutePath());
+
 		if (container_handler_)
 		{
 			auto data_buffer = MemoryBuffer();
@@ -99,6 +106,8 @@ namespace stego_disk
 
 	void CarrierFileMKV::LoadBuffer(MemoryBuffer &buffer)
 	{
+		LOG_DEBUG("Loading buffer");
+
 		buffer.Resize(raw_capacity_);
 		buffer.Clear();
 
@@ -110,10 +119,17 @@ namespace stego_disk
 		{
 			current_byte |= (packet->pts & 0x1) << (7 - byte_position);
 
+			LOG_TRACE("Reading from packet, pts: " + std::to_string(packet->pts) +
+					  " dts: " + std::to_string(packet->dts) +
+					  " stream index: " + std::to_string(packet->stream_index));
+
 			byte_position += 1;
 
 			if (byte_position == 8)
 			{
+				LOG_TRACE("Byte read: " + std::to_string(current_byte) +
+						  " offset: " + std::to_string(buffer_offset));
+
 				buffer.Write(buffer_offset, &current_byte, sizeof(uint8));
 				current_byte = 0u;
 				byte_position = 0;
@@ -124,17 +140,28 @@ namespace stego_disk
 
 	void CarrierFileMKV::SaveBuffer(const MemoryBuffer &buffer)
 	{
+		LOG_DEBUG("Saving buffer");
+
 		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
 
 		// save new pts for all packets
 		for (auto &packet : container_handler_->GetData())
 		{
+			LOG_TRACE("Packet before, pts: " + std::to_string(packet->pts) +
+				"dts: " + std::to_string(packet->dts) +
+				"stream index: " + std::to_string(packet->stream_index));
+
 			packet->pts = (packet->pts & (~1)) | ((buffer[buffer_offset] >> (7 - byte_position)) & 1);
 		
+			LOG_TRACE("Packet after, pts: " + std::to_string(packet->pts) +
+				"dts: " + std::to_string(packet->dts) +
+				"stream index: " + std::to_string(packet->stream_index))
+
 			byte_position += 1;
 
 			if (byte_position == 8)
 			{
+				LOG_TRACE("Buffer byte saved: " + std::to_string(buffer[buffer_offset]));
 				byte_position = 0;
 				buffer_offset += 1;
 			}

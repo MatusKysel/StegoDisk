@@ -128,7 +128,7 @@ class STEGO_DISK_EXPORT ZeroAllocatedSize : public std::bad_array_new_length {
 public:
 	ZeroAllocatedSize() {}
 
-	virtual const char * what() const noexcept { return "Size of new created "
+	virtual const char * what() const noexcept override { return "Size of new created "
 		                                                "buffer is zero"; }
 
 	virtual ~ZeroAllocatedSize() {}
@@ -228,7 +228,7 @@ class STEGO_DISK_EXPORT FuctionNotImplementad : public std::exception {
 public:
     FuctionNotImplementad() {}
 
-	virtual const char * what() const noexcept { return "This function is not "
+	virtual const char * what() const noexcept override { return "This function is not "
 		                                                "implemented yet"; }
 
 	virtual ~FuctionNotImplementad() {}
@@ -247,5 +247,14 @@ public:
 
 private:
 	const std::string file_;
+};
+
+class STEGO_DISK_EXPORT AllocError : public std::runtime_error {
+public:
+	AllocError() :
+		std::runtime_error("Memory allocation error")
+	{}
+
+	virtual ~AllocError() {}
 };
 }

@@ -50,6 +50,7 @@ namespace stego_disk
 	private:
 		void Close();
 		StreamType GetStreamType(int type) const;
+		std::string GetStreamStr(StreamType type) const;
 	private:
 		std::string file_name_{ "" };
 		AVFormatContext *input_context_{ nullptr };
