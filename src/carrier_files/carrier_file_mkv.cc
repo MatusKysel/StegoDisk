@@ -28,7 +28,7 @@ namespace stego_disk
 			auto data_buffer = MemoryBuffer(); 
 			this->LoadBuffer(data_buffer);
 
-			buffer_.Resize(raw_capacity_);
+			buffer_.Resize(static_cast<std::size_t>(raw_capacity_));
 			buffer_.Clear();
 
 			if (!permutation_->GetSize())
@@ -38,7 +38,7 @@ namespace stego_disk
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)
 			{
-				if (data_buffer[i] & 0x01)
+				if (data_buffer[static_cast<std::size_t>(i)] & 0x01)
 				{
 					SetBitInBufferPermuted(i);
 				}
@@ -57,7 +57,7 @@ namespace stego_disk
 			auto data_buffer = MemoryBuffer();
 			this->LoadBuffer(data_buffer);
 
-			buffer_.Resize(raw_capacity_);
+			buffer_.Resize(static_cast<std::size_t>(raw_capacity_));
 			buffer_.Clear();
 
 			if (!permutation_->GetSize())
@@ -67,7 +67,7 @@ namespace stego_disk
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)
 			{
-				if (data_buffer[i] & 0x01)
+				if (data_buffer[static_cast<std::size_t>(i)] & 0x01)
 				{
 					SetBitInBufferPermuted(i);
 				}
@@ -77,7 +77,7 @@ namespace stego_disk
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)
 			{
-				data_buffer[i] = (data_buffer[i] & 0xFE) | GetBitInBufferPermuted(i);
+				data_buffer[static_cast<std::size_t>(i)] = (data_buffer[static_cast<std::size_t>(i)] & 0xFE) | GetBitInBufferPermuted(i);
 			}
 
 			this->SaveBuffer(data_buffer);
@@ -108,7 +108,7 @@ namespace stego_disk
 	{
 		LOG_DEBUG("Loading buffer");
 
-		buffer.Resize(raw_capacity_);
+		buffer.Resize(static_cast<std::size_t>(raw_capacity_));
 		buffer.Clear();
 
 		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
