@@ -45,7 +45,7 @@ namespace stego_disk
 		void Load();
 		void Save();
 
-		StreamData GetStreamData();
+		StreamData& GetStreamData();
 		std::vector<PacketUPtr>& GetData();
 	private:
 		void Close();

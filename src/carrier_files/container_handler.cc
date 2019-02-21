@@ -114,7 +114,7 @@ namespace stego_disk
 		this->Close();
 	}
 
-	stego_disk::StreamData ContainerHandler::GetStreamData()
+	stego_disk::StreamData& ContainerHandler::GetStreamData()
 	{
 		return stream_data_;
 	}
