@@ -16,6 +16,7 @@
 #include "carrier_file_jpeg.h"
 #include "carrier_file_png.h"
 #include "carrier_file_mkv.h"
+#include "carrier_file_mpeg.h"
 #include "encoders/encoder_factory.h"
 #include "permutations/permutation_factory.h"
 #include "utils/stego_config.h"
@@ -42,6 +43,10 @@ namespace stego_disk
 		else if (ext == "mkv")
 		{
 			carrier_file = std::make_shared<CarrierFileMKV>(file, nullptr, CreatePermutation(ext), nullptr);
+		}
+		else if (ext == "mp4")
+		{
+			carrier_file = std::make_shared<CarrierFileMPEG>(file, nullptr, CreatePermutation(ext), nullptr);
 		}
 
 		if (carrier_file) 

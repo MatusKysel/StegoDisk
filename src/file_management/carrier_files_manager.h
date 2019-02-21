@@ -27,7 +27,7 @@ class VirtualStorage;
 class CarrierFile;
 
 static std::unordered_set<std::string> SupportedFormats {
-	"jpg", "bmp", "png", "mkv"
+	"jpg", "bmp", "png", "mkv", "mp4"
 };
 
 class CarrierFilesManager {
