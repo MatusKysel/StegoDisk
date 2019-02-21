@@ -89,9 +89,7 @@ namespace stego_disk
 
 				for (const auto &packet : video_stream)
 				{
-					auto zero_pts = this->ModifyLSB(packet.get().pts, 0);
-					auto one_pts = this->ModifyLSB(packet.get().pts, 1);
-					auto dts = packet.get().dts;
+					auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
 					if (zero_pts >= dts && one_pts >= dts)
 					{
@@ -122,9 +120,7 @@ namespace stego_disk
 
 		for (const auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
 		{
-			auto zero_pts = this->ModifyLSB(packet.get().pts, 0);
-			auto one_pts = this->ModifyLSB(packet.get().pts, 1);
-			auto dts = packet.get().dts;
+			auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
 			if (zero_pts >= dts && one_pts >= dts)
 			{
@@ -149,9 +145,7 @@ namespace stego_disk
 
 		for (auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
 		{
-			auto zero_pts = this->ModifyLSB(packet.get().pts, 0);
-			auto one_pts = this->ModifyLSB(packet.get().pts, 1);
-			auto dts = packet.get().dts;
+			auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
 			if (zero_pts >= dts && one_pts >= dts)
 			{
@@ -179,5 +173,14 @@ namespace stego_disk
 	{
 		auto modified_value = (value & static_cast<uint64>(~0x1)) | lsb;
 		return modified_value;
+	}
+
+	std::tuple<uint64, uint64, uint64> CarrierFileMPEG::GetTestValues(const AVPacket &packet) const
+	{
+		auto zero_pts = this->ModifyLSB(packet.pts, 0);
+		auto one_pts = this->ModifyLSB(packet.pts, 1);
+		auto dts = packet.dts;
+
+		return std::make_tuple(zero_pts, one_pts, dts);
 	}
 }

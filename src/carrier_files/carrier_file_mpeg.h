@@ -4,6 +4,8 @@
 #include "utils/stego_types.h"
 #include "container_handler.h"
 
+#include <tuple>
+
 namespace stego_disk
 {
 	class MemoryBuffer;
@@ -19,6 +21,7 @@ namespace stego_disk
 		void LoadBuffer(MemoryBuffer &buffer);
 		void SaveBuffer(const MemoryBuffer &buffer);
 		uint64 ModifyLSB(uint64 value, uint64 lsb) const;
+		std::tuple<uint64, uint64, uint64> GetTestValues(const AVPacket &packet) const;
 	private:
 		ContainerHandlerUPtr container_handler_{ nullptr };
 	};
