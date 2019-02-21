@@ -59,7 +59,7 @@ namespace stego_disk
 	{
 		LOG_INFO("Saving container: " + file_name_);
 
-		if (avformat_alloc_output_context2(&output_context_, nullptr, nullptr, file_name_.c_str()) <= 0)
+		if (avformat_alloc_output_context2(&output_context_, nullptr, nullptr, file_name_.c_str()) < 0)
 		{
 			LOG_ERROR("Failed to allocate output context: " + file_name_);
 			throw exception::AllocError();
@@ -128,13 +128,13 @@ namespace stego_disk
 	{
 		LOG_INFO("Initializing container handler: " + file_name_);
 
-		if (!avformat_open_input(&input_context_, file_name_.c_str(), nullptr, nullptr))
+		if(avformat_open_input(&input_context_, file_name_.c_str(), nullptr, nullptr) < 0)
 		{
 			LOG_ERROR("Failed to open: " + file_name_);
 			throw exception::IoError{ file_name_ };
 		}
 
-		if (!avformat_find_stream_info(input_context_, nullptr))
+		if (avformat_find_stream_info(input_context_, nullptr) < 0)
 		{
 			LOG_ERROR("Failed to find stream info: " + file_name_);
 			throw exception::ParseError{ file_name_, "Could not find stream info" };
