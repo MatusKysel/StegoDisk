@@ -46,12 +46,13 @@ namespace stego_disk
 
 			stream = input_context_->streams[packet->stream_index];
 			auto stream_type = GetStreamType(stream->codecpar->codec_type);
-			data_.emplace_back(std::move(packet));
-			stream_data_[stream_type].emplace_back(std::ref(*data_.back()));
 
 			LOG_TRACE("Packet read, pts: " + std::to_string(packet->pts) +
-					  " dts: " + std::to_string(packet->dts) +
-					  " stream: " + this->GetStreamStr(stream_type));
+				" dts: " + std::to_string(packet->dts) +
+				" stream: " + this->GetStreamStr(stream_type));
+
+			data_.emplace_back(std::move(packet));
+			stream_data_[stream_type].emplace_back(std::ref(*data_.back()));
 		}
 	}
 
