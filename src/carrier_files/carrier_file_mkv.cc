@@ -86,6 +86,8 @@ namespace stego_disk
 
 	stego_disk::uint64 CarrierFileMKV::CalculateCapacity() const
 	{
+		LOG_DEBUG("Calculating MKV raw capacity");
+
 		if (container_handler_)
 		{
 			auto stream_data = container_handler_->GetStreamData();
@@ -96,6 +98,7 @@ namespace stego_disk
 				size += static_cast<uint64>(stream.second.size());
 			}
 
+			LOG_DEBUG("Raw capacity: " + std::to_string(size / 8) + "B");
 			return (size / 8);
 		}
 		else
@@ -106,7 +109,7 @@ namespace stego_disk
 
 	void CarrierFileMKV::LoadBuffer(MemoryBuffer &buffer)
 	{
-		LOG_DEBUG("Loading buffer");
+		LOG_DEBUG("Loading MKV buffer");
 
 		buffer.Resize(static_cast<std::size_t>(raw_capacity_));
 		buffer.Clear();
@@ -140,7 +143,7 @@ namespace stego_disk
 
 	void CarrierFileMKV::SaveBuffer(const MemoryBuffer &buffer)
 	{
-		LOG_DEBUG("Saving buffer");
+		LOG_DEBUG("Saving MKV buffer");
 
 		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
 

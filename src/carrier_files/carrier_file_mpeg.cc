@@ -13,10 +13,13 @@ namespace stego_disk
 		}
 
 		raw_capacity_ = this->CalculateCapacity();
+		LOG_DEBUG("File: " + file.GetAbsolutePath() + " raw capacity: " + std::to_string(raw_capacity_));
 	}
 
 	void CarrierFileMPEG::LoadFile()
 	{
+		LOG_INFO("Loading mpeg carrier file: " + this->GetFile().GetAbsolutePath());
+
 		if (container_handler_)
 		{
 			auto data_buffer = MemoryBuffer();
@@ -44,6 +47,8 @@ namespace stego_disk
 
 	void CarrierFileMPEG::SaveFile()
 	{
+		LOG_INFO("Saving mpeg carrier file: " + this->GetFile().GetAbsolutePath());
+
 		if (container_handler_)
 		{
 			auto data_buffer = MemoryBuffer();
@@ -78,6 +83,8 @@ namespace stego_disk
 
 	stego_disk::uint64 CarrierFileMPEG::CalculateCapacity() const
 	{
+		LOG_DEBUG("Calculating MPEG raw capacity");
+
 		if (container_handler_)
 		{
 			auto stream_data = container_handler_->GetStreamData();
@@ -102,6 +109,7 @@ namespace stego_disk
 				return 0;
 			}
 
+			LOG_DEBUG("Raw capacity: " + std::to_string(size / 8) + "B");
 			return (size / 8);
 		}
 		else
@@ -112,10 +120,12 @@ namespace stego_disk
 
 	void CarrierFileMPEG::LoadBuffer(MemoryBuffer &buffer)
 	{
+		LOG_DEBUG("Loading MPEG buffer");
+
 		buffer.Resize(static_cast<std::size_t>(raw_capacity_));
 		buffer.Clear();
 
-		std::size_t byte_position{ 0u }, buff_offset{ 0u };
+		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
 		uint8 current_byte{ 0u };
 
 		for (const auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
@@ -126,35 +136,59 @@ namespace stego_disk
 			{
 				current_byte |= (packet.get().pts & 0x1) << (7 - byte_position);
 
+				LOG_TRACE("Reading from packet, pts: " + std::to_string(packet.get().pts) +
+					" dts: " + std::to_string(packet.get().dts) +
+					" stream index: " + std::to_string(packet.get().stream_index));
+
 				byte_position += 1;
 
 				if (byte_position == 8)
 				{
-					buffer.Write(buff_offset, &current_byte, sizeof(uint8));
+					LOG_TRACE("Byte read: " + std::to_string(current_byte) +
+						" offset: " + std::to_string(buffer_offset));
+
+					buffer.Write(buffer_offset, &current_byte, sizeof(uint8));
 					current_byte = 0u;
 					byte_position = 0;
-					buff_offset += 1;
+					buffer_offset += 1;
 				}
+			}
+			else
+			{
+				LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
+					"dts: " + std::to_string(packet.get().dts) +
+					"stream index: " + std::to_string(packet.get().stream_index))
 			}
 		}
 	}
 
 	void CarrierFileMPEG::SaveBuffer(const MemoryBuffer &buffer)
 	{
+		LOG_DEBUG("Saving MPEG buffer");
+
 		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
 
 		for (auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
 		{
+			LOG_TRACE("Packet before, pts: " + std::to_string(packet.get().pts) +
+				"dts: " + std::to_string(packet.get().dts) +
+				"stream index: " + std::to_string(packet.get().stream_index));
+
 			auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
 			if (zero_pts >= dts && one_pts >= dts)
 			{
 				packet.get().pts = (packet.get().pts & (~1)) | ((buffer[buffer_offset] >> (7 - byte_position)) & 1);
 
+				LOG_TRACE("Packet after, pts: " + std::to_string(packet.get().pts) +
+					"dts: " + std::to_string(packet.get().dts) +
+					"stream index: " + std::to_string(packet.get().stream_index))
+
 				byte_position += 1;
 
 				if (byte_position == 8)
 				{
+					LOG_TRACE("Buffer byte saved: " + std::to_string(buffer[buffer_offset]));
 					byte_position = 0;
 					buffer_offset += 1;
 				}
@@ -163,6 +197,12 @@ namespace stego_disk
 				{
 					break;
 				}
+			}
+			else
+			{
+				LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
+					"dts: " + std::to_string(packet.get().dts) +
+					"stream index: " + std::to_string(packet.get().stream_index))
 			}
 		}
 
@@ -175,6 +215,7 @@ namespace stego_disk
 		return modified_value;
 	}
 
+	// returns testing values for packet, used in checks whether we can use actual packet for embedding or not
 	std::tuple<uint64, uint64, uint64> CarrierFileMPEG::GetTestValues(const AVPacket &packet) const
 	{
 		auto zero_pts = this->ModifyLSB(packet.pts, 0);
