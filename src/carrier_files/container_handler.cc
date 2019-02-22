@@ -82,7 +82,7 @@ namespace stego_disk
 				throw exception::IoError{ file_name_ };
 			}
 
-			output_stream->codecpar->codec_tag = 0;
+			this->SetStreamParameters(input_stream, output_stream);
 		}
 
 		if (avio_open(&output_context_->pb, file_name_.c_str(), AVIO_FLAG_WRITE) < 0)
@@ -202,5 +202,17 @@ namespace stego_disk
 				return "unknown";
 			}
 		}
+	}
+
+	void ContainerHandler::SetStreamParameters(AVStream *input, AVStream *output) const
+	{
+		output->codecpar->codec_tag = 0;
+		output->time_base = input->time_base;
+		output->avg_frame_rate = input->avg_frame_rate;
+		output->duration = input->duration;
+		output->first_dts = input->first_dts;
+		output->nb_frames = input->nb_frames;
+		output->r_frame_rate = input->r_frame_rate;
+		output->start_time = input->start_time;
 	}
 }

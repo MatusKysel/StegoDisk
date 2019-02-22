@@ -51,6 +51,7 @@ namespace stego_disk
 		void Close();
 		StreamType GetStreamType(int type) const;
 		std::string GetStreamStr(StreamType type) const;
+		void SetStreamParameters(AVStream *input, AVStream *output) const;
 	private:
 		std::string file_name_{ "" };
 		AVFormatContext *input_context_{ nullptr };
