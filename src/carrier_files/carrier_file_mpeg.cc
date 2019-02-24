@@ -30,7 +30,7 @@ namespace stego_disk
 
 			if (!permutation_->GetSize())
 			{
-				permutation_->Init(raw_capacity_, subkey_);
+				permutation_->Init(raw_capacity_ * 8, subkey_);
 			}
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)
@@ -59,7 +59,7 @@ namespace stego_disk
 
 			if (!permutation_->GetSize())
 			{
-				permutation_->Init(raw_capacity_, subkey_);
+				permutation_->Init(raw_capacity_ * 8, subkey_);
 			}
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)
@@ -122,10 +122,10 @@ namespace stego_disk
 	{
 		LOG_DEBUG("Loading MPEG buffer");
 
-		buffer.Resize(static_cast<std::size_t>(raw_capacity_));
+		buffer.Resize(static_cast<std::size_t>(raw_capacity_ * 8));
 		buffer.Clear();
 
-		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
+		std::size_t buffer_offset{ 0u };
 		uint8 current_byte{ 0u };
 
 		for (const auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
@@ -134,23 +134,20 @@ namespace stego_disk
 
 			if (zero_pts >= dts && one_pts >= dts)
 			{
-				current_byte |= (packet.get().pts & 0x1) << (7 - byte_position);
-
 				LOG_TRACE("Reading from packet, pts: " + std::to_string(packet.get().pts) +
 					" dts: " + std::to_string(packet.get().dts) +
 					" stream index: " + std::to_string(packet.get().stream_index));
 
-				byte_position += 1;
+				current_byte = packet.get().pts & 0xFF;
+				buffer.Write(buffer_offset, &current_byte, sizeof(uint8));
+				buffer_offset += 1;
 
-				if (byte_position == 8)
+				LOG_TRACE("Byte read: " + std::to_string(current_byte) +
+					" offset: " + std::to_string(buffer_offset));
+
+				if (buffer_offset == buffer.GetSize())
 				{
-					LOG_TRACE("Byte read: " + std::to_string(current_byte) +
-						" offset: " + std::to_string(buffer_offset));
-
-					buffer.Write(buffer_offset, &current_byte, sizeof(uint8));
-					current_byte = 0u;
-					byte_position = 0;
-					buffer_offset += 1;
+					break;
 				}
 			}
 			else
@@ -166,34 +163,26 @@ namespace stego_disk
 	{
 		LOG_DEBUG("Saving MPEG buffer");
 
-		std::size_t byte_position{ 0u }, buffer_offset{ 0u };
+		std::size_t buffer_offset{ 0u };
 
 		for (auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
 		{
-			LOG_TRACE("Packet before, pts: " + std::to_string(packet.get().pts) +
-				"dts: " + std::to_string(packet.get().dts) +
-				"stream index: " + std::to_string(packet.get().stream_index));
-
 			auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
 			if (zero_pts >= dts && one_pts >= dts)
 			{
-				packet.get().pts = (packet.get().pts & (~1)) | ((buffer[buffer_offset] >> (7 - byte_position)) & 1);
+				LOG_TRACE("Packet before, pts: " + std::to_string(packet.get().pts) +
+					"dts: " + std::to_string(packet.get().dts) +
+					"stream index: " + std::to_string(packet.get().stream_index));
+
+				packet.get().pts = (packet.get().pts & (~1)) | ((buffer[buffer_offset] & 1));
+				buffer_offset += 1;
 
 				LOG_TRACE("Packet after, pts: " + std::to_string(packet.get().pts) +
 					"dts: " + std::to_string(packet.get().dts) +
 					"stream index: " + std::to_string(packet.get().stream_index))
 
-				byte_position += 1;
-
-				if (byte_position == 8)
-				{
-					LOG_TRACE("Buffer byte saved: " + std::to_string(buffer[buffer_offset]));
-					byte_position = 0;
-					buffer_offset += 1;
-				}
-
-				if (buffer_offset >= raw_capacity_)
+				if (buffer_offset == buffer.GetSize())
 				{
 					break;
 				}

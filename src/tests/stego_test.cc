@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
 
   if ( invert == false ) {
     LOG_DEBUG("Generating random string");
-    GenerateRandomString(&input, gen_file_size);
+	GenerateRandomString(&input, gen_file_size);
   } else {
     LOG_DEBUG("Creating inverted DCT string");
     input.resize(gen_file_size);
@@ -273,6 +273,10 @@ int main(int argc, char *argv[]) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
               " output size: " << output.size());
     error = true;
+  }
+  else
+  {
+	  LOG_INFO("Test successful!");
   }
 
   return error;

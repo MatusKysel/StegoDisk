@@ -20,6 +20,7 @@
 
 #include "api_mask.h"
 #include "stego_types.h"
+#include "utils/stego_math.h"
 
 namespace stego_disk {
 
@@ -183,6 +184,11 @@ uint8* MemoryBuffer::GetRawPointer() const {
 
 const uint8* MemoryBuffer::GetConstRawPointer() const {
   return buffer_;
+}
+
+std::string MemoryBuffer::GetData() const
+{
+	return StegoMath::HexBufferToStr(this->buffer_, this->size_);
 }
 
 void MemoryBuffer::Write(std::size_t offset, const uint8* data,

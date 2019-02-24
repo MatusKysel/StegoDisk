@@ -47,6 +47,8 @@ public:
   uint8* GetRawPointer() const;
   const uint8* GetConstRawPointer() const;
 
+  std::string GetData() const;
+
   void Clear(); // set content to zero
   void Randomize(); // replace content by random data
   void Fill(uint8 value); // fill entire buffer with value
