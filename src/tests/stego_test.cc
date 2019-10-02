@@ -26,7 +26,7 @@ bool LoggerInit() {
   std::string logging_level("INFO");
 
   char *env_logging_level = NULL;
-  if ((env_logging_level = getenv("LOGGING_LEVEL"))) {
+  if ((env_logging_level = secure_getenv("LOGGING_LEVEL"))) {
     logging_level.assign(env_logging_level);
   }
 
@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
   }
   if (dir.empty()) {
     LOG_ERROR("directory was not set");
-    return false;
+    return -1;
   }
   stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
                            StrToPermutation(permutation));

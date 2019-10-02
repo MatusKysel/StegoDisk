@@ -66,8 +66,6 @@ MemoryBuffer::MemoryBuffer(const MemoryBuffer& other) {
  * other buffer is not destroyed - data are moved to new buffer
  */
 MemoryBuffer::MemoryBuffer(MemoryBuffer&& other) {
-  if ( buffer_ != nullptr ) Destroy();
-
   buffer_ = other.buffer_;
   size_ = other.size_;
 

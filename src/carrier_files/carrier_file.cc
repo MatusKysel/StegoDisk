@@ -214,7 +214,7 @@ int CarrierFile::ExtractBufferUsingEncoder() {
       try {
         virtual_storage_->WriteByte(virtual_storage_offset_ +
                                     (b * data_block_size_) + i, data_buffer[i]);
-      } catch (std::out_of_range& ex) {
+      } catch (std::out_of_range&) {
         LOG_DEBUG("CarrierFile::extractBufferUsingEncoder: "
                   "virtualStorage->writeByte failed: block: " << (b + 1) << "/"
                   << blocks_used_ << ", byte: " << (i + 1) << "/" <<
@@ -249,7 +249,7 @@ int CarrierFile::EmbedBufferUsingEncoder() {
       try {
         data_buffer[i] = virtual_storage_->ReadByte(virtual_storage_offset_ +
                                                     (b * data_block_size_) + i);
-      } catch (std::out_of_range& ex) {
+      } catch (std::out_of_range&) {
         LOG_DEBUG("CarrierFile::embedBufferUsingEncoder: virtualStorage->"
                   "readByte failed: block: " << (b + 1) << "/" << blocks_used_
                   << ", byte: " << (i + 1) << "/" << data_block_size_);
