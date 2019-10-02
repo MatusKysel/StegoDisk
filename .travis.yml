@@ -13,18 +13,18 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Caskroom/cask/osxfuse --force; fi
 
 install:
-- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-8" CC="gcc-8"; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-9" CC="gcc-9"; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-8" CC="clang-8"; fi
 
 addons:
   apt:
     update: true
     sources:
-    - ubuntu-toolchain-r-test
-    - llvm-toolchain-xenial-8
+    - ppa:ubuntu-toolchain-r/test
+    - llvm-toolchain-bionic-8
     packages:
-    - gcc-8
-    - g++-8
+    - gcc-9
+    - g++-9
     - clang-8
     - libfuse-dev
 
@@ -38,13 +38,13 @@ script:
   - make check
 
 sudo: required
-dist: xenial
-osx_image: xcode10.2
+dist: bionic
+osx_image: xcode11
 notifications:
   email:
     on_success: never
-    on_failure: always
+    on_failure: never
 
 branches:
   only:
-    - master
+    - feature/travis-update
