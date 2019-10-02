@@ -14,18 +14,19 @@ before_install:
 
 install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-9" CC="gcc-9"; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-8" CC="clang-8"; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-9" CC="clang-9"; fi
 
 addons:
   apt:
     update: true
     sources:
-    - ppa:ubuntu-toolchain-r/test
-    - llvm-toolchain-bionic-8
+    - sourceline: 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main'
+      key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+    - ubuntu-toolchain-r-test
     packages:
     - gcc-9
     - g++-9
-    - clang-8
+    - clang-9
     - libfuse-dev
 
 before_script:
