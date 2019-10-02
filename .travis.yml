@@ -48,4 +48,4 @@ notifications:
 
 branches:
   only:
-    - feature/remove-warnings
+    - master
