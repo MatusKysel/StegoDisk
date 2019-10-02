@@ -12,7 +12,7 @@ build:
   verbosity: minimal
   parallel: true
 
-build_script: cmake --build . --target check --config Release
+build_script: cmake --build . --target check --config Release -- -j8
 
 notifications:
 - provider: Email

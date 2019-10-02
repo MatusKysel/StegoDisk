@@ -25,8 +25,8 @@ bool LoggerInit() {
 
   std::string logging_level("INFO");
 
-  char *env_logging_level = NULL;
-  if ((env_logging_level = secure_getenv("LOGGING_LEVEL"))) {
+  char *env_logging_level = nullptr;
+  if ((env_logging_level = getenv("LOGGING_LEVEL"))) {
     logging_level.assign(env_logging_level);
   }
 
