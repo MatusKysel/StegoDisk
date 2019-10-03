@@ -100,7 +100,8 @@ void HammingEncoder::Init(uint32 parity_bits) {
       (parity_bits > kEncoderHammingParityBitsMax)) {
     string err = "HammingEncoder::init: 'parity_bits' is " +
                  std::to_string(static_cast<uint64>(parity_bits));
-    err += ", should be in <" + kEncoderHammingParityBitsMin;
+    err += ", should be in <" + std::to_string(
+             static_cast<uint64>(kEncoderHammingParityBitsMin));
     err += "," + std::to_string(
              static_cast<uint64>(kEncoderHammingParityBitsMax));
     err += ">";
