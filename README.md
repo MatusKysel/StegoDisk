@@ -1,6 +1,6 @@
 # StegoDisk
 
-Linux/OSX [![Build Status](https://travis-ci.org/MatusKysel/StegoDisk.svg?branch=master)](https://travis-ci.org/MatusKysel/StegoDisk)
+Linux/OSX [![Build Status](https://travis-ci.com/MatusKysel/StegoDisk.svg?branch=master)](https://travis-ci.com/MatusKysel/StegoDisk)
 
 Windows [![Build status](https://ci.appveyor.com/api/projects/status/0x4qk5yudw0o30m7?svg=true)](https://ci.appveyor.com/project/MatusKysel/stegodisk)
 
