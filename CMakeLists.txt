@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.9)
 include(GenerateExportHeader)
 
 
@@ -100,6 +100,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_C_VISIBILITY_PRESET hidden) #PSTODO do not work fot libjpeg
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+set (CMAKE_INTERPROCEDURAL_OPTIMIZATION True) #LTO
 
 if(NOT WIN32)
   set(warnings "-Wall -Wextra") #-Werror
