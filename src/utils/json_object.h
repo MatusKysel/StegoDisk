@@ -518,8 +518,8 @@ private:
   }
 
   NodeType type_;
-  bool bool_val_;
-  double number_val_;
+  bool bool_val_ = false;
+  double number_val_ = 0.0;
   std::unique_ptr<std::string> string_;
   std::unique_ptr<ArrayType> array_;
   std::unique_ptr<ObjectType> object_;
