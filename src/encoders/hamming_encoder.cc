@@ -121,7 +121,7 @@ void HammingEncoder::Init(uint32 parity_bits) {
         total_bits_ *= 2;
     total_bits_--;
     */
-  total_bits_ = static_cast<uint64>(1L << parity_bits_) - 1;
+  total_bits_ = (static_cast<uint64>(1L) << parity_bits_) - 1;
 
   // in/out block params
   data_block_size_ = static_cast<uint32>(StegoMath::Lcm(parity_bits_, 8)) / 8;
