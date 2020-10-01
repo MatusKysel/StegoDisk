@@ -11,8 +11,8 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [master]
-  schedule:
-    - cron: '0 19 * * 4'
+  # schedule:
+    # - cron: '0 19 * * 4'
 
 jobs:
   analyze:
@@ -51,9 +51,10 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
-    - run: Build 
-       cmake .
-    # make check
+    - name: Build
+      run: |
+        cmake .
+        make check
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
