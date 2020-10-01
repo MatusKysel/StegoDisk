@@ -60,8 +60,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/api_mask.h.in ${CMAKE_BINARY_DIR}
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
 include_directories(${CMAKE_BINARY_DIR}) #this is for stego-disk_export.h file
 
-
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(ADD_CMAKE_MODULE_PATH)
@@ -101,13 +99,11 @@ set(CMAKE_C_VISIBILITY_PRESET hidden) #PSTODO do not work fot libjpeg
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
-if(NOT WIN32)
-  set(warnings "-Wall -Wextra") #-Werror
+if(NOT MSVC)
+  set(warnings "-Wall -Wextra -pedantic -Werror")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pthread ${warnings}")
-endif()
-
-if(WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /O2")
+else ()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /O2 /W4") #/WX
   if (BUILD_SHARED_LIBS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS ")
   endif()

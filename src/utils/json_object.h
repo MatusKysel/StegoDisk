@@ -56,7 +56,7 @@ public:
     ARRAY
   };
 
-  JsonObject() : type_(NULL_VAL) {}
+  JsonObject() : type_(NULL_VAL), bool_val_(false), number_val_(0.0) {}
   JsonObject(const JsonObject &o) : type_(o.type_) {
     switch (type_) {
       case NULL_VAL:
@@ -154,10 +154,10 @@ public:
   void Assign(bool val) { type_ = BOOLEAN; bool_val_ = val; }
 
   template<typename T>
-  void Assign(T val, typename std::enable_if<std::is_integral<T>::value>::type *ignore = 0) { type_ = NUMBER; number_val_ = val; }
+  void Assign(T val, typename std::enable_if<std::is_integral<T>::value>::type*) { type_ = NUMBER; number_val_ = val; }
 
   template<typename T>
-  void Assign(T val, typename std::enable_if<std::is_floating_point<T>::value>::type *ignore = 0) { type_ = NUMBER; number_val_ = val; }
+  void Assign(T val, typename std::enable_if<std::is_floating_point<T>::value>::type*) { type_ = NUMBER; number_val_ = val; }
 
   void SetNull() { type_ = NULL_VAL; }
 
@@ -518,8 +518,8 @@ private:
   }
 
   NodeType type_;
-  bool bool_val_;
-  double number_val_;
+  bool bool_val_ = false;
+  double number_val_ = 0.0;
   std::unique_ptr<std::string> string_;
   std::unique_ptr<ArrayType> array_;
   std::unique_ptr<ObjectType> object_;

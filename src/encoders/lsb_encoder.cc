@@ -98,7 +98,7 @@ void LsbEncoder::Init(uint32 block_size) {
       (block_size > kEncoderLsbBlockSizeMax)) {
     string err = "LsbEncoder::init: 'block_size' is "
                  + std::to_string(static_cast<uint64>(block_size));
-    err += ", but should be in range <" + kEncoderLsbBlockSizeMin;
+    err += ", but should be in range <" + std::to_string(static_cast<uint64>(kEncoderLsbBlockSizeMin));
     err += "," + std::to_string(static_cast<uint64>(kEncoderLsbBlockSizeMax));
     err += ">";
     throw std::invalid_argument(err);
