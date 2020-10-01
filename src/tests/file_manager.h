@@ -30,7 +30,8 @@ public:
   inline static void CopyFile(const std::string &input, const std::string &output) {
     std::ifstream  src(input, std::ios::binary);
     std::ofstream  dst(output, std::ios::binary);
-    dst << src.rdbuf();
+    if(src.is_open() && dst.is_open())
+      dst << src.rdbuf();
   }
 
   inline static std::string GetWinPath(const std::string &input) {

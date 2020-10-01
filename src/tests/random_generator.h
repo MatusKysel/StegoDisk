@@ -11,6 +11,7 @@
 
 #include <ctime>
 #include <cstdlib>
+#include <random>
 
 #include <string>
 #include <fstream>
@@ -18,10 +19,9 @@
 
 class RandomGenerator {
  public:
-  RandomGenerator() : random_file_("/dev/urandom", std::ios_base::binary | std::ios_base::in) {
+  RandomGenerator() : random_file_("/dev/urandom", std::ios_base::binary | std::ios_base::in), generator_(device_()), distribution_(0, 256) {
     if (random_file_.is_open()) std::cout << "Will seed random binary strings from /dev/urandom" << std::endl;
     else std::cout << "Failed to open /dev/urandom, will use rand() to generate random binary strings" << std::endl;
-    std::srand(std::time(0));
   }
 
   ~RandomGenerator() {
@@ -44,12 +44,15 @@ class RandomGenerator {
   }
 
   static char RandomChar() {
-    return rand() % 256;
+    return static_cast<char>(Instance().distribution_(Instance().generator_));
   }
 
   inline static bool RandomOpen() { return Instance().random_file_.is_open(); }
  private:
   std::fstream random_file_;
+  std::random_device device_;
+  std::mt19937 generator_;
+  std::uniform_int_distribution<int> distribution_;
 };
 
 void GenerateRandomString(std::string *s, size_t size) {

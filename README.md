@@ -4,6 +4,8 @@ Linux/OSX [![Build Status](https://travis-ci.com/MatusKysel/StegoDisk.svg?branch
 
 Windows [![Build status](https://ci.appveyor.com/api/projects/status/0x4qk5yudw0o30m7?svg=true)](https://ci.appveyor.com/project/MatusKysel/stegodisk)
 
+[![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6Ik1hdHVzS3lzZWwiLCJyZXBvMSI6IlN0ZWdvRGlzayIsImluY2x1ZGVMaW50IjpmYWxzZSwiYXV0aG9ySWQiOjIxNzM0LCJpYXQiOjE2MDE1NTYyNDl9.4jQMcz0AJilnAU5D65QZ9Ozm3V6N2MGP0kDnPe0f4H8)](https://www.deepcode.ai/app/gh/MatusKysel/StegoDisk/_/dashboard?utm_content=gh%2FMatusKysel%2FStegoDisk)
+
 
 ### Overview
 StegoDisk is cross platform steganographic library with a support of BMP, JPEG and PNG files. This library is using steganographic techniques for embedding data into carrier files. This libarary aslo comes with new interface for the Python programming language.
@@ -39,15 +41,15 @@ int main(int argc, char *argv[]) {
   stego_storage->Open(dir, password);
 
   stego_storage->Load();
-  
+
   size = stego_storage->GetSize();
 
   stego_storage->Write(input, 0, input.size());
-  
+
   stego_storage->Read(output, 0, input.size());
-  
+
   stego_storage->Save();
-  
+
   return 0;
 }
 ```
@@ -80,12 +82,12 @@ In this configuration, all parameters are filled in, but in the event when some 
 As the standard way to configure systems is configuration using enumerated types, which are defined for the individual parameters.
 This method is more intuitive for programmers and most likely it will be the most used form of configuration for this steganographic file system. An example of the configuration by this method:
 ```C++
-// Function defintion 
+// Function defintion
 void Configure( const EncoderFactory::EncoderType encoder,
                 const PermutationFactory::PermutationType global_perm,
                 const PermutationFactory::PermutationType local_perm ) const ;
-                 
-// Function usage 
+
+// Function usage
 stego_storage->Configure( StegoStorage::EncoderFactory::LSB,
                           StegoStorage::PermutationFactory::AFFINE,
                           StegoStorage::PermutationFactory::FEISTEL_MIX );
