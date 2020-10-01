@@ -123,7 +123,7 @@ int FuseService::MountFuse(const std::string &mount_point) {
   if (!mnt_pt) {
     return -1;
   }
-  strcpy(mnt_pt, mount_point_.c_str());
+  strncpy(mnt_pt, mount_point_.c_str(), mount_point_.size());
 
   LOG_INFO("mount point: " << mnt_pt);
 

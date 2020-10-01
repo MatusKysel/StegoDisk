@@ -17,6 +17,7 @@
 #include <exception>
 #include <stdexcept>
 #include <ctime>
+#include <random>
 
 #include "api_mask.h"
 #include "stego_types.h"
@@ -24,6 +25,10 @@
 using namespace std;
 
 namespace stego_disk {
+
+static std::random_device rd;
+static std::mt19937 gen(rd());
+static std::uniform_int_distribution<> distrib(0, 255);
 
 void MemoryBuffer::Init(std::size_t new_size) {
   size_ = new_size;
@@ -207,11 +212,10 @@ void MemoryBuffer::Randomize() {
   if ((buffer_ == nullptr) || (size_ == 0)) return;
 
   memset(buffer_, 0, size_);
-  memset(buffer_, 0xFF, size_); //TODO(Matus) naco je toto dobre
+  memset(buffer_, 0xFF, size_);
 
-  srand(static_cast<unsigned int>(time(NULL)));
   for (std::size_t i = 0; i < size_; ++i) {
-    buffer_[i] = static_cast<uint8>(rand()); //PSTODO naozaj? nepiseme nahodou kniznicu ktora sluzi na security...?
+    buffer_[i] = static_cast<uint8>(distrib(gen));
   }
 }
 
