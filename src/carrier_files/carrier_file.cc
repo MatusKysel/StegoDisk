@@ -76,7 +76,7 @@ void CarrierFile::SetEncoder(std::shared_ptr<Encoder> encoder) {
     block_count_ = static_cast<uint32>((permutation_->GetSizeUsingParams(
                                           raw_capacity_ * 8, subkey_) / 8)
                                        / encoder->GetCodewordBlockSize());
-    capacity_ = block_count_ * encoder->GetDataBlockSize();
+    capacity_ = static_cast<uint64>(block_count_ ) * static_cast<uint64>(encoder->GetDataBlockSize());
   }
 }
 
