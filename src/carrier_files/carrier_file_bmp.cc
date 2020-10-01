@@ -58,8 +58,7 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   height_ = abs(*((int32_t*)&bmp_info[8]));
 #pragma GCC diagnostic pop
 
-  bmp_size_ = (((bmp_bits_per_pixel * width_ + 31) / 32) * 4) *
-              height_;
+  bmp_size_ = static_cast<uint64_t>(((bmp_bits_per_pixel * width_ + 31) / 32) * 4) * height_;
 
   if ((bmp_size_ + 54) > bmp_file_size) {
     throw exception::IoError(file_.GetFileName());
