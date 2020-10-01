@@ -8,15 +8,14 @@ os:
   - linux
   - osx
 
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Caskroom/cask/osxfuse --force; fi
-
 install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "g++" ]]; then export CXX="g++-10" CC="gcc-10"; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-10" CC="clang-10"; fi
 
 addons:
+  homebrew:
+    casks:
+    - osxfuse
   apt:
     update: true
     sources:
@@ -34,7 +33,7 @@ before_script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 ..
 
-script: 
+script:
   - make -j$(nproc)
   - make check
 
