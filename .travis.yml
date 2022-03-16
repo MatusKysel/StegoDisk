@@ -38,7 +38,7 @@ script:
   - make check
 
 dist: bionic
-osx_image: xcode12u
+osx_image: xcode13.2
 notifications:
   email:
     on_success: never
@@ -46,4 +46,4 @@ notifications:
 
 branches:
   only:
-    - master
+    - update-travis
