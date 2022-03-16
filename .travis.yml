@@ -37,7 +37,7 @@ script:
   - make -j$(nproc)
   - make check
 
-dist: bionic
+dist: focal
 osx_image: xcode13.2
 notifications:
   email:
@@ -46,4 +46,4 @@ notifications:
 
 branches:
   only:
-    - update-travis
+    - master
