@@ -208,7 +208,7 @@ void CarrierFileJPEG::SaveFile() {
   fseek(file_ptr.Get(), 0, SEEK_SET);
   jpeg_stdio_src(&cinfo_decompress, file_ptr.Get());
 
-  // save markers (exif data etc)
+  // save markers (exif data etc), see libjpeg-turbo/transupp.c:jcopy_marker_setup()
   jpeg_save_markers(&cinfo_decompress, JPEG_COM, 0xffff);
   for (int i = 0; i < 16; ++i) {
     jpeg_save_markers(&cinfo_decompress, JPEG_APP0 + i, 0xffff);
@@ -325,14 +325,46 @@ void CarrierFileJPEG::SaveFile() {
   // set jpeg params
   jpeg_copy_critical_parameters(&cinfo_decompress, &cinfo_compress);
 
+  // If write_JFIF_header is true, JFIF APP0 marker is emitted; jpeg_set_defaults() and
+  // jpeg_set_colorspace() set this true if a JFIF-legal JPEG color space (ie, YCbCr or
+  // grayscale) is selected, otherwise is set to false. If write_Adobe_marker is true,
+  // an Adobe APP14 marker is emitted; jpeg_set_defaults() and jpeg_set_colorspace() set
+  // this true if JPEG color space RGB, CMYK, or YCCK is selected, otherwise false.
+  //
+  // But if one of them is true and not present in original file, writing the corresponding
+  // marker will change the metadata; so suppress writing the marker in this case.
+  // Note: Change of the relevant variable should be before writing coefficients.
+  if (cinfo_compress.write_JFIF_header && !cinfo_decompress.saw_JFIF_marker)
+    cinfo_compress.write_JFIF_header = false;
+  if (cinfo_compress.write_Adobe_marker && !cinfo_decompress.saw_Adobe_marker)
+    cinfo_compress.write_Adobe_marker = false;
+
   // write coeffs
   jpeg_write_coefficients(&cinfo_compress, coeff_arrays);
 
-  // write markers
+  // write markers; see libjpeg-turbo/transupp.c:jcopy_markers_execute()
   jpeg_saved_marker_ptr marker;
   for(marker = cinfo_decompress.marker_list;
       marker != NULL;
       marker = marker->next) {
+    if (cinfo_compress.write_JFIF_header &&
+        marker->marker == JPEG_APP0 &&
+        marker->data_length >= 5 &&
+        GETJOCTET(marker->data[0]) == 0x4A &&
+        GETJOCTET(marker->data[1]) == 0x46 &&
+        GETJOCTET(marker->data[2]) == 0x49 &&
+        GETJOCTET(marker->data[3]) == 0x46 &&
+        GETJOCTET(marker->data[4]) == 0)
+      continue;                 // reject duplicate JFIF
+    if (cinfo_compress.write_Adobe_marker &&
+        marker->marker == JPEG_APP0 + 14 &&
+        marker->data_length >= 5 &&
+        GETJOCTET(marker->data[0]) == 0x41 &&
+        GETJOCTET(marker->data[1]) == 0x64 &&
+        GETJOCTET(marker->data[2]) == 0x6F &&
+        GETJOCTET(marker->data[3]) == 0x62 &&
+        GETJOCTET(marker->data[4]) == 0x65)
+      continue;                 // reject duplicate Adobe
     jpeg_write_marker(&cinfo_compress, marker->marker, marker->data,
                       marker->data_length);
   }
