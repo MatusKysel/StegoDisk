@@ -7,8 +7,6 @@
 */
 
 #include <iostream>
-#include <fstream>
-#include <algorithm>
 #include <string>
 #include <cstring>
 
@@ -102,6 +100,7 @@ int main(int argc, char *argv[]) {
   size_t size;
   std::unique_ptr<stego_disk::StegoStorage>
       stego_storage(new stego_disk::StegoStorage());
+  std::unique_ptr<stego_disk::FuseService> fuse_service(new stego_disk::FuseService());
 
   if(!dir.empty() && test_directory) {
     std::cout << dir << std::endl;
@@ -121,11 +120,13 @@ int main(int argc, char *argv[]) {
   stego_storage->Load();
   size = stego_storage->GetSize();
 
-  if (FuseService::Init(stego_storage.get()) != 0) {
+  if (fuse_service->Init(stego_storage.get()) != 0) {
     return false;
   }
 
-  if (FuseService::MountFuse(DST_DIRECTORY) != 0) {
+  std::string fuse_mount = fuse_service->MountFuse();
+
+  if (fuse_mount.empty()) {
     return false;
   }
 
@@ -134,8 +135,8 @@ int main(int argc, char *argv[]) {
   std::string input;
   std::string output;
   std::string input_file = std::string(DST_DIRECTORY) +
-                           std::string(FuseService::virtual_file_name_,
-                                       std::strlen(FuseService::virtual_file_name_));
+                           std::string(stego_disk::FuseService::virtual_file_name_,
+                                       std::strlen(stego_disk::FuseService::virtual_file_name_));
 //  LOG_DEBUG("Generating random string");
 //  GenerateRandomString(&input, gen_file_size);
 //  LOG_DEBUG("Writing to the storage");
@@ -154,7 +155,7 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Reading from the storage");
   stego_storage->Read(&(output[0]), 0, input.size());
   stego_storage->Save();
-  FuseService::UnmountFuse(DST_DIRECTORY);
+  stego_disk::FuseService::UnmountFuse(fuse_mount);
 
   if(test_directory) FileManager::RemoveDirectory(dir);
 

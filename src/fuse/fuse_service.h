@@ -21,33 +21,36 @@
 
 #include <string>
 
-//#include "fuse_service_delegate.h"
 #include "api_mask.h"
 #include "logging/logger.h"
 #include "stego-disk_export.h"
 #include "stego_storage.h"
 
-static struct fuse_operations stegofs_ops;
+namespace stego_disk {
 
-//PSTODO add namespace
+struct FuseContext {
+  StegoStorage* stego_storage;
+  uint64 capacity;
+  uid_t uid;
+  gid_t gid;
+  mode_t mode;
+  struct timespec tv[2];
+  bool writes;
+};
+
 class STEGO_DISK_EXPORT FuseService {
 
 public:
-  FuseService();
-
-//  static FuseServiceDelegate* delegate_;
-  static stego_disk::StegoStorage* stego_storage_;
-  static stego_disk::uint64 capacity_;
-  static bool fuse_mounted_;
   static const char* virtual_file_name_;
-  static std::string mount_point_;
-  static pid_t fuse_proc_pid_;
 
-  static int Init(stego_disk::StegoStorage *stego_storage);
-  static int MountFuse(const std::string &mount_point);
+  int Init(StegoStorage *stego_storage);
+  std::string MountFuse();
+  int MountFuse(const std::string &mount_point);
   static int UnmountFuse(const std::string &mount_point);
 
+private:
+  FuseContext ctx_;
 };
+}
 
 #endif // STEGODISK_FUSE_FUSESERVICE_H_
-
