@@ -49,7 +49,7 @@ public:
   static int UnmountFuse(const std::string &mount_point);
 
 private:
-  FuseContext* ctx_;
+  FuseContext* ctx_ = nullptr;
 };
 }
 

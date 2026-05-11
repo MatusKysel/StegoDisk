@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <cstring>
 
@@ -28,7 +29,7 @@ struct StegoPair{
 };
 
 
-StegoPair mount_stego(std::string dir, bool password) {
+StegoPair mount_stego(const std::string& dir, bool password) {
   StegoPair pair;
 
   pair.stego_storage.reset(new stego_disk::StegoStorage());
@@ -42,14 +43,14 @@ StegoPair mount_stego(std::string dir, bool password) {
   pair.stego_storage->Load();
 
   if (fuse_service->Init(pair.stego_storage.get()) != 0) {
-    throw;
+    throw std::runtime_error("FuseService::Init failed");
   }
 
   std::string fuse_mount = fuse_service->MountFuse();
   pair.fuse_mount = fuse_mount;
 
   if (fuse_mount.empty()) {
-    throw;
+    throw std::runtime_error("FuseService::MountFuse failed");
   }
 
 
@@ -142,7 +143,7 @@ int main(int argc, char *argv[]) {
 
   if (dir.empty()) {
     LOG_ERROR("directory was not set");
-    return false;
+    return -1;
   }
 
   StegoPair pair1 = mount_stego(dir, password);
@@ -152,15 +153,14 @@ int main(int argc, char *argv[]) {
   std::string input;
   std::string output;
   std::string input_file = pair1.fuse_mount + "/" + 
-                           std::string(stego_disk::FuseService::virtual_file_name_,
-                                       std::strlen(stego_disk::FuseService::virtual_file_name_));
+                           std::string(stego_disk::FuseService::virtual_file_name_);
 
   LOG_DEBUG("Generating random string");
   GenerateRandomString(&input, gen_file_size);
   LOG_DEBUG("Writing to the storage");
   std::ofstream ofs(input_file.c_str());
   if (!ofs.is_open()) {
-    return false;
+    return -1;
   }
   ofs << input;
   ofs.close();
@@ -170,12 +170,11 @@ int main(int argc, char *argv[]) {
   StegoPair pair2 = mount_stego(dir, password);
 
   std::string input_file2 = pair2.fuse_mount + "/" + 
-                           std::string(stego_disk::FuseService::virtual_file_name_,
-                                       std::strlen(stego_disk::FuseService::virtual_file_name_));
+                           std::string(stego_disk::FuseService::virtual_file_name_);
 
   std::ifstream ifs(input_file2.c_str());
   if (!ifs.is_open()) {
-    return false;
+    return -1;
   }
   output.resize(input.size());
   ifs.read(&output[0], input.size());

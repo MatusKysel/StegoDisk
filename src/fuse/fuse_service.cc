@@ -9,6 +9,8 @@
 
 #include "fuse_service.h"
 
+#include <cerrno>
+#include <cstdlib>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -21,6 +23,7 @@
 #include <sys/xattr.h>
 #include <sys/mount.h>
 #include <sys/param.h>
+#include <sys/wait.h>
 
 #include <ctime>
 #include <string>
@@ -156,7 +159,11 @@ static int sfs_read(const char *path, char *buf, size_t size, off_t offset,
     size64 = ctx->capacity - offset64;
   }
 
-  ctx->stego_storage->Read(buf, offset64, size64);
+  try {
+    ctx->stego_storage->Read(buf, offset64, size64);
+  } catch (...) {
+    return -EIO;
+  }
   return static_cast<int>(size64);
 }
 
@@ -183,7 +190,12 @@ static int sfs_write(const char *path, const char *buf, size_t size,
     size64 = ctx->capacity - offset64;
   }
 
-  ctx->stego_storage->Write(buf, offset64, size64);
+  try {
+    ctx->stego_storage->Write(buf, offset64, size64);
+  } catch (...) {
+    return -EIO;
+  }
+
   ctx->writes = true;
   return static_cast<int>(size64);
 }
@@ -199,7 +211,11 @@ static void sfs_destroy(void*) {
 static int sfs_flush(const char*, struct fuse_file_info*) {
   FuseContext *ctx = get_ctx();
   if (ctx->writes) {
-    ctx->stego_storage->Save();
+    try {
+      ctx->stego_storage->Save();
+    } catch (...) {
+      return -EIO;
+    }
     ctx->writes = false;
   }
   return 0;
@@ -257,6 +273,9 @@ int FuseService::Init(StegoStorage *stego_storage) {
 }
 
 std::string FuseService::MountFuse() {
+  if (!ctx_)
+    return "";
+
   char temp[] = "/tmp/fuseXXXXXX";
   char* p = mkdtemp(temp);
 
@@ -267,14 +286,19 @@ std::string FuseService::MountFuse() {
 
   if (MountFuse(path) == 0)
     return path;
-  else
-    return "";
+
+  rmdir(path.c_str());
+  return "";
 }
 
 int FuseService::MountFuse(const std::string &mount_point) {
+  if (!ctx_)
+    return -1;
+
   LOG_INFO("mount point: " << mount_point);
 
   FuseContext *ctx = ctx_;
+  ctx_ = nullptr;
   std::thread([mount_point, ctx]() {
     char mnt_pt[PATH_MAX];
     strncpy(mnt_pt, mount_point.c_str(), sizeof(mnt_pt) - 1);
@@ -302,6 +326,18 @@ int FuseService::MountFuse(const std::string &mount_point) {
       return 0;
   }
 
+  pid_t pid = fork();
+
+  if (pid == 0) {
+    execl("/bin/umount", "umount", mount_point.c_str(), nullptr);
+    _exit(127);
+  }
+
+  if (pid > 0) {
+    int status;
+    waitpid(pid, &status, 0);
+  }
+
   return -1;
 }
 
@@ -311,13 +347,23 @@ int FuseService::UnmountFuse(const std::string &mount_point) {
   struct stat st;
 
   for (int i = 0; i < 300; ++i) {
-    int ret = system(("umount " + mount_point).c_str());
+    pid_t pid = fork();
 
-    if (ret != 0) {
-      usleep(1000000);
-      continue;
+    if (pid == 0) {
+      execl("/bin/umount", "umount", mount_point.c_str(), nullptr);
+      _exit(127);
     }
 
+    int status = 0;
+    waitpid(pid, &status, 0);
+
+    if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+      break;
+
+    usleep(1000000);
+  }
+
+  for (int i = 0; i < 300; ++i) {
     if (stat(virtual_file.c_str(), &st) != 0)
       return 0;
 
