@@ -131,7 +131,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 
 ################ FUSE ##################
 if(WITH_FUSE)
-  find_package(FUSE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(FUSE REQUIRED fuse)
   if(NOT FUSE_FOUND)
     message (STATUS "Unable to find fuse.h")
   else()
