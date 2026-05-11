@@ -30,7 +30,6 @@
 #include "encoders/encoder.h"
 #include "encoders/hamming_encoder.h"
 #include "file_management/carrier_files_manager.h"
-#include "fuse.h"
 #include "permutations/affine_permutation.h"
 #include "permutations/feistel_num_permutation.h"
 #include "permutations/permutation.h"
@@ -73,7 +72,7 @@ static int sfs_getattr(const char *path, struct stat *stbuf) {
   FuseContext *ctx = get_ctx();
   memset(stbuf, 0, sizeof(struct stat));
 
-  if (strcmp(path, "/") == 0) { /* The root directory of our file system,. */
+  if (strcmp(path, "/") == 0) { /* The root directory of our file system. */
     stbuf->st_mode = S_IFDIR | 0755;
     stbuf->st_nlink = 3;
   } else if (strcmp(path, file_path) == 0) { /* The only file we have. */
@@ -194,6 +193,7 @@ static void* sfs_init(struct fuse_conn_info *) {
 }
 
 static void sfs_destroy(void*) {
+  delete get_ctx();
 }
 
 static int sfs_flush(const char*, struct fuse_file_info*) {
@@ -222,14 +222,15 @@ static int sfs_utimens(const char *, const struct timespec tv[2]) {
 
 
 int FuseService::Init(StegoStorage *stego_storage) {
-  ctx_.stego_storage = stego_storage;
-  ctx_.capacity = stego_storage->GetSize();
-  ctx_.uid = getuid();
-  ctx_.gid = getgid();
-  ctx_.mode = S_IFREG | 0600;
-  ctx_.tv[0] = {};
-  ctx_.tv[1] = {};
-  ctx_.writes = false;
+  ctx_ = new FuseContext();
+  ctx_->stego_storage = stego_storage;
+  ctx_->capacity = stego_storage->GetSize();
+  ctx_->uid = getuid();
+  ctx_->gid = getgid();
+  ctx_->mode = S_IFREG | 0600;
+  ctx_->tv[0] = {};
+  ctx_->tv[1] = {};
+  ctx_->writes = false;
 
   stegofs_ops.init = sfs_init;
   stegofs_ops.getattr = sfs_getattr;
@@ -273,7 +274,7 @@ std::string FuseService::MountFuse() {
 int FuseService::MountFuse(const std::string &mount_point) {
   LOG_INFO("mount point: " << mount_point);
 
-  FuseContext *ctx = &ctx_;
+  FuseContext *ctx = ctx_;
   std::thread([mount_point, ctx]() {
     char mnt_pt[PATH_MAX];
     strncpy(mnt_pt, mount_point.c_str(), sizeof(mnt_pt) - 1);
@@ -306,7 +307,24 @@ int FuseService::MountFuse(const std::string &mount_point) {
 
 int FuseService::UnmountFuse(const std::string &mount_point) {
   LOG_INFO("unmounting: " << mount_point);
-  return umount(mount_point.c_str());
+  std::string virtual_file = mount_point + "/" + virtual_file_name_;
+  struct stat st;
+
+  for (int i = 0; i < 300; ++i) {
+    int ret = system(("umount " + mount_point).c_str());
+
+    if (ret != 0) {
+      usleep(1000000);
+      continue;
+    }
+
+    if (stat(virtual_file.c_str(), &st) != 0)
+      return 0;
+
+    usleep(1000000);
+  }
+
+  return -1;
 }
 
 }

@@ -9,6 +9,8 @@
 
 #include "carrier_files_manager.h"
 
+#include <exception>
+#include <mutex>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -76,11 +78,21 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
   }
 
   std::vector<CarrierFilePtr> created(eligible_files.size());
+  std::exception_ptr first_exception;
+  std::mutex exception_mutex;
   std::for_each(std::execution::par, eligible_files.begin(), eligible_files.end(),
           [&](auto &file) {
-              auto idx = &file - &eligible_files[0];
-              created[idx] = CarrierFileFactory::CreateCarrierFile(file);
+                try{
+                  auto idx = &file - &eligible_files[0];
+                  created[idx] = CarrierFileFactory::CreateCarrierFile(file);
+                } catch (...) {
+                  std::lock_guard<std::mutex> lock(exception_mutex);
+                  if (!first_exception)
+                    first_exception = std::current_exception();
+                }
           });
+  if (first_exception)
+    std::rethrow_exception(first_exception);
 
   for (auto &result : created) {
     if (result != nullptr) {
@@ -136,10 +148,20 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
     offset += carrier_files_[i]->GetCapacity();
   }
 
+  std::exception_ptr first_exception;
+  std::mutex exception_mutex;
   std::for_each(std::execution::par, carrier_files_.begin(), carrier_files_.end(),
-          [](auto &file) {
-              file->LoadFile();
+          [&](auto &file) {
+                try {
+                  file->LoadFile();
+                } catch (...) {
+                  std::lock_guard<std::mutex> lock(exception_mutex);
+                  if (!first_exception)
+                    first_exception = std::current_exception();
+                }
           });
+  if (first_exception)
+    std::rethrow_exception(first_exception);
 
   virtual_storage_ = storage;
   try {
@@ -288,10 +310,20 @@ void CarrierFilesManager::DeriveSubkeys() {
 
 
 void CarrierFilesManager::SaveAllFiles() {
+  std::exception_ptr first_exception;
+  std::mutex exception_mutex;
   std::for_each(std::execution::par, carrier_files_.begin(), carrier_files_.end(),
-          [](auto &file) {
-              file->SaveFile();
+          [&](auto &file) {
+                try {
+                  file->SaveFile();
+                } catch (...) {
+                  std::lock_guard<std::mutex> lock(exception_mutex);
+                  if (!first_exception)
+                    first_exception = std::current_exception();
+                }
           });
+  if (first_exception)
+    std::rethrow_exception(first_exception);
 }
 
 

@@ -6,7 +6,9 @@
 *
 */
 
+#include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <cstring>
 
@@ -20,6 +22,39 @@
 
 #include "tests/test_config.h"
 
+struct StegoPair{
+  std::unique_ptr<stego_disk::StegoStorage> stego_storage;
+  std::string fuse_mount;
+};
+
+
+StegoPair mount_stego(std::string dir, bool password) {
+  StegoPair pair;
+
+  pair.stego_storage.reset(new stego_disk::StegoStorage());
+  std::unique_ptr<stego_disk::FuseService> fuse_service(new stego_disk::FuseService());
+
+
+  pair.stego_storage->Configure();
+  LOG_DEBUG("Opening storage");
+  pair.stego_storage->Open(dir, (password) ? PASSWORD : "");
+  LOG_DEBUG("Loading storage");
+  pair.stego_storage->Load();
+
+  if (fuse_service->Init(pair.stego_storage.get()) != 0) {
+    throw;
+  }
+
+  std::string fuse_mount = fuse_service->MountFuse();
+  pair.fuse_mount = fuse_mount;
+
+  if (fuse_mount.empty()) {
+    throw;
+  }
+
+
+  return pair;
+}
 
 bool LoggerInit() {
 
@@ -97,11 +132,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  size_t size;
-  std::unique_ptr<stego_disk::StegoStorage>
-      stego_storage(new stego_disk::StegoStorage());
-  std::unique_ptr<stego_disk::FuseService> fuse_service(new stego_disk::FuseService());
-
   if(!dir.empty() && test_directory) {
     std::cout << dir << std::endl;
     dir = DST_DIRECTORY + dir;
@@ -109,57 +139,52 @@ int main(int argc, char *argv[]) {
     FileManager::RemoveDirectory(dir);
     FileManager::CopyDirectory(SRC_DIRECTORY, dir);
   }
+
   if (dir.empty()) {
     LOG_ERROR("directory was not set");
     return false;
   }
-  stego_storage->Configure();
-  LOG_DEBUG("Opening storage");
-  stego_storage->Open(dir, (password) ? PASSWORD : "");
-  LOG_DEBUG("Loading storage");
-  stego_storage->Load();
-  size = stego_storage->GetSize();
 
-  if (fuse_service->Init(stego_storage.get()) != 0) {
-    return false;
-  }
+  StegoPair pair1 = mount_stego(dir, password);
 
-  std::string fuse_mount = fuse_service->MountFuse();
-
-  if (fuse_mount.empty()) {
-    return false;
-  }
-
-  std::cout << "Storage size = " << size << "B" << std::endl;
-  if( gen_file_size == 0) gen_file_size = size;
+  std::cout << "Storage size = " << pair1.stego_storage->GetSize() << "B" << std::endl;
+  if( gen_file_size == 0) gen_file_size = pair1.stego_storage->GetSize();
   std::string input;
   std::string output;
-  std::string input_file = std::string(DST_DIRECTORY) +
+  std::string input_file = pair1.fuse_mount + "/" + 
                            std::string(stego_disk::FuseService::virtual_file_name_,
                                        std::strlen(stego_disk::FuseService::virtual_file_name_));
-//  LOG_DEBUG("Generating random string");
-//  GenerateRandomString(&input, gen_file_size);
-//  LOG_DEBUG("Writing to the storage");
-//  std::ofstream ofs(input_file.c_str());
-//  if (!ofs.is_open()) {
-//    return true;
-//  }
-//  ofs << input;
-//  ofs.close();
-//  LOG_DEBUG("Saving storage");
-  stego_storage->Save();
 
-  LOG_DEBUG("Loading storage");
-  stego_storage->Load();
+  LOG_DEBUG("Generating random string");
+  GenerateRandomString(&input, gen_file_size);
+  LOG_DEBUG("Writing to the storage");
+  std::ofstream ofs(input_file.c_str());
+  if (!ofs.is_open()) {
+    return false;
+  }
+  ofs << input;
+  ofs.close();
+  stego_disk::FuseService::UnmountFuse(pair1.fuse_mount);
+  FileManager::RemoveDirectory(pair1.fuse_mount);
+
+  StegoPair pair2 = mount_stego(dir, password);
+
+  std::string input_file2 = pair2.fuse_mount + "/" + 
+                           std::string(stego_disk::FuseService::virtual_file_name_,
+                                       std::strlen(stego_disk::FuseService::virtual_file_name_));
+
+  std::ifstream ifs(input_file2.c_str());
+  if (!ifs.is_open()) {
+    return false;
+  }
   output.resize(input.size());
-  LOG_DEBUG("Reading from the storage");
-  stego_storage->Read(&(output[0]), 0, input.size());
-  stego_storage->Save();
-  stego_disk::FuseService::UnmountFuse(fuse_mount);
+  ifs.read(&output[0], input.size());
+  ifs.close();
+
+  stego_disk::FuseService::UnmountFuse(pair2.fuse_mount);
+  FileManager::RemoveDirectory(pair2.fuse_mount);
 
   if(test_directory) FileManager::RemoveDirectory(dir);
-
-  FileManager::RemoveDirectory(input_file);
 
   if (input != output) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
