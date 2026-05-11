@@ -296,7 +296,6 @@ set(UTILS_HDRS
   src/utils/stego_header.h
   src/utils/stego_math.h
   src/utils/stego_types.h
-  src/utils/thread_pool.h
 )
 
 set(UTILS_SRCS
@@ -382,7 +381,12 @@ endif()
 
 add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_SRC})
 
-target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
+if(UNIX AND NOT APPLE)
+  find_package(TBB REQUIRED)
+  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES} TBB::tbb)
+else()
+  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
+endif()
 
 generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")
 

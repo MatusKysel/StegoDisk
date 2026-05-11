@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <execution>
 
 #include "api_mask.h"
 #include "carrier_files/carrier_file.h"
@@ -30,7 +31,6 @@
 #include "utils/stego_config.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
-#include "utils/thread_pool.h"
 #include "virtual_storage/virtual_storage.h"
 
 using namespace std;
@@ -42,7 +42,6 @@ CarrierFilesManager::CarrierFilesManager() :
   files_in_directory_(0),
   virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
   encoder_(std::shared_ptr<Encoder>(nullptr)),
-  thread_pool_(std::make_unique<ThreadPool>(0)),
   is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
@@ -69,18 +68,21 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
      LOG_TRACE(file.GetBasePath() + " - " + file.GetRelativePath());
   }
 
-  std::vector<std::future<CarrierFilePtr>> carrier_files;
-
-  for(auto &file: files) {
-    if(StegoConfig::exclude_list().find(file.GetExtension()) == StegoConfig::exclude_list().end()) {
-      carrier_files.emplace_back(thread_pool_->enqueue(
-                                   &CarrierFileFactory::CreateCarrierFile,
-                                   file));
+  std::vector<File> eligible_files;
+  for (auto &file : files) {
+    if (StegoConfig::exclude_list().find(file.GetExtension()) == StegoConfig::exclude_list().end()) {
+      eligible_files.push_back(file);
     }
   }
 
-  for(auto &&file: carrier_files) {
-    auto result = file.get();
+  std::vector<CarrierFilePtr> created(eligible_files.size());
+  std::for_each(std::execution::par, eligible_files.begin(), eligible_files.end(),
+          [&](auto &file) {
+              auto idx = &file - &eligible_files[0];
+              created[idx] = CarrierFileFactory::CreateCarrierFile(file);
+          });
+
+  for (auto &result : created) {
     if (result != nullptr) {
       carrier_files_.push_back(result);
     }
@@ -134,17 +136,10 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
     offset += carrier_files_[i]->GetCapacity();
   }
 
-  std::vector<std::future<void>> load_results;
-
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    load_results.emplace_back(thread_pool_->enqueue(&CarrierFile::LoadFile,
-                                                    carrier_files_[i]));
-  }
-
-  for(auto &&result: load_results) {
-    try {result.get();}
-    catch (...) { throw; }
-  }
+  std::for_each(std::execution::par, carrier_files_.begin(), carrier_files_.end(),
+          [](auto &file) {
+              file->LoadFile();
+          });
 
   virtual_storage_ = storage;
   try {
@@ -293,17 +288,10 @@ void CarrierFilesManager::DeriveSubkeys() {
 
 
 void CarrierFilesManager::SaveAllFiles() {
-  std::vector<std::future<void>> save_results;
-
-  for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    save_results.emplace_back(
-          thread_pool_->enqueue(&CarrierFile::SaveFile, carrier_files_[i]));
-  }
-
-  for(auto &&result: save_results) {
-    try {result.get();}
-    catch (...) { throw; }
-  }
+  std::for_each(std::execution::par, carrier_files_.begin(), carrier_files_.end(),
+          [](auto &file) {
+              file->SaveFile();
+          });
 }
 
 
