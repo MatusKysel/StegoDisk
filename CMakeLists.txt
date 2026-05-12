@@ -131,12 +131,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 
 ################ FUSE ##################
 if(WITH_FUSE)
-  find_package(FUSE)
-  if(NOT FUSE_FOUND)
-    message (STATUS "Unable to find fuse.h")
-  else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(FUSE REQUIRED fuse)
     include_directories(${FUSE_INCLUDE_DIRS})
-  endif()
 else()
   message (STATUS "Build this library without FUSE")
  set(FUSE_FOUND FALSE)
@@ -295,7 +292,6 @@ set(UTILS_HDRS
   src/utils/stego_header.h
   src/utils/stego_math.h
   src/utils/stego_types.h
-  src/utils/thread_pool.h
 )
 
 set(UTILS_SRCS
@@ -381,7 +377,12 @@ endif()
 
 add_library(${STEGODISK_LIBRARY} ${STEGODISK_SRCS} ${STEGODISK_HDRS} ${LODEPNG_SRC})
 
-target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
+if(UNIX AND NOT APPLE)
+  find_package(TBB REQUIRED)
+  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES} TBB::tbb)
+else()
+  target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
+endif()
 
 generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")
 

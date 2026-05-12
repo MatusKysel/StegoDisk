@@ -18,7 +18,6 @@
 #include "api_mask.h"
 #include "hash/hash.h"
 #include "keys/key.h"
-#include "utils/thread_pool.h"
 
 namespace stego_disk {
 
@@ -69,7 +68,6 @@ private:
 
   std::shared_ptr<VirtualStorage> virtual_storage_;
   std::shared_ptr<Encoder> encoder_;
-  std::unique_ptr<ThreadPool> thread_pool_;
   bool is_active_encoder_;
 };
 
