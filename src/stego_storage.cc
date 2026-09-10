@@ -64,7 +64,7 @@ void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
 
   json::JsonObject config;
   config.AddToObject("encoder", EncoderFactory::GetEncoderName(encoder));
-  config.AddToObject("global_perm", PermutationFactory::GetPermutationName(global_perm));
+  config.AddToObject("glob_perm", PermutationFactory::GetPermutationName(global_perm));
   config.AddToObject("local_perm",  PermutationFactory::GetPermutationName(local_perm));
   StegoConfig::Init(config);
 }
