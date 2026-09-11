@@ -233,7 +233,10 @@ void CarrierFilesManager::ApplyEncoder() {
   DeriveSubkeys();
 
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
-    carrier_files_[i]->SetEncoder(encoder_);
+    const auto &file_config = StegoConfig::file_config();
+    const auto override = file_config.find(carrier_files_[i]->GetFile().GetExtension());
+    carrier_files_[i]->SetEncoder(override == file_config.end()
+        ? encoder_ : EncoderFactory::GetEncoder(override->second.first));
     capacity += carrier_files_[i]->GetCapacity();
     raw_cap += carrier_files_[i]->GetRawCapacity();
     LOG_DEBUG("CarrierFilesManager::applyEncoder: file '" <<
@@ -353,6 +356,12 @@ uint64 CarrierFilesManager::GetCapacityUsingEncoder(
     throw exception::InvalidState(exception::Operation::getCapacity,
                                   exception::Component::encoder,
                                   exception::ComponentState::notSetted);
+  if (carrier_files_.empty()) return 0;
+
+  // Capacity may depend on keyed permutations even before ApplyEncoder().
+  GenerateMasterKey();
+  DeriveSubkeys();
+
   uint64 capacity = 0;
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     capacity += carrier_files_.at(i)->GetCapacityUsingEncoder(encoder);

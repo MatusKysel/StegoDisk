@@ -9,16 +9,25 @@ StegoDisk is cross platform steganographic library with a support of BMP, JPEG a
 [Source code](https://github.com/MatusKysel/StegoDisk/releases/latest)
 
 ### Building
-This project is using CMake bulid system, so it will generate Make files for Unix systems (gcc 4.8/clang 3.4 or greater) as well as Solution files for Microsoft Visual Studio (Visual Studio 2013 or greater).
+The build requires CMake 3.25 or newer and a compiler with C++17 support. CI uses CMake 4.4.3 on Linux, macOS, and Windows. Initialize the bundled dependencies before configuring:
 ```Bash
-cmake -DCMAKE_BUILD_TYPE= { Debug | Release} .
+git submodule update --init --recursive
+cmake -S . -B out -DCMAKE_BUILD_TYPE=Release
+cmake --build out --config Release --parallel 4
 ```
+No command-line policy override is needed for the bundled JPEG library. Use `-DCMAKE_BUILD_TYPE=Debug` for a Debug build with Makefiles or Ninja. With a multi-configuration generator such as Visual Studio or Ninja Multi-Config, select the configuration using `--config Debug` when building.
 #### Running unit test
-For build verification do not forget to run prepared unit test. It is possible by this command
+Build and run the project test suite with:
 ```Bash
-make check
+cmake --build out --config Release --target check
 ```
-or by building check project in Visual studio solution.
+Alternatively, build the `check` project in a Visual Studio solution.
+
+For an out-of-source build in `out`, run the project tests after building with:
+```Bash
+ctest --test-dir out --build-config Release -L stegodisk --output-on-failure --no-tests=error
+```
+This includes regression tests for reconfiguration, capacity estimates, per-file encoders, and reopening storage.
 
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
@@ -72,6 +81,8 @@ The configuration itself through external files is an excellent security option 
 ```
 
 In this configuration, all parameters are filled in, but in the event when some of them stayed unfilled steganographic file system will replace them by the default parameters. The first part of the configuration file global parameters are set, such as an encoder and a permutation, you can also specify these parameters per individual file type, and in the last part filters for file type exclusion are set.
+
+File-specific encoder overrides are now applied when loading and saving. Older versions ignored these encoder overrides and used the global encoder for every file. To reopen an existing store written by those versions, set each file-specific encoder to the global encoder that was used when the store was saved; keep the permutation settings unchanged.
 
 ##### Enum configuration
 As the standard way to configure systems is configuration using enumerated types, which are defined for the individual parameters.
