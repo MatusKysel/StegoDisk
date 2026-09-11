@@ -99,12 +99,46 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
   raw_capacity_ = (lodepng_get_raw_size(width_, height_, &state_.info_raw) / 8);
 }
 
+/**
+ * @brief Reads the carrier from disk and decodes it into `image`
+ *
+ * Leaves `image` untouched when it already holds the decoded carrier, which
+ * is what lets SaveFile() reuse the work LoadFile() did.
+ */
+void CarrierFilePNG::DecodeInto(DecodedImage *image) {
+  if (*image != nullptr)
+    return;
+
+  auto file_ptr = file_.Open();
+
+  MemoryBuffer png_buffer(file_.GetSize());
+
+  fseek(file_ptr.Get(), 0, SEEK_SET);
+  const uint32 read_cnt = static_cast<uint32>(
+      fread(png_buffer.GetRawPointer(), 1, file_.GetSize(), file_ptr.Get()));
+
+  if (read_cnt < file_.GetSize()) {
+    LOG_ERROR("Unable to read file.");
+    throw exception::IoError{file_.GetFileName()};
+  }
+
+  unsigned char *decoded = nullptr;
+  unsigned width = 0;
+  unsigned height = 0;
+  const unsigned error =
+      lodepng_decode(&decoded, &width, &height, &state_,
+                     png_buffer.GetConstRawPointer(), read_cnt);
+
+  if (error)
+    throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
+
+  *image = DecodedImage(decoded, &free);
+}
+
 void CarrierFilePNG::LoadFile() {
 
   if (file_loaded_)
     return;
-
-  auto file_ptr = file_.Open();
 
   LOG_INFO("Loading file " << file_.GetRelativePath());
 
@@ -115,34 +149,15 @@ void CarrierFilePNG::LoadFile() {
   buffer_.Resize(raw_capacity_);
   buffer_.Clear();
 
-  MemoryBuffer png_buffer(file_.GetSize());
+  const uint64 bits_to_modify = permutation_->GetSize();
 
-  uint64 bits_to_modify = permutation_->GetSize();
-
-
-  fseek(file_ptr.Get(), 0, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(
-      fread(png_buffer.GetRawPointer(), 1, file_.GetSize(), file_ptr.Get()));
-
-  if (read_cnt < file_.GetSize()) {
-    LOG_ERROR("Unable to read file.");
-    throw exception::IoError{file_.GetFileName()};
-  }
-
-  unsigned char *image;
-  unsigned width, height;
-
-  unsigned error = lodepng_decode(&image, &width, &height, &state_,
-                                  png_buffer.GetConstRawPointer(), read_cnt);
-
-  if (error)
-    throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
+  // Held until SaveFile(), which needs these same pixels.
+  DecodeInto(&decoded_image_);
+  const unsigned char *image = decoded_image_.get();
 
   // copy LSB data to content buffer
 
   ExtractLsbToBufferPermuted(image, bits_to_modify);
-
-  free(image);
 
   ExtractBufferUsingEncoder();
 
@@ -170,28 +185,12 @@ void CarrierFilePNG::SaveFile() {
   buffer_.Resize(raw_capacity_);
   buffer_.Clear();
 
-  MemoryBuffer png_buffer(file_.GetSize());
+  const uint64 bits_to_modify = permutation_->GetSize();
 
-  uint64 bits_to_modify = permutation_->GetSize();
-
-  fseek(file_ptr.Get(), 0, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(
-      fread(png_buffer.GetRawPointer(), 1, file_.GetSize(), file_ptr.Get()));
-
-  if (read_cnt < file_.GetSize()) {
-    LOG_ERROR("Unable to read file.")
-    throw exception::IoError{file_.GetFileName()};
-  }
-  // copy LSB data to content buffer
-
-  unsigned char *image;
-  unsigned width, height;
-
-  unsigned error = lodepng_decode(&image, &width, &height, &state_,
-                                  png_buffer.GetConstRawPointer(), read_cnt);
-
-  if (error)
-    throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
+  // Normally still holds the pixels LoadFile() decoded; only decodes when the
+  // carrier was released, so the outcome does not depend on the cache.
+  DecodeInto(&decoded_image_);
+  unsigned char *image = decoded_image_.get();
 
   // copy LSB data to content buffer
 
@@ -204,7 +203,7 @@ void CarrierFilePNG::SaveFile() {
   unsigned char *image_out;
   size_t size_out;
 
-  error =
+  unsigned error =
       lodepng_encode(&image_out, &size_out, image, width_, height_, &state_);
 
   if (error)
@@ -221,8 +220,9 @@ void CarrierFilePNG::SaveFile() {
     throw exception::IoError{file_.GetFileName()};
   }
 
-  free(image);
   free(image_out);
+  // The carrier is written; the pixels are no longer worth holding.
+  decoded_image_.reset();
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");
 }
