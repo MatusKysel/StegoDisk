@@ -2,6 +2,8 @@
 
 Linux/macOS/Windows [![CI](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml)
 
+[![codecov](https://codecov.io/gh/MatusKysel/StegoDisk/branch/master/graph/badge.svg)](https://app.codecov.io/github/MatusKysel/StegoDisk)
+
 ### Overview
 StegoDisk is cross platform steganographic library with a support of BMP, JPEG and PNG files. This library is using steganographic techniques for embedding data into carrier files. This libarary aslo comes with new interface for the Python programming language.
 
@@ -28,6 +30,49 @@ For an out-of-source build in `out`, run the project tests after building with:
 ctest --test-dir out --build-config Release -L stegodisk --output-on-failure --no-tests=error
 ```
 This includes regression tests for reconfiguration, capacity estimates, per-file encoders, and reopening storage.
+
+#### Code coverage
+The `Coverage` workflow runs the project tests in an instrumented GCC Debug build and uploads a Cobertura XML report to [Codecov](https://app.codecov.io/github/MatusKysel/StegoDisk). It uses GitHub OIDC authentication; no `CODECOV_TOKEN` secret is required. Public fork pull requests use the Codecov action's tokenless upload support.
+
+Coverage includes the library sources compiled by the default build, including Keccak. Test code and the bundled `lib/` dependencies are excluded; optional FUSE code is not built by this workflow. Coverage percentage checks are informational while a baseline is established; test failures, failed uploads, and empty or near-empty reports fail the workflow. XML and browsable HTML reports are also available in the run's `coverage-reports` artifact. The badge shows the latest coverage uploaded for `master`, so it populates after the first successful run on that branch.
+
+To generate the same reports locally on Linux with GCC 13, CMake, Ninja, TBB, and `gcovr==8.6` installed:
+
+```sh
+CC=gcc-13 CXX=g++-13 cmake -S . -B out-coverage -G Ninja \
+  -DCMAKE_BUILD_TYPE=Debug -DOPTIMIZE_FOR_NATIVE=OFF \
+  -DCMAKE_CXX_FLAGS="--coverage -fprofile-update=atomic -fprofile-abs-path" \
+  -DCMAKE_EXE_LINKER_FLAGS=--coverage -DCMAKE_SHARED_LINKER_FLAGS=--coverage
+cmake --build out-coverage --parallel 4
+ctest --test-dir out-coverage --build-config Debug -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
+gcovr --config gcovr.cfg --gcov-executable gcov-13 \
+  --xml-pretty --xml out-coverage/coverage.xml \
+  --html-details out-coverage/coverage.html --print-summary --fail-under-line 1 out-coverage
+```
+
+#### AddressSanitizer and UndefinedBehaviorSanitizer
+The `Sanitizers` workflow runs the full project test suite with Clang 18 AddressSanitizer and UndefinedBehaviorSanitizer on Linux. It checks memory accesses, leaks, and undefined behavior; a detected error immediately fails the job. Failure logs are retained in the `sanitizer-test-logs` artifact.
+
+To reproduce locally with Clang 18, its sanitizer runtimes, LLVM symbolizer, CMake, Ninja, and TBB installed:
+
+```sh
+CC=clang-18 CXX=clang++-18 cmake -S . -B out-sanitizers -G Ninja \
+  -DCMAKE_BUILD_TYPE=Debug -DOPTIMIZE_FOR_NATIVE=OFF \
+  -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+  -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+  -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined \
+  -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined
+cmake --build out-sanitizers --parallel 4
+ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer-18 \
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
+UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1:external_symbolizer_path=/usr/bin/llvm-symbolizer-18 \
+ctest --test-dir out-sanitizers --build-config Debug -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
+```
+
+#### Static analysis
+The `Clang-Tidy` and `Cppcheck` workflows check the Linux Debug library sources and project headers. Clang-tidy uses the correctness checks in `.clang-tidy`; cppcheck enables its error and warning checks. Each workflow contains the commands for generating its compilation database and running the analyzer locally. Tests, bundled dependency translation units, and optional FUSE code are outside these analysis configurations.
+
+Source findings are initially **advisory** while the existing backlog is reviewed. A green analysis job does not mean there are no findings. Tool, configuration, and parsing failures fail the job. Findings appear in the job summary and full diagnostics are retained in the `clang-tidy-reports` and `cppcheck-reports` artifacts.
 
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library

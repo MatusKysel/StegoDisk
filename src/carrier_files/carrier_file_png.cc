@@ -35,7 +35,6 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
 	throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
   }
 
-  lodepng_state_init(&state_);
   unsigned error = lodepng_inspect(&width_, &height_, &state_, png_header, 64);
   if(error)
 	throw exception::ParseError{file_.GetFileName(), "Unable to read file state"};
