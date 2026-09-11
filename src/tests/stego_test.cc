@@ -40,13 +40,18 @@ static void PrintHelp(char *name) {
             << "Options:\n"
             << "\t-h,--help\t\tShow this help message\n"
             << "\t-e,--encoder ENCODER\tSpecify the encoder\n"
-            << "\t-p,--permutation PERMUTATION\tSpecify the permutation\n"
+            << "\t-p,--permutation PERMUTATION\tSpecify the permutation (both global and local)\n"
+            << "\t--global_perm PERMUTATION\tSpecify the global permutation only\n"
+            << "\t--local_perm PERMUTATION\tSpecify the local permutation only\n"
             << "\t-g,--gen_file_size GEN_SIZE\tSpecify size of generated data\n"
+            << "\t-o,--offset OFFSET\tSpecify the byte offset to write and read at\n"
             << "\t-%,--percent PERCENT\tSpecify percentage of carrier loading\n"
             << "\t-d,--directory DIRECTORY\tSpecify the source directory\n"
             << "\t-t,--test_directory \tSpecify that this directory is only for"
                " testing and it will create copy of it\n"
-            << "\t-p,--password \tSpecify if the password sould be used\n"
+            << "\t-i,--invert \tWrite the bitwise inverse of the current storage content\n"
+            << "\t-w,--password 0|1\tSpecify if the password should be used\n"
+            << "\t--wrong_password \tReopen with a different password and expect a mismatch\n"
             << std::endl;
 }
 
@@ -89,13 +94,16 @@ int main(int argc, char *argv[]) {
   if (!LoggerInit()) return -1;
 
   std::string encoder;
-  std::string permutation;
+  std::string global_perm;
+  std::string local_perm;
   std::string file_type;
   std::string dir;
   bool test_directory = false;
   bool password = false;
+  bool wrong_password = false;
   bool invert = false;
   size_t gen_file_size = 0;
+  size_t offset = 0;
   size_t percent = 100;
 
   if (argc < 3) {
@@ -116,11 +124,35 @@ int main(int argc, char *argv[]) {
       }
     } else if ((arg == "-p") || (arg == "--permutation")) {
       if (++i < argc) {
-        permutation = argv[i];
+        global_perm = argv[i];
+        local_perm = argv[i];
       } else {
         LOG_ERROR("--permutation option requires one argument.");
         return -1;
       }
+    } else if (arg == "--global_perm") {
+      if (++i < argc) {
+        global_perm = argv[i];
+      } else {
+        LOG_ERROR("--global_perm option requires one argument.");
+        return -1;
+      }
+    } else if (arg == "--local_perm") {
+      if (++i < argc) {
+        local_perm = argv[i];
+      } else {
+        LOG_ERROR("--local_perm option requires one argument.");
+        return -1;
+      }
+    } else if ((arg == "-o") || (arg == "--offset")) {
+      if (++i < argc) {
+        offset = static_cast<size_t>(atoll(argv[i]));
+      } else {
+        LOG_ERROR("--offset option requires one argument.");
+        return -1;
+      }
+    } else if (arg == "--wrong_password") {
+      wrong_password = true;
     } else if ((arg == "-g") || (arg == "--gen_file_size")) {
       if (++i < argc) {
         gen_file_size = static_cast<size_t>(atoi(argv[i]));
@@ -157,7 +189,7 @@ int main(int argc, char *argv[]) {
         LOG_ERROR("--file_type option requires one argument.");
         return -1;
       }
-    } else if ((arg == "-p") || (arg == "--password")) {
+    } else if ((arg == "-w") || (arg == "--password")) {
       if (++i < argc) {
         password = (atoi(argv[i]) == 1) ? true : false;
       } else {
@@ -184,15 +216,23 @@ int main(int argc, char *argv[]) {
     LOG_ERROR("directory was not set");
     return -1;
   }
-  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
-                           StrToPermutation(permutation));
+  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(global_perm),
+                           StrToPermutation(local_perm));
   LOG_DEBUG("Opening storage");
   stego_storage->Open(dir, (password) ? PASSWORD : "");
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
-  size = stego_storage->GetSize() * static_cast<size_t>(static_cast<double>(percent) / 100.0);
-  std::cout << "Storage size = " << size << "B" << std::endl;
-  if( gen_file_size == 0) gen_file_size = size;
+  const size_t capacity = stego_storage->GetSize();
+  std::cout << "Storage capacity = " << capacity << "B" << std::endl;
+  if (offset >= capacity) {
+    LOG_ERROR("offset " << offset << " is outside the storage capacity " << capacity);
+    return -1;
+  }
+  size = static_cast<size_t>(static_cast<double>(capacity - offset) *
+                             static_cast<double>(percent) / 100.0);
+  if (gen_file_size == 0 || gen_file_size > size) gen_file_size = size;
+  std::cout << "Payload size = " << gen_file_size << "B at offset " << offset
+            << std::endl;
   std::string input;
   std::string output;
 
@@ -202,30 +242,38 @@ int main(int argc, char *argv[]) {
   } else {
     LOG_DEBUG("Creating inverted DCT string");
     input.resize(gen_file_size);
-    stego_storage->Read(&(input[0]), 0, input.size());
+    stego_storage->Read(&(input[0]), offset, input.size());
     for (size_t i = 0; i < input.size(); ++i) {
       input[i] = ~(input[i]);
     }
   }
 
   LOG_DEBUG("Writing to the storage");
-  stego_storage->Write(&(input[0]), 0, input.size());
+  stego_storage->Write(&(input[0]), offset, input.size());
   LOG_DEBUG("Saving storage");
   stego_storage->Save();
 
   LOG_DEBUG("Opening storage");
-  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(permutation),
-                           StrToPermutation(permutation));
-  stego_storage->Open(dir, (password) ? PASSWORD : "");
+  stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(global_perm),
+                           StrToPermutation(local_perm));
+  std::string reopen_password = (password) ? PASSWORD : "";
+  if (wrong_password) reopen_password = std::string("wrong-") + PASSWORD;
+  stego_storage->Open(dir, reopen_password);
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
   output.resize(input.size());
   LOG_DEBUG("Reading from the storage");
-  stego_storage->Read(&(output[0]), 0, input.size());
+  stego_storage->Read(&(output[0]), offset, input.size());
 
   if(test_directory) FileManager::RemoveDirectory(dir);
 
-  if (input != output) {
+  if (wrong_password) {
+    // A different password must not reproduce the payload.
+    if (input == output) {
+      LOG_ERROR("Payload was readable with a wrong password!");
+      error = true;
+    }
+  } else if (input != output) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
               " output size: " << output.size());
     error = true;
