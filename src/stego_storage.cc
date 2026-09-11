@@ -83,17 +83,20 @@ void StegoStorage::Load() {
 								  exception::ComponentState::notOpened};
   }
   
-  try {
-    carrier_files_manager_->SetEncoder(
-          EncoderFactory::GetEncoder(StegoConfig::encoder()));
-    carrier_files_manager_->ApplyEncoder();
+  // A new load invalidates whatever was loaded before, including when it fails
+  // part way through; the storage must not keep reporting the old capacity.
+  virtual_storage_.reset();
 
-    virtual_storage_ = std::make_shared<VirtualStorage>();
-    virtual_storage_->SetPermutation(
-          PermutationFactory::GetPermutation(StegoConfig::global_perm()));
-    carrier_files_manager_->LoadVirtualStorage(virtual_storage_);
-  }
-  catch (...) { throw; }
+  carrier_files_manager_->SetEncoder(
+        EncoderFactory::GetEncoder(StegoConfig::encoder()));
+  carrier_files_manager_->ApplyEncoder();
+
+  auto virtual_storage = std::make_shared<VirtualStorage>();
+  virtual_storage->SetPermutation(
+        PermutationFactory::GetPermutation(StegoConfig::global_perm()));
+  // Published only once every carrier has been read successfully.
+  carrier_files_manager_->LoadVirtualStorage(virtual_storage);
+  virtual_storage_ = std::move(virtual_storage);
 }
 
 void StegoStorage::Save() {

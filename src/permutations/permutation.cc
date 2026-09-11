@@ -24,13 +24,15 @@ PermElem Permutation::GetSize() const {
 }
 
 void Permutation::CommonPermuteInputCheck(PermElem index) const {
+  // Checked first: the range of an uninitialized permutation is meaningless,
+  // and size_ == 0 would otherwise mask this state behind an out_of_range.
+  if (!initialized_)
+    throw exception::InvalidState{exception::Operation::commonPermuteInputCheck,
+                                  exception::Component::permutation,
+                                  exception::ComponentState::notInitialized};
+
   if (index >= size_)
     throw std::out_of_range("Permutation: element index out of range");
-
-  if (!initialized_)
-    exception::InvalidState{exception::Operation::commonPermuteInputCheck,
-			                exception::Component::permutation,
-							exception::ComponentState::notInitialized};
 }
 
 } // stego_disk
