@@ -2,9 +2,6 @@
 
 Linux/macOS/Windows [![CI](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml)
 
-[![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6Ik1hdHVzS3lzZWwiLCJyZXBvMSI6IlN0ZWdvRGlzayIsImluY2x1ZGVMaW50IjpmYWxzZSwiYXV0aG9ySWQiOjIxNzM0LCJpYXQiOjE2MDE1NTYyNDl9.4jQMcz0AJilnAU5D65QZ9Ozm3V6N2MGP0kDnPe0f4H8)](https://www.deepcode.ai/app/gh/MatusKysel/StegoDisk/_/dashboard?utm_content=gh%2FMatusKysel%2FStegoDisk)
-
-
 ### Overview
 StegoDisk is cross platform steganographic library with a support of BMP, JPEG and PNG files. This library is using steganographic techniques for embedding data into carrier files. This libarary aslo comes with new interface for the Python programming language.
 
