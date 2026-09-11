@@ -27,6 +27,7 @@ StegoStorage::~StegoStorage() {}
 void StegoStorage::Open(const std::string &storage_base_path,
                         const std::string &password) {
   opened_ = false;
+  virtual_storage_.reset();
 
   carrier_files_manager_->SetPassword(password);
   carrier_files_manager_->LoadDirectory(storage_base_path);

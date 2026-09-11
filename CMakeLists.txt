@@ -420,5 +420,6 @@ endif()
 # TESTING
 
 if(BUILD_TESTS)
+  enable_testing()
   add_subdirectory(src/tests)
 endif()

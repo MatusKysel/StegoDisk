@@ -28,6 +28,8 @@ public:
 
   inline static void Init(const json::JsonObject &config) {
 
+    Instance().exclude_list_.clear();
+    Instance().file_config_.clear();
     Instance().encoder_ = EncoderFactory::GetEncoderType(config["encoder"].ToString());
     Instance().global_perm_ = PermutationFactory::GetPermutationType(config["glob_perm"].ToString());
     Instance().local_perm_ = PermutationFactory::GetPermutationType(config["local_perm"].ToString());

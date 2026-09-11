@@ -81,7 +81,7 @@ void CarrierFile::SetEncoder(std::shared_ptr<Encoder> encoder) {
 }
 
 uint64 CarrierFile::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) {
-  if (encoder && permutation_) return 0;
+  if (!encoder || !permutation_) return 0;
   uint64 block_count = ((permutation_->GetSizeUsingParams(
                            raw_capacity_ * 8, subkey_) / 8)
                         / encoder->GetCodewordBlockSize());

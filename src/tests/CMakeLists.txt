@@ -83,11 +83,21 @@ add_stego_unit_test(UnitEncoderLsb encoders lsb)
 add_stego_unit_test(UnitEncoderHamming encoders hamming)
 add_stego_unit_test(UnitFactories factories)
 
+add_test(NAME StateConfigurationReset COMMAND stego-state-test config)
+add_test(NAME StateCapacityEstimate COMMAND stego-state-test capacity)
+add_test(NAME StateEncoderOverride COMMAND stego-state-test encoder_override)
+add_test(NAME StateReopen COMMAND stego-state-test reopen)
+
+# Select the project suite separately from the bundled JPEG library's tests.
+get_property(STEGO_TEST_NAMES DIRECTORY PROPERTY TESTS)
+set_tests_properties(${STEGO_TEST_NAMES} PROPERTIES LABELS stegodisk)
+
 ###################################################################################################################################
 ###################################################################################################################################
 
 add_executable(stego-test stego_test.cc)
 add_executable(stego-unit-test stego_unit_test.cc)
+add_executable(stego-state-test stego_state_test.cc)
 
 if(FUSE_FOUND)
   add_executable(stego-fuse-test stego_fuse_test.cc)
@@ -108,12 +118,13 @@ set(STEGO_FUSE_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${FUSE_LIBRARIES})
 
 target_link_libraries(stego-test ${STEGO_TEST_LIBRARIES})
 target_link_libraries(stego-unit-test ${STEGO_TEST_LIBRARIES})
+target_link_libraries(stego-state-test ${STEGO_TEST_LIBRARIES})
 
 if(FUSE_FOUND)
   target_link_libraries(stego-fuse-test ${STEGO_FUSE_TEST_LIBRARIES})
 endif()
 
-list(APPEND TESTS stego-test stego-unit-test)
+list(APPEND TESTS stego-test stego-unit-test stego-state-test)
 
 add_custom_target(check
   COMMAND ${CMAKE_CTEST_COMMAND} -T test --build-config ${CMAKE_CFG_INTDIR} --test-timeout 600 --output-on-failure --parallel 4 

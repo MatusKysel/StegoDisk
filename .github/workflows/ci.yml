@@ -79,4 +79,4 @@ jobs:
         run: cmake --build out --config Release --parallel 4
 
       - name: Test
-        run: cmake --build out --config Release --target check
+        run: ctest --test-dir out --build-config Release -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error

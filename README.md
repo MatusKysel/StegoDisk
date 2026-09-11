@@ -20,6 +20,12 @@ make check
 ```
 or by building check project in Visual studio solution.
 
+For an out-of-source build in `out`, run the project tests after building with:
+```Bash
+ctest --test-dir out --build-config Release -L stegodisk --output-on-failure --no-tests=error
+```
+This includes regression tests for reconfiguration, capacity estimates, per-file encoders, and reopening storage.
+
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
 
@@ -72,6 +78,8 @@ The configuration itself through external files is an excellent security option 
 ```
 
 In this configuration, all parameters are filled in, but in the event when some of them stayed unfilled steganographic file system will replace them by the default parameters. The first part of the configuration file global parameters are set, such as an encoder and a permutation, you can also specify these parameters per individual file type, and in the last part filters for file type exclusion are set.
+
+File-specific encoder overrides are now applied when loading and saving. Older versions ignored these encoder overrides and used the global encoder for every file. To reopen an existing store written by those versions, set each file-specific encoder to the global encoder that was used when the store was saved; keep the permutation settings unchanged.
 
 ##### Enum configuration
 As the standard way to configure systems is configuration using enumerated types, which are defined for the individual parameters.
