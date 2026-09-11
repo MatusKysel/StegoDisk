@@ -9,16 +9,19 @@ StegoDisk is cross platform steganographic library with a support of BMP, JPEG a
 [Source code](https://github.com/MatusKysel/StegoDisk/releases/latest)
 
 ### Building
-This project is using CMake bulid system, so it will generate Make files for Unix systems (gcc 4.8/clang 3.4 or greater) as well as Solution files for Microsoft Visual Studio (Visual Studio 2013 or greater).
+The build requires CMake 3.25 or newer and a compiler with C++17 support. CI uses CMake 4.4.3 on Linux, macOS, and Windows. Initialize the bundled dependencies before configuring:
 ```Bash
-cmake -DCMAKE_BUILD_TYPE= { Debug | Release} .
+git submodule update --init --recursive
+cmake -S . -B out -DCMAKE_BUILD_TYPE=Release
+cmake --build out --config Release --parallel 4
 ```
+No command-line policy override is needed for the bundled JPEG library. Use `-DCMAKE_BUILD_TYPE=Debug` for a Debug build with Makefiles or Ninja. With a multi-configuration generator such as Visual Studio or Ninja Multi-Config, select the configuration using `--config Debug` when building.
 #### Running unit test
-For build verification do not forget to run prepared unit test. It is possible by this command
+Build and run the project test suite with:
 ```Bash
-make check
+cmake --build out --config Release --target check
 ```
-or by building check project in Visual studio solution.
+Alternatively, build the `check` project in a Visual Studio solution.
 
 For an out-of-source build in `out`, run the project tests after building with:
 ```Bash

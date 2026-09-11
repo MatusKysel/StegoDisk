@@ -33,8 +33,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -S . -B out -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 \
-            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake -S . -B out -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1
           cmake --build out --parallel 4
 
       - name: Perform CodeQL Analysis

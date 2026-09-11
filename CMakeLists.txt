@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
-include(GenerateExportHeader)
+cmake_minimum_required(VERSION 3.25...4.4)
 
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
@@ -20,7 +19,8 @@ if(NOT OBFUSCATE_SYMBOLS)
 	set(OBFUSCATE_LIBRARY "stego-disk")
 endif()
 
-project(${OBFUSCATE_PROJECT} CXX)
+project(${OBFUSCATE_PROJECT} LANGUAGES C CXX)
+include(GenerateExportHeader)
 
 if(BUILD_SHARED)
   message (STATUS "Build this library as shared")
@@ -29,10 +29,6 @@ else()
   message (STATUS "Build this library as static")
   set(BUILD_SHARED_LIBS OFF)
 endif()
-
-cmake_policy(SET CMP0009 NEW)
-cmake_policy(SET CMP0063 NEW)
-set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
@@ -88,13 +84,14 @@ if(QT_CREATOR_PROJECT_SHOW)
   add_custom_target(DummyHeaderShow SOURCES ${SRCS} ${HDRS})
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build configuration" FORCE)
 endif()
 
 ################ CXX FLAGS ##################
 #include(CXXCompilerFlags)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_C_VISIBILITY_PRESET hidden) #PSTODO do not work fot libjpeg
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -102,7 +99,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 if(NOT MSVC)
   set(warnings "-Wall -Wextra -pedantic -Werror")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pthread ${warnings}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread ${warnings}")
   if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # libc++ ships the parallel algorithms (std::execution::par) only behind this flag.
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexperimental-library")
@@ -115,7 +112,7 @@ if(NOT MSVC)
       endif()
   endif()
 else ()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /O2 /W4") #/WX
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /W4") #/WX
   if (BUILD_SHARED_LIBS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS ")
   endif()
@@ -123,11 +120,22 @@ endif()
 ################ CXX FLAGS ##################
 
 ################ LIBJPEGTURBO ##################
-option(ENABLE_SHARED OFF)
-option(WITH_TURBOJPEG OFF)
-option(WITH_SIMD OFF)
+option(ENABLE_SHARED "Build the bundled JPEG shared library" OFF)
+option(WITH_TURBOJPEG "Build the bundled TurboJPEG API" OFF)
+option(WITH_SIMD "Enable SIMD in the bundled JPEG library" OFF)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-add_subdirectory(lib/libjpeg-turbo)
+# The pinned dependency declares a pre-3.5 policy version, removed in CMake 4.
+# Apply the tested policies to that subdirectory without changing its source or
+# leaking a compatibility override into consumers of this project.
+block(SCOPE_FOR VARIABLES)
+  set(CMAKE_POLICY_VERSION_MINIMUM 4.4)
+  # CMake < 4.0 does not recognize CMAKE_POLICY_VERSION_MINIMUM.
+  set(CMAKE_POLICY_DEFAULT_CMP0054 NEW)
+  set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
+  # The dependency's tests expect its tools in their own binary directories.
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "")
+  add_subdirectory(lib/libjpeg-turbo)
+endblock()
 set(LIBJPEGTURBO_LIBRARIES jpeg-static)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg-turbo)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)

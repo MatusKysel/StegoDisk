@@ -103,29 +103,21 @@ if(FUSE_FOUND)
   add_executable(stego-fuse-test stego_fuse_test.cc)
 endif()
 
-if(NOT WIN32)
-	set(LIBJPEGTURBO_LIBRARIES_STATIC ${CMAKE_BINARY_DIR}/${LIBDIR}/libjpeg.a)
-else()
-	link_directories(${CMAKE_BINARY_DIR}/${LIBDIR}/*/)
-	set(LIBJPEGTURBO_LIBRARIES_STATIC jpeg-static)
-endif()
-
-set(STEGO_TEST_LIBRARIES ${STEGODISK_LIBRARY})
-if(NOT BUILD_SHARED_LIBS)
-  set(STEGO_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${LIBJPEGTURBO_LIBRARIES_STATIC})
-endif()
-set(STEGO_FUSE_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${FUSE_LIBRARIES})
-
-target_link_libraries(stego-test ${STEGO_TEST_LIBRARIES})
-target_link_libraries(stego-unit-test ${STEGO_TEST_LIBRARIES})
-target_link_libraries(stego-state-test ${STEGO_TEST_LIBRARIES})
+# The library target carries its JPEG dependency, including configuration paths.
+target_link_libraries(stego-test PRIVATE ${STEGODISK_LIBRARY})
+target_link_libraries(stego-unit-test PRIVATE ${STEGODISK_LIBRARY})
+target_link_libraries(stego-state-test PRIVATE ${STEGODISK_LIBRARY})
 
 if(FUSE_FOUND)
-  target_link_libraries(stego-fuse-test ${STEGO_FUSE_TEST_LIBRARIES})
+  target_link_libraries(stego-fuse-test PRIVATE ${STEGODISK_LIBRARY} ${FUSE_LIBRARIES})
 endif()
 
 list(APPEND TESTS stego-test stego-unit-test stego-state-test)
 
 add_custom_target(check
-  COMMAND ${CMAKE_CTEST_COMMAND} -T test --build-config ${CMAKE_CFG_INTDIR} --test-timeout 600 --output-on-failure --parallel 4 
-  DEPENDS ${TESTS})
+  COMMAND ${CMAKE_CTEST_COMMAND} --test-dir "${CMAKE_CURRENT_BINARY_DIR}"
+    --build-config "$<CONFIG>" -L stegodisk --timeout 600
+    --output-on-failure --parallel 4 --no-tests=error
+  DEPENDS ${TESTS}
+  USES_TERMINAL
+  VERBATIM)
