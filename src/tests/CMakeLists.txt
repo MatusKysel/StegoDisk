@@ -87,6 +87,7 @@ add_test(NAME StateConfigurationReset COMMAND stego-state-test config)
 add_test(NAME StateCapacityEstimate COMMAND stego-state-test capacity)
 add_test(NAME StateEncoderOverride COMMAND stego-state-test encoder_override)
 add_test(NAME StateReopen COMMAND stego-state-test reopen)
+add_test(NAME PngMetadataLifetime COMMAND stego-png-lifetime-test)
 
 # Select the project suite separately from the bundled JPEG library's tests.
 get_property(STEGO_TEST_NAMES DIRECTORY PROPERTY TESTS)
@@ -98,6 +99,7 @@ set_tests_properties(${STEGO_TEST_NAMES} PROPERTIES LABELS stegodisk)
 add_executable(stego-test stego_test.cc)
 add_executable(stego-unit-test stego_unit_test.cc)
 add_executable(stego-state-test stego_state_test.cc)
+add_executable(stego-png-lifetime-test stego_png_lifetime_test.cc)
 
 if(FUSE_FOUND)
   add_executable(stego-fuse-test stego_fuse_test.cc)
@@ -107,12 +109,14 @@ endif()
 target_link_libraries(stego-test PRIVATE ${STEGODISK_LIBRARY})
 target_link_libraries(stego-unit-test PRIVATE ${STEGODISK_LIBRARY})
 target_link_libraries(stego-state-test PRIVATE ${STEGODISK_LIBRARY})
+target_link_libraries(stego-png-lifetime-test PRIVATE ${STEGODISK_LIBRARY})
 
 if(FUSE_FOUND)
   target_link_libraries(stego-fuse-test PRIVATE ${STEGODISK_LIBRARY} ${FUSE_LIBRARIES})
 endif()
 
 list(APPEND TESTS stego-test stego-unit-test stego-state-test)
+list(APPEND TESTS stego-png-lifetime-test)
 
 add_custom_target(check
   COMMAND ${CMAKE_CTEST_COMMAND} --test-dir "${CMAKE_CURRENT_BINARY_DIR}"

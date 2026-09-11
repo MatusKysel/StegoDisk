@@ -35,7 +35,7 @@ public:
   void SaveFile();
 
 private:
-  LodePNGState state_;
+  lodepng::State state_;
 };
 
 } // stego_disk
