@@ -70,9 +70,9 @@ ctest --test-dir out-sanitizers --build-config Debug -L stegodisk --output-on-fa
 ```
 
 #### Static analysis
-The `Clang-Tidy` workflow checks the Linux Debug library sources and project headers using the correctness checks in `.clang-tidy`. The workflow contains the commands for generating its compilation database and running the analyzer locally. Tests, bundled dependency translation units, and optional FUSE code are outside this analysis configuration.
+The `Clang-Tidy` and `Cppcheck` workflows check the Linux Debug library sources and project headers. Clang-tidy uses the correctness checks in `.clang-tidy`; cppcheck enables its error and warning checks. Each workflow contains the commands for generating its compilation database and running the analyzer locally. Tests, bundled dependency translation units, and optional FUSE code are outside these analysis configurations.
 
-Source findings are initially **advisory** while the existing backlog is reviewed. A green analysis job does not mean there are no findings. Tool, configuration, and parsing failures fail the job. Findings appear in the job summary and full diagnostics are retained in the `clang-tidy-reports` artifact.
+Source findings are initially **advisory** while the existing backlog is reviewed. A green analysis job does not mean there are no findings. Tool, configuration, and parsing failures fail the job. Findings appear in the job summary and full diagnostics are retained in the `clang-tidy-reports` and `cppcheck-reports` artifacts.
 
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
