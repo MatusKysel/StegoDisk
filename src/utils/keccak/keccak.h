@@ -15,7 +15,12 @@
 #define ROTL64(x, y) (((x) << (y)) | ((x) >> (64 - (y))))
 #endif
 
-// compute a keccak hash (md) of given byte length from "in"
+// Largest block size any valid digest length produces: 200 - 2 * mdlen with
+// mdlen >= 1.
+#define KECCAK_MAX_RATE 198
+
+// Computes a keccak hash (md) of the given byte length from "in".
+// Returns 0 on success, -1 if the arguments are out of range.
 int keccak(const uint8_t *in, int inlen, uint8_t *md, int mdlen);
 
 // update the state

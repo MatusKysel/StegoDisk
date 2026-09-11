@@ -10,6 +10,7 @@
 #include "keccak_hash_impl.h"
 
 #include <stdexcept>
+#include <string>
 
 #include "api_mask.h"
 #include "utils/exceptions.h"
@@ -18,7 +19,15 @@
 namespace stego_disk {
 
 KeccakHashImpl::KeccakHashImpl(std::size_t state_size) {
-    //TODO: check if stateSize is valid
+    // The sponge rate is 200 - 2 * state_size bytes and is absorbed in whole
+    // 64-bit words, so a size that does not leave a multiple of 8 would drop
+    // the tail of every block. Requiring a multiple of 4 below 100 keeps the
+    // rate word-aligned and positive.
+    if (state_size == 0 || state_size >= 100 || (state_size % 4) != 0)
+        throw std::invalid_argument(
+            "KeccakHashImpl: unsupported state size "
+            + std::to_string(state_size));
+
     state_size_ = state_size;
 }
 
@@ -33,10 +42,9 @@ void KeccakHashImpl::Process(MemoryBuffer& state,
     if (data == nullptr)
         throw exception::NullptrArgument{"data"};
 
-    //TOOD: rewrite implementation (int data types)
-    //TODO: create new optimized version (sth like FastKeccakImpl / NISTKeccakImpl)
-    keccak(data, static_cast<int>(length),
-           state.GetRawPointer(), static_cast<int>(state_size_));
+    if (keccak(data, static_cast<int>(length),
+               state.GetRawPointer(), static_cast<int>(state_size_)) != 0)
+        throw std::invalid_argument("KeccakHashImpl: invalid hash arguments");
 }
 
 } // stego_disk
