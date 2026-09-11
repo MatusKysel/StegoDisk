@@ -1,0 +1,106 @@
+name: Clang-Tidy
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clang-tidy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: clang-tidy (advisory findings)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CC: clang-18
+      CXX: clang++-18
+      CMAKE_VERSION: 4.4.3
+
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Set up Python for build and analysis tools
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install analysis tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 clang-tidy-18 libtbb-dev
+          python -m pip install "cmake==$CMAKE_VERSION" ninja PyYAML
+          clang-tidy-18 --version
+
+      - name: Test analyzer report handling
+        run: >-
+          python -B -m unittest discover -s .github/scripts
+          -p test_summarize_static_analysis.py -v
+
+      - name: Configure project compilation database
+        id: configure
+        run: |
+          cmake -S . -B out-static-analysis/clang-tidy -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DOPTIMIZE_FOR_NATIVE=OFF \
+            -DBUILD_TESTS=OFF \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          clang-tidy-18 --verify-config
+
+      # Findings are initially advisory, but tool failures still fail the job.
+      # Source filters omit bundled lib/ translation units. clang-tidy also
+      # limits header diagnostics to src/. Tests are disabled above so their
+      # translation units are absent from the database.
+      - name: Run clang-tidy correctness checks
+        shell: bash
+        run: |
+          source_filter="^$PWD/src/.*[.]cc$"
+          python - "$source_filter" <<'PY'
+          import json
+          from pathlib import Path
+          import re
+          import sys
+
+          database = Path("out-static-analysis/clang-tidy/compile_commands.json")
+          pattern = re.compile(sys.argv[1])
+          sources = {
+              entry["file"] for entry in json.loads(database.read_text())
+              if pattern.search(entry["file"])
+          }
+          if not sources:
+              raise SystemExit("No project source files selected for clang-tidy")
+          print(f"Analyzing {len(sources)} project translation units")
+          PY
+          run-clang-tidy-18 -p out-static-analysis/clang-tidy -j 4 \
+            -header-filter="^$PWD/src/" \
+            -export-fixes=out-static-analysis/clang-tidy/clang-tidy.yaml \
+            "$source_filter" \
+            2>&1 | tee out-static-analysis/clang-tidy/clang-tidy.log
+
+      - name: Summarize findings and validate analyzer report
+        if: ${{ !cancelled() && steps.configure.outcome == 'success' }}
+        run: >-
+          python .github/scripts/summarize-static-analysis.py
+          out-static-analysis/clang-tidy clang-tidy
+
+      - name: Preserve analyzer diagnostics
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: clang-tidy-reports
+          path: |
+            out-static-analysis/clang-tidy/clang-tidy.log
+            out-static-analysis/clang-tidy/clang-tidy.yaml
+            out-static-analysis/clang-tidy/summary.md
+          if-no-files-found: warn
+          retention-days: 14

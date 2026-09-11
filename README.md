@@ -69,6 +69,11 @@ UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1:external_symbolizer_path=/usr/b
 ctest --test-dir out-sanitizers --build-config Debug -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
 ```
 
+#### Static analysis
+The `Clang-Tidy` workflow checks the Linux Debug library sources and project headers using the correctness checks in `.clang-tidy`. The workflow contains the commands for generating its compilation database and running the analyzer locally. Tests, bundled dependency translation units, and optional FUSE code are outside this analysis configuration.
+
+Source findings are initially **advisory** while the existing backlog is reviewed. A green analysis job does not mean there are no findings. Tool, configuration, and parsing failures fail the job. Findings appear in the job summary and full diagnostics are retained in the `clang-tidy-reports` artifact.
+
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
 

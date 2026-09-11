@@ -24,3 +24,4 @@ stego-disk_export.h
 
 out-coverage/
 out-sanitizers/
+out-static-analysis/
