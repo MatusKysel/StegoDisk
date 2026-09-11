@@ -21,3 +21,5 @@ src/tests/test_config.h
 src/version.h
 src/api_mask.h
 stego-disk_export.h
+
+out-coverage/

@@ -2,6 +2,8 @@
 
 Linux/macOS/Windows [![CI](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml)
 
+[![codecov](https://codecov.io/gh/MatusKysel/StegoDisk/branch/master/graph/badge.svg)](https://app.codecov.io/github/MatusKysel/StegoDisk)
+
 ### Overview
 StegoDisk is cross platform steganographic library with a support of BMP, JPEG and PNG files. This library is using steganographic techniques for embedding data into carrier files. This libarary aslo comes with new interface for the Python programming language.
 
@@ -28,6 +30,25 @@ For an out-of-source build in `out`, run the project tests after building with:
 ctest --test-dir out --build-config Release -L stegodisk --output-on-failure --no-tests=error
 ```
 This includes regression tests for reconfiguration, capacity estimates, per-file encoders, and reopening storage.
+
+#### Code coverage
+The `Coverage` workflow runs the project tests in an instrumented GCC Debug build and uploads a Cobertura XML report to [Codecov](https://app.codecov.io/github/MatusKysel/StegoDisk). It uses GitHub OIDC authentication; no `CODECOV_TOKEN` secret is required. Public fork pull requests use the Codecov action's tokenless upload support.
+
+Coverage includes the library sources compiled by the default build, including Keccak. Test code and the bundled `lib/` dependencies are excluded; optional FUSE code is not built by this workflow. Coverage percentage checks are informational while a baseline is established; test failures, failed uploads, and empty or near-empty reports fail the workflow. XML and browsable HTML reports are also available in the run's `coverage-reports` artifact. The badge shows the latest coverage uploaded for `master`, so it populates after the first successful run on that branch.
+
+To generate the same reports locally on Linux with GCC 13, CMake, Ninja, TBB, and `gcovr==8.6` installed:
+
+```sh
+CC=gcc-13 CXX=g++-13 cmake -S . -B out-coverage -G Ninja \
+  -DCMAKE_BUILD_TYPE=Debug -DOPTIMIZE_FOR_NATIVE=OFF \
+  -DCMAKE_CXX_FLAGS="--coverage -fprofile-update=atomic -fprofile-abs-path" \
+  -DCMAKE_EXE_LINKER_FLAGS=--coverage -DCMAKE_SHARED_LINKER_FLAGS=--coverage
+cmake --build out-coverage --parallel 4
+ctest --test-dir out-coverage --build-config Debug -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
+gcovr --config gcovr.cfg --gcov-executable gcov-13 \
+  --xml-pretty --xml out-coverage/coverage.xml \
+  --html-details out-coverage/coverage.html --print-summary --fail-under-line 1 out-coverage
+```
 
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
