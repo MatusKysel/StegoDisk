@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [master, legacy]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libtbb-dev
+
+      - name: Configure
+        shell: bash
+        run: |
+          mkdir -p out
+          extra=""
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # Tests build the temp path into a C string, so it must use forward slashes.
+            extra="-A x64 -DTEST_DIR=$(cygpath -m "$RUNNER_TEMP")/"
+          fi
+          # libjpeg-turbo submodule still declares cmake_minimum_required(2.8.12),
+          # which CMake >= 4 rejects without this override.
+          cmake -S . -B out -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 $extra
+
+      - name: Build
+        run: cmake --build out --config Release --parallel 4
+
+      - name: Test
+        run: cmake --build out --config Release --target check
