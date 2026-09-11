@@ -168,7 +168,8 @@ void CarrierFile::SetSubkey(const Key& subkey) {
 }
 
 void CarrierFile::SetBitInBufferPermuted(uint64 index) {
-  if (index >= permutation_->GetSize()) {
+  const uint64 size = permutation_->GetSize();
+  if (index >= size) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: index " << index <<
              " is too big!");
     throw std::out_of_range("Index is out of range!");
@@ -176,12 +177,84 @@ void CarrierFile::SetBitInBufferPermuted(uint64 index) {
 
   uint64 permuted_index = permutation_->Permute(index);
 
-  if (permuted_index >= permutation_->GetSize()) {
+  if (permuted_index >= size) {
     LOG_INFO("CarrierFile::SetBitInBufferPermuted: permuted index " << permuted_index << " is too big!");
     throw std::out_of_range("Permuted index is out of range!");
   }
 
   buffer_[permuted_index / 8] |= ( 1 << (permuted_index % 8));
+}
+
+// Checks that the permuted bit range fits the buffer, so the bulk loops below
+// can index it directly instead of bounds checking every single bit.
+uint64 CarrierFile::PermutedBitCapacity() const {
+  const uint64 size = permutation_->GetSize();
+  if (size > static_cast<uint64>(buffer_.GetSize()) * 8)
+    throw std::out_of_range("Permutation does not fit the carrier buffer!");
+  return size;
+}
+
+/**
+ * @brief Copies the low bit of each source byte into the permuted buffer
+ *
+ * Equivalent to calling SetBitInBufferPermuted() for every set low bit, but
+ * the range checks and the buffer lookup are hoisted out of the loop. This
+ * runs once per carrier bit, so only the permutation call remains per bit.
+ *
+ * @param[in] source  bytes whose low bit carries the data
+ * @param[in] count   number of bytes to read
+ */
+void CarrierFile::ExtractLsbToBufferPermuted(const uint8 *source,
+                                             uint64 count) {
+  if (source == nullptr)
+    throw exception::NullptrArgument{"source"};
+
+  const uint64 size = PermutedBitCapacity();
+  if (count > size)
+    throw std::out_of_range("Index is out of range!");
+
+  uint8 *buffer = buffer_.GetRawPointer();
+  Permutation &permutation = *permutation_;
+
+  for (uint64 i = 0; i < count; ++i) {
+    if ((source[i] & 0x01) == 0) continue;
+    const uint64 permuted_index = permutation.Permute(i);
+    // Kept from the per-bit version. Against a cached size this is a compare,
+    // not the virtual call it used to be.
+    if (permuted_index >= size)
+      throw std::out_of_range("Permuted index is out of range!");
+    buffer[permuted_index / 8] |= static_cast<uint8>(1 << (permuted_index % 8));
+  }
+}
+
+/**
+ * @brief Writes permuted buffer bits back into the low bit of each byte
+ *
+ * The counterpart of ExtractLsbToBufferPermuted(), with the same checks
+ * hoisted out of the loop.
+ *
+ * @param[in,out] destination  bytes whose low bit is replaced
+ * @param[in]     count        number of bytes to write
+ */
+void CarrierFile::ApplyBufferPermutedToLsb(uint8 *destination, uint64 count) {
+  if (destination == nullptr)
+    throw exception::NullptrArgument{"destination"};
+
+  const uint64 size = PermutedBitCapacity();
+  if (count > size)
+    throw std::out_of_range("Index is out of range!");
+
+  const uint8 *buffer = buffer_.GetConstRawPointer();
+  Permutation &permutation = *permutation_;
+
+  for (uint64 i = 0; i < count; ++i) {
+    const uint64 permuted_index = permutation.Permute(i);
+    if (permuted_index >= size)
+      throw std::out_of_range("Permuted index is out of range!");
+    const uint8 bit = (buffer[permuted_index / 8] >>
+                       (permuted_index % 8)) & 0x01;
+    destination[i] = static_cast<uint8>((destination[i] & 0xFE) | bit);
+  }
 }
 
 uint8 CarrierFile::GetBitInBufferPermuted(uint64 index) {

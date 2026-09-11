@@ -87,6 +87,12 @@ protected:
   void SetBitInBufferPermuted(uint64 index);
   uint8 GetBitInBufferPermuted(uint64 index);
 
+  // Bulk equivalents of the two calls above for carriers whose bits sit in
+  // consecutive bytes. They do the range checks once instead of per bit.
+  void ExtractLsbToBufferPermuted(const uint8 *source, uint64 count);
+  void ApplyBufferPermutedToLsb(uint8 *destination, uint64 count);
+  uint64 PermutedBitCapacity() const;
+
   int ExtractBufferUsingEncoder();
   int EmbedBufferUsingEncoder();
 
