@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   sanitizers:
-    name: ASan
+    name: ASan + UBSan
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -25,6 +25,7 @@ jobs:
       CMAKE_VERSION: 4.4.3
       ASAN_SYMBOLIZER_PATH: /usr/bin/llvm-symbolizer-18
       ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1:external_symbolizer_path=/usr/bin/llvm-symbolizer-18
 
     steps:
       - name: Checkout repository with submodules
@@ -43,19 +44,19 @@ jobs:
           sudo apt-get install -y clang-18 llvm-18 libclang-rt-18-dev libtbb-dev
           python -m pip install "cmake==$CMAKE_VERSION" ninja
 
-      - name: Configure ASan build
+      - name: Configure ASan and UBSan build
         run: |
           cmake -S . -B out-sanitizers -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug -DOPTIMIZE_FOR_NATIVE=OFF \
-            -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
-            -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
-            -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address \
-            -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address
+            -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+            -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined \
+            -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined
 
       - name: Build
         run: cmake --build out-sanitizers --parallel 4
 
-      - name: Run project tests under ASan
+      - name: Run project tests under ASan and UBSan
         run: >-
           ctest --test-dir out-sanitizers --build-config Debug
           -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error

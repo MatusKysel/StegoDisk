@@ -50,21 +50,22 @@ gcovr --config gcovr.cfg --gcov-executable gcov-13 \
   --html-details out-coverage/coverage.html --print-summary --fail-under-line 1 out-coverage
 ```
 
-#### AddressSanitizer
-The `Sanitizers` workflow runs the full project test suite with Clang 18 AddressSanitizer on Linux. It checks memory accesses and enables LeakSanitizer; a detected error fails the job. Failure logs are retained in the `sanitizer-test-logs` artifact.
+#### AddressSanitizer and UndefinedBehaviorSanitizer
+The `Sanitizers` workflow runs the full project test suite with Clang 18 AddressSanitizer and UndefinedBehaviorSanitizer on Linux. It checks memory accesses, leaks, and undefined behavior; a detected error immediately fails the job. Failure logs are retained in the `sanitizer-test-logs` artifact.
 
 To reproduce locally with Clang 18, its sanitizer runtimes, LLVM symbolizer, CMake, Ninja, and TBB installed:
 
 ```sh
 CC=clang-18 CXX=clang++-18 cmake -S . -B out-sanitizers -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DOPTIMIZE_FOR_NATIVE=OFF \
-  -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
-  -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
-  -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address \
-  -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address
+  -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+  -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+  -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined \
+  -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined
 cmake --build out-sanitizers --parallel 4
 ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer-18 \
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
+UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1:external_symbolizer_path=/usr/bin/llvm-symbolizer-18 \
 ctest --test-dir out-sanitizers --build-config Debug -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
 ```
 
