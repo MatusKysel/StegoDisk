@@ -119,6 +119,18 @@ else ()
 endif()
 ################ CXX FLAGS ##################
 
+################ ZLIB (optional) ##################
+# Only used to speed up rewriting PNG carriers: lodepng's own deflate is about
+# half the speed. Without zlib the PNG encoder falls back to tuned lodepng
+# settings, so this is a performance option, never a requirement.
+find_package(ZLIB QUIET)
+if(ZLIB_FOUND)
+  message(STATUS "Using zlib for PNG compression: ${ZLIB_VERSION_STRING}")
+else()
+  message(STATUS "zlib not found, using lodepng deflate for PNG compression")
+endif()
+################ ZLIB (optional) ##################
+
 ################ LIBJPEGTURBO ##################
 option(ENABLE_SHARED "Build the bundled JPEG shared library" OFF)
 option(WITH_TURBOJPEG "Build the bundled TurboJPEG API" OFF)
@@ -394,6 +406,11 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES} TBB::tbb)
 else()
   target_link_libraries(${STEGODISK_LIBRARY} ${THIRD_LIBRARIES})
+endif()
+
+if(ZLIB_FOUND)
+  target_link_libraries(${STEGODISK_LIBRARY} ZLIB::ZLIB)
+  target_compile_definitions(${STEGODISK_LIBRARY} PRIVATE STEGODISK_HAVE_ZLIB)
 endif()
 
 generate_export_header(${STEGODISK_LIBRARY} BASE_NAME "stego-disk")

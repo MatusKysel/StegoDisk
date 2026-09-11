@@ -12,11 +12,62 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef STEGODISK_HAVE_ZLIB
+#include <zlib.h>
+#endif
+
 #include "utils/exceptions.h"
 #include "utils/stego_errors.h"
 
 
 namespace stego_disk {
+
+namespace {
+
+#ifdef STEGODISK_HAVE_ZLIB
+// Compression level for the rewritten carrier. Level 3 is roughly twice as
+// fast as lodepng's own deflate for about 2% more bytes; level 6 gives back
+// those bytes but none of the speed.
+const int kDeflateLevel = 3;
+
+// lodepng calls this instead of its own deflate. It must emit a complete zlib
+// stream, which is exactly what compress2 produces, and allocate with malloc
+// because lodepng frees the result.
+unsigned CompressWithZlib(unsigned char **out, size_t *outsize,
+                          const unsigned char *in, size_t insize,
+                          const LodePNGCompressSettings *) {
+  const uLongf bound = compressBound(static_cast<uLong>(insize));
+  *out = static_cast<unsigned char *>(malloc(bound));
+  if (*out == nullptr) return 83;  // lodepng: allocation failed
+
+  uLongf written = bound;
+  if (compress2(*out, &written, in, static_cast<uLong>(insize),
+                kDeflateLevel) != Z_OK) {
+    free(*out);
+    *out = nullptr;
+    return 83;
+  }
+  *outsize = written;
+  return 0;
+}
+#endif
+
+// Re-encoding the carrier dominates a save, and the pixels are fixed by the
+// embedding, so only the deflate settings are ours to choose. Both branches
+// produce a valid PNG with identical pixels; they differ only in file size.
+void ConfigureEncoderForSpeed(LodePNGState *state) {
+#ifdef STEGODISK_HAVE_ZLIB
+  state->encoder.zlibsettings.custom_zlib = CompressWithZlib;
+#else
+  // Without zlib, tune lodepng's deflate: most of its time goes into match
+  // finding, and a shorter window with no lazy matching costs ~0.6% of size.
+  state->encoder.zlibsettings.windowsize = 512;
+  state->encoder.zlibsettings.lazymatching = 0;
+  state->encoder.zlibsettings.nicematch = 32;
+#endif
+}
+
+}  // namespace
 
 CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
                                std::shared_ptr<Permutation> permutation,
@@ -41,6 +92,7 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
 
   state_.info_raw.colortype = LCT_RGB;
   state_.info_raw.bitdepth = 8;
+  ConfigureEncoderForSpeed(&state_);
 
   raw_capacity_ = (lodepng_get_raw_size(width_, height_, &state_.info_raw) / 8);
 }
