@@ -155,8 +155,11 @@ int keccak(const uint8_t *in, int inlen, uint8_t *md, int mdlen)
         keccakf(st, KECCAK_ROUNDS);
     }
 
-    // last block and padding
-    memcpy(temp, in, (size_t)inlen);
+    // last block and padding. The length is checked because memcpy declares
+    // its source non-null, so copying zero bytes from the null pointer that
+    // an empty message legitimately carries is still undefined.
+    if (inlen > 0)
+        memcpy(temp, in, (size_t)inlen);
     temp[inlen++] = 1;
     memset(temp + inlen, 0, (size_t)(rsiz - inlen));
     temp[rsiz - 1] |= 0x80;
