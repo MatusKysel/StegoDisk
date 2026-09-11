@@ -23,7 +23,10 @@
 #include "encoders/encoder_factory.h"
 #include "encoders/hamming_encoder.h"
 #include "encoders/lsb_encoder.h"
+#include "hash/hash.h"
+#include "hash/keccak_hash_impl.h"
 #include "keys/key.h"
+#include "utils/keccak/keccak.h"
 #include "logging/logger.h"
 #include "permutations/permutation.h"
 #include "permutations/permutation_factory.h"
@@ -33,6 +36,8 @@
 using stego_disk::Encoder;
 using stego_disk::EncoderFactory;
 using stego_disk::HammingEncoder;
+using stego_disk::Hash;
+using stego_disk::KeccakHashImpl;
 using stego_disk::Key;
 using stego_disk::LsbEncoder;
 using stego_disk::PermElem;
@@ -362,10 +367,91 @@ void TestFactories() {
   EXPECT(Key().GetSize() == 0);
 }
 
+// ------------------------------------------------------------------------ hash
+
+// Digests are storage format: every existing volume's keys and permutations
+// derive from them, so these values must never change. They are the original
+// Keccak (0x01 padding) at a 32-byte digest, i.e. the same function Ethereum
+// calls keccak256; the first two entries are its published vectors.
+struct HashVector {
+  const char *name;
+  int length;
+  const char *digest;
+};
+
+const HashVector kHashVectors[] = {
+  {"empty", 0, "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"},
+  {"abc", 3, "4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45"},
+  {"rate_minus_1", 135, "aba4a58b3b2fcbcdc90624cc76fb6acc522abffc59c25642a5aaaafd00469e8b"},
+  {"exact_rate", 136, "3b3e38f46f9e12a80496894e32e624903a092a42d2096603b4d8151235a56795"},
+  {"rate_plus_1", 137, "0f018f4a7d578f411e6f2a380295e8abff3ba307c4a497253af577d0fb3d7592"},
+  {"long", 1000, "c77d9bffcae9f0984e6dff7eea63cc14cad5f367f791e27b08a1953f192f30a5"},
+};
+
+// Reproduces the inputs the vectors above were generated from.
+std::vector<uint8> HashVectorInput(const HashVector &vector) {
+  const std::string name(vector.name);
+  if (name == "abc") return {'a', 'b', 'c'};
+  if (name == "long") {
+    std::vector<uint8> data(static_cast<std::size_t>(vector.length));
+    for (std::size_t i = 0; i < data.size(); ++i)
+      data[i] = static_cast<uint8>(i * 31 + 7);
+    return data;
+  }
+  return std::vector<uint8>(static_cast<std::size_t>(vector.length), 0xAA);
+}
+
+std::string ToHex(const uint8 *data, std::size_t length) {
+  static const char kDigits[] = "0123456789abcdef";
+  std::string hex;
+  for (std::size_t i = 0; i < length; ++i) {
+    hex.push_back(kDigits[data[i] >> 4]);
+    hex.push_back(kDigits[data[i] & 0x0F]);
+  }
+  return hex;
+}
+
+void TestHash() {
+  for (const auto &vector : kHashVectors) {
+    g_context = std::string("keccak vector ") + vector.name;
+    const std::vector<uint8> input = HashVectorInput(vector);
+    EXPECT(static_cast<int>(input.size()) == vector.length);
+    // An empty vector's data() may be null, which the Hash wrapper rejects.
+    const uint8 empty = 0;
+    const uint8 *bytes = input.empty() ? &empty : input.data();
+
+    uint8 digest[32] = {};
+    EXPECT(keccak(bytes, vector.length, digest, sizeof(digest)) == 0);
+    EXPECT(ToHex(digest, sizeof(digest)) == std::string(vector.digest));
+
+    // The Hash wrapper must produce the same bytes as the raw function.
+    Hash hash(bytes, input.size());
+    EXPECT(hash.GetStateSize() == sizeof(digest));
+    EXPECT(ToHex(hash.GetState().GetConstRawPointer(), hash.GetStateSize()) ==
+           std::string(vector.digest));
+  }
+
+  g_context = "keccak arguments";
+  uint8 digest[32] = {};
+  const uint8 data[1] = {0};
+  EXPECT(keccak(nullptr, 0, digest, sizeof(digest)) == 0);  // empty message
+  EXPECT(keccak(nullptr, 1, digest, sizeof(digest)) == -1);
+  EXPECT(keccak(data, 1, nullptr, sizeof(digest)) == -1);
+  EXPECT(keccak(data, -1, digest, sizeof(digest)) == -1);
+  EXPECT(keccak(data, 1, digest, 0) == -1);
+  EXPECT(keccak(data, 1, digest, 100) == -1);
+
+  g_context = "keccak state size";
+  EXPECT_THROWS(KeccakHashImpl(0), std::invalid_argument);
+  EXPECT_THROWS(KeccakHashImpl(30), std::invalid_argument);   // rate not word aligned
+  EXPECT_THROWS(KeccakHashImpl(100), std::invalid_argument);
+}
+
 int Usage(const char *name) {
   std::cerr << "Usage: " << name << " <permutations|encoders|factories> [instance]\n"
             << "  permutations instance: identity affine affine64 num_feistel mix_feistel\n"
-            << "  encoders instance:     lsb hamming\n";
+            << "  encoders instance:     lsb hamming\n"
+            << "  hash and factories take no instance\n";
   return 2;
 }
 
@@ -394,6 +480,8 @@ int main(int argc, char *argv[]) {
     if (!instance.empty() && instance != "lsb" && instance != "hamming") return Usage(argv[0]);
   } else if (group == "factories") {
     TestFactories();
+  } else if (group == "hash") {
+    TestHash();
   } else {
     return Usage(argv[0]);
   }

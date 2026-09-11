@@ -82,6 +82,7 @@ add_stego_unit_test(UnitPermutationMixFeistel permutations mix_feistel)
 add_stego_unit_test(UnitEncoderLsb encoders lsb)
 add_stego_unit_test(UnitEncoderHamming encoders hamming)
 add_stego_unit_test(UnitFactories factories)
+add_stego_unit_test(UnitHashVectors hash)
 
 add_test(NAME StateConfigurationReset COMMAND stego-state-test config)
 add_test(NAME StateCapacityEstimate COMMAND stego-state-test capacity)
