@@ -1,0 +1,93 @@
+name: Coverage
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: coverage-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write # Authenticate the Codecov upload with GitHub OIDC.
+    env:
+      CC: gcc-13
+      CXX: g++-13
+      CMAKE_VERSION: 4.4.3
+      GCOVR_VERSION: '8.6'
+
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Set up Python for build tools
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install coverage toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-13 g++-13 libtbb-dev
+          python -m pip install "cmake==$CMAKE_VERSION" "gcovr==$GCOVR_VERSION" ninja
+
+      - name: Configure instrumented Debug build
+        run: |
+          cmake -S . -B out-coverage -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DOPTIMIZE_FOR_NATIVE=OFF \
+            -DCMAKE_CXX_FLAGS="--coverage -fprofile-update=atomic -fprofile-abs-path" \
+            -DCMAKE_EXE_LINKER_FLAGS=--coverage \
+            -DCMAKE_SHARED_LINKER_FLAGS=--coverage
+
+      - name: Build
+        run: cmake --build out-coverage --parallel 4
+
+      - name: Run project tests
+        run: >-
+          ctest --test-dir out-coverage --build-config Debug
+          -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
+
+      - name: Generate coverage reports
+        id: report
+        run: |
+          gcovr --config gcovr.cfg --gcov-executable gcov-13 \
+            --xml-pretty --xml out-coverage/coverage.xml \
+            --html-details out-coverage/coverage.html \
+            --print-summary --fail-under-line 1 out-coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          # The action uses tokenless uploads for public fork pull requests.
+          use_oidc: true
+          files: out-coverage/coverage.xml
+          disable_search: true
+          plugins: noop
+          fail_ci_if_error: true
+
+      - name: Preserve coverage reports
+        if: ${{ !cancelled() && steps.report.outcome == 'success' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-reports
+          path: |
+            out-coverage/coverage.xml
+            out-coverage/coverage*.html
+            out-coverage/coverage*.css
+          if-no-files-found: error
+          retention-days: 14

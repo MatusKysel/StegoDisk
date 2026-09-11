@@ -1,0 +1,91 @@
+name: Cppcheck
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cppcheck-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: cppcheck (advisory findings)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CC: gcc-13
+      CXX: g++-13
+      CMAKE_VERSION: 4.4.3
+
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Set up Python for build and analysis tools
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install analysis tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-13 g++-13 cppcheck libtbb-dev
+          python -m pip install "cmake==$CMAKE_VERSION" ninja PyYAML
+          cppcheck --version
+
+      - name: Configure project compilation database
+        id: configure
+        run: |
+          cmake -S . -B out-static-analysis/cppcheck -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DOPTIMIZE_FOR_NATIVE=OFF \
+            -DBUILD_TESTS=OFF \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run cppcheck correctness checks
+        run: |
+          mkdir -p out-static-analysis/cppcheck/cache
+          # Compile databases omit compiler-provided platform macros. Source
+          # filtering excludes bundled lib/ translation units and tests.
+          status=0
+          cppcheck --project=out-static-analysis/cppcheck/compile_commands.json \
+            --file-filter='src/*.cc' -isrc/tests \
+            --enable=warning --std=c++17 --platform=unix64 \
+            -D__unix__=1 -D__linux__=1 --library=posix \
+            --cppcheck-build-dir=out-static-analysis/cppcheck/cache -j 4 \
+            --xml --output-file=out-static-analysis/cppcheck/cppcheck.xml \
+            --error-exitcode=2 \
+            > out-static-analysis/cppcheck/cppcheck.log 2>&1 || status=$?
+          cat out-static-analysis/cppcheck/cppcheck.log
+          # Exit 2 means diagnostics, which are initially advisory. The report
+          # step rejects parsing errors; invalid arguments and crashes fail here.
+          if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
+            exit "$status"
+          fi
+
+      - name: Summarize findings and validate analyzer report
+        if: ${{ !cancelled() && steps.configure.outcome == 'success' }}
+        run: >-
+          python .github/scripts/summarize-static-analysis.py
+          out-static-analysis/cppcheck cppcheck
+
+      - name: Preserve analyzer diagnostics
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: cppcheck-reports
+          path: |
+            out-static-analysis/cppcheck/cppcheck.log
+            out-static-analysis/cppcheck/cppcheck.xml
+            out-static-analysis/cppcheck/summary.md
+          if-no-files-found: warn
+          retention-days: 14

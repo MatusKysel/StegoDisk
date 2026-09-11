@@ -230,9 +230,9 @@ void LsbEncoder::SetArgByName(const string &param, const string &val) {
   string p = param;
 
   if (param.empty())
-    exception::EmptyArgument{"param"};
+    throw exception::EmptyArgument{"param"};
   if (val.empty())
-    exception::EmptyArgument{"val"};
+    throw exception::EmptyArgument{"val"};
 
   std::transform(p.begin(), p.end(), p.begin(), ::tolower);
 

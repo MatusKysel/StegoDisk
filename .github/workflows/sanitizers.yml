@@ -1,0 +1,71 @@
+name: Sanitizers
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sanitizers-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sanitizers:
+    name: ASan + UBSan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CC: clang-18
+      CXX: clang++-18
+      CMAKE_VERSION: 4.4.3
+      ASAN_SYMBOLIZER_PATH: /usr/bin/llvm-symbolizer-18
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1:external_symbolizer_path=/usr/bin/llvm-symbolizer-18
+
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Set up Python for build tools
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install sanitizer toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 llvm-18 libclang-rt-18-dev libtbb-dev
+          python -m pip install "cmake==$CMAKE_VERSION" ninja
+
+      - name: Configure ASan and UBSan build
+        run: |
+          cmake -S . -B out-sanitizers -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug -DOPTIMIZE_FOR_NATIVE=OFF \
+            -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+            -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined \
+            -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined
+
+      - name: Build
+        run: cmake --build out-sanitizers --parallel 4
+
+      - name: Run project tests under ASan and UBSan
+        run: >-
+          ctest --test-dir out-sanitizers --build-config Debug
+          -L stegodisk --output-on-failure --parallel 4 --timeout 600 --no-tests=error
+
+      - name: Preserve test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sanitizer-test-logs
+          path: out-sanitizers/Testing/Temporary/
+          if-no-files-found: ignore
+          retention-days: 14

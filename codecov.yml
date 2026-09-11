@@ -1,0 +1,16 @@
+# Establish a baseline without imposing a coverage target on existing code.
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+comment:
+  layout: "header, diff, files"
+  behavior: default
+  require_base: false
+  require_head: true
+  hide_project_coverage: false

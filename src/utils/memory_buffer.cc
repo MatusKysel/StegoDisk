@@ -26,10 +26,6 @@ using namespace std;
 
 namespace stego_disk {
 
-static std::random_device rd;
-static std::mt19937 gen(rd());
-static std::uniform_int_distribution<> distrib(0, 255);
-
 void MemoryBuffer::Init(std::size_t new_size) {
   size_ = new_size;
   if (size_ > 0) {
@@ -193,7 +189,9 @@ const uint8* MemoryBuffer::GetConstRawPointer() const {
 void MemoryBuffer::Write(std::size_t offset, const uint8* data,
                          std::size_t length) {
 
-  if ((offset + length) > size_)
+  // Compared without adding, so that offset + length cannot overflow and wrap
+  // back under the size.
+  if (length > size_ || offset > size_ - length)
     throw  std::out_of_range("MemoryBuffer: write: offset + length > size");
 
   memcpy(static_cast<void*>(buffer_ + offset), data, length);
@@ -210,6 +208,10 @@ void MemoryBuffer::Clear() {
 void MemoryBuffer::Randomize() {
 
   if ((buffer_ == nullptr) || (size_ == 0)) return;
+
+  // Independent buffers may be randomized concurrently by carrier workers.
+  static thread_local std::mt19937 gen(std::random_device{}());
+  static thread_local std::uniform_int_distribution<> distrib(0, 255);
 
   memset(buffer_, 0, size_);
   memset(buffer_, 0xFF, size_);

@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <random>
 #include <set>
@@ -228,6 +229,71 @@ void TestReopen() {
   ExpectUnloaded(storage);
 }
 
+
+// A fresh carrier set has no valid checksum yet, so the first Load() must still
+// succeed and let the caller write the initial payload.
+void TestFirstLoadOnVirginCarriers() {
+  TestDirectory directory;
+  directory.AddPng();
+  StegoStorage storage;
+  ConfigureIdentity(storage);
+  storage.Open(directory.path.string(), "test-password");
+  storage.Load();
+  EXPECT(storage.GetSize() > 0);
+}
+
+// Read()/Write() bounds must hold for offsets near the top of the address space:
+// "offset + length" overflows uint64 and wraps back under the capacity.
+void TestIoBounds() {
+  TestDirectory directory;
+  directory.AddPng();
+  StegoStorage storage;
+  ConfigureIdentity(storage);
+  storage.Open(directory.path.string(), "test-password");
+  storage.Load();
+
+  const std::size_t size = storage.GetSize();
+  EXPECT(size > 0);
+  if (size == 0) return;
+
+  std::vector<unsigned char> buffer(64, 0);
+
+  // Plain out-of-range accesses.
+  EXPECT_THROWS(storage.Read(buffer.data(), size, 1), std::out_of_range);
+  EXPECT_THROWS(storage.Write(buffer.data(), size, 1), std::out_of_range);
+  EXPECT_THROWS(storage.Read(buffer.data(), 0, size + 1), std::out_of_range);
+  EXPECT_THROWS(storage.Write(buffer.data(), 0, size + 1), std::out_of_range);
+
+  // Offsets chosen so that offset + length wraps around to a small value.
+  const std::size_t wrapping_offset =
+      std::numeric_limits<std::size_t>::max() - buffer.size() + 1;
+  EXPECT_THROWS(storage.Read(buffer.data(), wrapping_offset, buffer.size()),
+                std::out_of_range);
+  EXPECT_THROWS(storage.Write(buffer.data(), wrapping_offset, buffer.size()),
+                std::out_of_range);
+
+  // The last valid byte stays readable and writable.
+  storage.Write(buffer.data(), size - 1, 1);
+  storage.Read(buffer.data(), size - 1, 1);
+}
+
+// A failed Load() must not leave the storage looking loaded.
+void TestLoadFailureLeavesNoStaleState() {
+  TestDirectory directory;
+  directory.AddPng();
+  StegoStorage storage;
+  ConfigureIdentity(storage);
+  storage.Open(directory.path.string(), "test-password");
+  storage.Load();
+  EXPECT(storage.GetSize() > 0);
+
+  // Open() succeeds and sizes the carriers; removing one makes only Load() fail.
+  storage.Open(directory.path.string(), "test-password");
+  fs::remove(directory.path / "carrier.png");
+  EXPECT_THROWS(storage.Load(), std::exception);
+  ExpectUnloaded(storage);
+}
+
 }  // namespace
 
 int main(int argc, char *argv[]) {
@@ -240,6 +306,9 @@ int main(int argc, char *argv[]) {
     else if (group == "capacity") TestCapacityEstimate();
     else if (group == "encoder_override") TestEncoderOverride();
     else if (group == "reopen") TestReopen();
+    else if (group == "first_load") TestFirstLoadOnVirginCarriers();
+    else if (group == "io_bounds") TestIoBounds();
+    else if (group == "load_failure") TestLoadFailureLeavesNoStaleState();
     else return 2;
   } catch (const std::exception &error) {
     std::cerr << "Unexpected exception: " << error.what() << '\n';

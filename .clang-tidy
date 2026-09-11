@@ -1,0 +1,23 @@
+# Start with correctness checks. Existing findings are reported as advisory in
+# CI until the backlog is reviewed; do not hide it with broad suppressions.
+Checks: >-
+  -*,
+  clang-analyzer-core.*,
+  clang-analyzer-cplusplus.*,
+  clang-analyzer-unix.*,
+  clang-analyzer-security.*,
+  bugprone-assert-side-effect,
+  bugprone-dangling-handle,
+  bugprone-exception-escape,
+  bugprone-infinite-loop,
+  bugprone-sizeof-expression,
+  bugprone-string-*,
+  bugprone-suspicious-*,
+  bugprone-throw-keyword-missing,
+  bugprone-undefined-memory-manipulation,
+  bugprone-use-after-move,
+  bugprone-unused-raii
+WarningsAsErrors: ''
+HeaderFilterRegex: '(^|/)src/'
+SystemHeaders: false
+FormatStyle: none
