@@ -2,8 +2,6 @@
 
 Linux/macOS/Windows [![CI](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/MatusKysel/StegoDisk/actions/workflows/ci.yml)
 
-Windows [![Build status](https://ci.appveyor.com/api/projects/status/0x4qk5yudw0o30m7?svg=true)](https://ci.appveyor.com/project/MatusKysel/stegodisk)
-
 [![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6Ik1hdHVzS3lzZWwiLCJyZXBvMSI6IlN0ZWdvRGlzayIsImluY2x1ZGVMaW50IjpmYWxzZSwiYXV0aG9ySWQiOjIxNzM0LCJpYXQiOjE2MDE1NTYyNDl9.4jQMcz0AJilnAU5D65QZ9Ozm3V6N2MGP0kDnPe0f4H8)](https://www.deepcode.ai/app/gh/MatusKysel/StegoDisk/_/dashboard?utm_content=gh%2FMatusKysel%2FStegoDisk)
 
 
