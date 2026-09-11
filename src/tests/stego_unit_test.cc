@@ -113,7 +113,8 @@ void TestPermutationBijection(const PermutationCase &pc, PermElem requested) {
   if (!perm) return;
 
   EXPECT(!perm->IsInitialized());
-  EXPECT_THROWS(perm->Permute(0), std::exception);
+  // An uninitialized permutation reports its state, not a range error.
+  EXPECT_THROWS(perm->Permute(0), stego_disk::exception::InvalidState);
 
   const PermElem announced = perm->GetSizeUsingParams(requested, key);
   perm->Init(requested, key);
@@ -242,6 +243,9 @@ void TestLsbEncoder() {
   EXPECT_THROWS(LsbEncoder(LsbEncoder::GetBlockSizeMax() * 2), std::invalid_argument);
 
   auto encoder = EncoderFactory::GetEncoder(EncoderFactory::EncoderType::LSB);
+  // Called directly, bypassing the factory's own argument validation.
+  EXPECT_THROWS(encoder->SetArgByName("", "1"), stego_disk::exception::EmptyArgument);
+  EXPECT_THROWS(encoder->SetArgByName("blockSize", ""), stego_disk::exception::EmptyArgument);
   EncoderFactory::SetEncoderArg(encoder, "blockSize", "8");
   EXPECT(encoder->GetDataBlockSize() == 8);
   EXPECT_THROWS(EncoderFactory::SetEncoderArg(encoder, "blockSize", "6"), std::invalid_argument);

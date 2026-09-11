@@ -189,7 +189,9 @@ const uint8* MemoryBuffer::GetConstRawPointer() const {
 void MemoryBuffer::Write(std::size_t offset, const uint8* data,
                          std::size_t length) {
 
-  if ((offset + length) > size_)
+  // Compared without adding, so that offset + length cannot overflow and wrap
+  // back under the size.
+  if (length > size_ || offset > size_ - length)
     throw  std::out_of_range("MemoryBuffer: write: offset + length > size");
 
   memcpy(static_cast<void*>(buffer_ + offset), data, length);

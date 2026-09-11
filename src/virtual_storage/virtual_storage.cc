@@ -203,7 +203,9 @@ void VirtualStorage::WriteByte(uint64 position, uint8 value) {
  */
 void VirtualStorage::Read(uint64 offset,
                           std::size_t length, uint8* buffer) const {
-  if (offset + length > usable_capacity_)
+  // Written so that offset + length cannot overflow uint64 and wrap back
+  // under the capacity, which would let a huge offset pass this check.
+  if (length > usable_capacity_ || offset > usable_capacity_ - length)
     throw std::out_of_range("index out of range");
 
   if (length == 0)
@@ -229,7 +231,9 @@ void VirtualStorage::Read(uint64 offset,
  */
 void VirtualStorage::Write(uint64 offset,
                            std::size_t length, const uint8* buffer) {
-  if (offset + length > usable_capacity_)
+  // Written so that offset + length cannot overflow uint64 and wrap back
+  // under the capacity, which would let a huge offset pass this check.
+  if (length > usable_capacity_ || offset > usable_capacity_ - length)
     throw std::out_of_range("index out of range");
 
   if (length == 0)
