@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [master, legacy]
+  pull_request:
+    branches: [master]
+
+# Toolchains under test (bump the version numbers here when new releases land):
+#   - Linux:   GCC 15 (ubuntu-toolchain-r/test PPA) and Clang 22 (apt.llvm.org)
+#   - macOS:   Apple Clang shipped with the newest Xcode on macos-latest
+#   - Windows: MSVC from the newest Visual Studio on windows-latest
+env:
+  GCC_VERSION: 15
+  CLANG_VERSION: 22
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ubuntu-gcc
+            os: ubuntu-latest
+            toolchain: gcc
+          - name: ubuntu-clang
+            os: ubuntu-latest
+            toolchain: clang
+          - name: macos-appleclang
+            os: macos-latest
+          - name: windows-msvc
+            os: windows-latest
+
+    steps:
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install GCC ${{ env.GCC_VERSION }} (Linux)
+        if: matrix.toolchain == 'gcc'
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y gcc-$GCC_VERSION g++-$GCC_VERSION libtbb-dev
+          echo "CC=gcc-$GCC_VERSION" >> "$GITHUB_ENV"
+          echo "CXX=g++-$GCC_VERSION" >> "$GITHUB_ENV"
+
+      - name: Install Clang ${{ env.CLANG_VERSION }} (Linux)
+        if: matrix.toolchain == 'clang'
+        run: |
+          wget -q https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh $CLANG_VERSION
+          sudo apt-get install -y libtbb-dev
+          echo "CC=clang-$CLANG_VERSION" >> "$GITHUB_ENV"
+          echo "CXX=clang++-$CLANG_VERSION" >> "$GITHUB_ENV"
+
+      - name: Configure
+        shell: bash
+        run: |
+          extra=""
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # Tests build the temp path into a C string, so it must use forward slashes.
+            extra="-A x64 -DTEST_DIR=$(cygpath -m "$RUNNER_TEMP")/"
+          fi
+          # libjpeg-turbo submodule still declares cmake_minimum_required(2.8.12),
+          # which CMake >= 4 rejects without this override.
+          cmake -S . -B out -DCMAKE_BUILD_TYPE=Release -DVERSION_NAMES=1 \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 $extra
+
+      - name: Report toolchain
+        shell: bash
+        run: grep -E "CMAKE_(C|CXX)_COMPILER(:|_VERSION)" out/CMakeCache.txt || true
+
+      - name: Build
+        run: cmake --build out --config Release --parallel 4
+
+      - name: Test
+        run: cmake --build out --config Release --target check
