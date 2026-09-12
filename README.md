@@ -88,6 +88,12 @@ python3 -m pip install clang-format==22.1.8
 python3 .github/scripts/check-format.py $(git merge-base HEAD origin/master) src
 ```
 
+The tree was formatted in one pass when the configuration was introduced. That commit moved whitespace only and is listed in `.git-blame-ignore-revs`, which GitHub honours automatically; to skip it in local blame as well:
+
+```Bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
 
