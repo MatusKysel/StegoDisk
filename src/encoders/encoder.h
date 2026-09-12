@@ -31,7 +31,7 @@ public:
 
   virtual uint32 GetDataBlockSize();
   virtual uint32 GetCodewordBlockSize();
-  virtual void SetArgByName(const string &arg, const string &val) = 0;
+  virtual void SetArgByName(const string& arg, const string& val) = 0;
 
   virtual const string GetNameInstance() const = 0;
   //static const string getName();

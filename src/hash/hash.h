@@ -45,9 +45,9 @@ private:
   // static stuff
 public:
   static void SetDefaultHashImpl(std::unique_ptr<HashImpl> new_hash_impl);
+
 private:
   static std::unique_ptr<HashImpl> default_hash_impl_;
-
 };
 
 } // stego_disk

@@ -24,8 +24,8 @@ namespace stego_disk {
 class STEGO_DISK_EXPORT PermutationFactory final {
 private:
   PermutationFactory();
-public:
 
+public:
   enum class PermutationType {
     IDENTITY,
     AFFINE,
@@ -37,11 +37,11 @@ public:
   // get vector of all permutations (each permutation once)
   static vector<std::shared_ptr<Permutation>> GetPermutations();
   // get instance of permutation based on the code name
-  static std::shared_ptr<Permutation> GetPermutation(
-      const string &permutation_name);
+  static std::shared_ptr<Permutation>
+  GetPermutation(const string &permutation_name);
   // get instance of permutation based on type
-  static std::shared_ptr<Permutation> GetPermutation(
-      const PermutationType permutation);
+  static std::shared_ptr<Permutation>
+  GetPermutation(const PermutationType permutation);
   // get instance of the default permutation
   static std::shared_ptr<Permutation> GetDefaultPermutation();
 
@@ -49,10 +49,12 @@ public:
 
   static PermutationType GetPermutationType(const std::string &permutation);
 
-  static const std::string GetPermutationName( const PermutationType permutation);
+  static const std::string
+  GetPermutationName(const PermutationType permutation);
 
 private:
-  static const PermutationType kDefaultPermutation = PermutationType::FEISTEL_MIX;
+  static const PermutationType kDefaultPermutation =
+      PermutationType::FEISTEL_MIX;
 };
 
 } // stego_disk

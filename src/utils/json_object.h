@@ -34,8 +34,7 @@
 
 namespace json {
 
-template<typename Iter>
-Iter NextIter(Iter it) {
+template <typename Iter> Iter NextIter(Iter it) {
   return ++it;
 }
 
@@ -43,98 +42,96 @@ static const std::string kStringChars("\\\"\n\t\r");
 
 class JsonObject {
   friend class PJson;
+
 public:
   typedef std::vector<JsonObject> ArrayType;
   typedef std::map<std::string, JsonObject> ObjectType;
 
-  enum NodeType {
-    NULL_VAL,
-    BOOLEAN,
-    NUMBER,
-    STRING,
-    OBJECT,
-    ARRAY
-  };
+  enum NodeType { NULL_VAL, BOOLEAN, NUMBER, STRING, OBJECT, ARRAY };
 
   JsonObject() : type_(NULL_VAL), bool_val_(false), number_val_(0.0) {}
   JsonObject(const JsonObject &o) : type_(o.type_) {
     switch (type_) {
-      case NULL_VAL:
-        break;
-      case BOOLEAN:
-        bool_val_ = o.bool_val_;
-        break;
-      case NUMBER:
-        number_val_ = o.number_val_;
-        break;
-      case STRING:
-        string_.reset(new std::string(*o.string_));
-        break;
-      case ARRAY:
-        array_.reset(new std::vector<JsonObject>(*o.array_));
-        break;
-      case OBJECT:
-        object_.reset(new std::map<std::string, JsonObject>(*o.object_));
-        break;
+    case NULL_VAL:
+      break;
+    case BOOLEAN:
+      bool_val_ = o.bool_val_;
+      break;
+    case NUMBER:
+      number_val_ = o.number_val_;
+      break;
+    case STRING:
+      string_.reset(new std::string(*o.string_));
+      break;
+    case ARRAY:
+      array_.reset(new std::vector<JsonObject>(*o.array_));
+      break;
+    case OBJECT:
+      object_.reset(new std::map<std::string, JsonObject>(*o.object_));
+      break;
     }
   }
 
   JsonObject(bool val) : type_(BOOLEAN), bool_val_(val) {}
 
-  template<typename T>
-  JsonObject(T val, typename std::enable_if<std::is_integral<T>::value>) : type_(NUMBER), number_val_(val) {}
+  template <typename T>
+  JsonObject(T val, typename std::enable_if<std::is_integral<T>::value>)
+      : type_(NUMBER), number_val_(val) {}
 
-  template<typename T>
-  JsonObject(T val, typename std::enable_if<std::is_floating_point<T>::value>) : type_(NUMBER), number_val_(val) {}
+  template <typename T>
+  JsonObject(T val, typename std::enable_if<std::is_floating_point<T>::value>)
+      : type_(NUMBER), number_val_(val) {}
 
   JsonObject(const char *val) : type_(STRING), string_(new std::string(val)) {}
-  JsonObject(const std::string &val) : type_(STRING), string_(new std::string(val)) {}
+  JsonObject(const std::string &val)
+      : type_(STRING), string_(new std::string(val)) {}
   JsonObject(NodeType type) : type_(type) {
     switch (type_) {
-      case BOOLEAN:
-        bool_val_ = false;
-        break;
-      case NUMBER:
-        number_val_ = 0.0;
-        break;
-      case STRING:
-        InitString();
-        break;
-      case ARRAY:
-        InitArray();
-        break;
-      case OBJECT:
-        InitObject();
-        break;
-      default:
-        break;
+    case BOOLEAN:
+      bool_val_ = false;
+      break;
+    case NUMBER:
+      number_val_ = 0.0;
+      break;
+    case STRING:
+      InitString();
+      break;
+    case ARRAY:
+      InitArray();
+      break;
+    case OBJECT:
+      InitObject();
+      break;
+    default:
+      break;
     }
   }
 
   virtual ~JsonObject() {}
 
   inline JsonObject &operator=(const JsonObject &o) {
-    if (&o == this) return *this;
+    if (&o == this)
+      return *this;
 
     type_ = o.type_;
     switch (type_) {
-      case NULL_VAL:
-        break;
-      case BOOLEAN:
-        bool_val_ = o.bool_val_;
-        break;
-      case NUMBER:
-        number_val_ = o.number_val_;
-        break;
-      case STRING:
-        string_.reset(new std::string(*o.string_));
-        break;
-      case ARRAY:
-        array_.reset(new std::vector<JsonObject>(*o.array_));
-        break;
-      case OBJECT:
-        object_.reset(new std::map<std::string, JsonObject>(*o.object_));
-        break;
+    case NULL_VAL:
+      break;
+    case BOOLEAN:
+      bool_val_ = o.bool_val_;
+      break;
+    case NUMBER:
+      number_val_ = o.number_val_;
+      break;
+    case STRING:
+      string_.reset(new std::string(*o.string_));
+      break;
+    case ARRAY:
+      array_.reset(new std::vector<JsonObject>(*o.array_));
+      break;
+    case OBJECT:
+      object_.reset(new std::map<std::string, JsonObject>(*o.object_));
+      break;
     }
 
     return *this;
@@ -151,21 +148,35 @@ public:
 
   inline NodeType type() const { return type_; }
 
-  void Assign(bool val) { type_ = BOOLEAN; bool_val_ = val; }
+  void Assign(bool val) {
+    type_ = BOOLEAN;
+    bool_val_ = val;
+  }
 
-  template<typename T>
-  void Assign(T val, typename std::enable_if<std::is_integral<T>::value>::type*) { type_ = NUMBER; number_val_ = val; }
+  template <typename T>
+  void Assign(T val,
+              typename std::enable_if<std::is_integral<T>::value>::type *) {
+    type_ = NUMBER;
+    number_val_ = val;
+  }
 
-  template<typename T>
-  void Assign(T val, typename std::enable_if<std::is_floating_point<T>::value>::type*) { type_ = NUMBER; number_val_ = val; }
+  template <typename T>
+  void
+  Assign(T val,
+         typename std::enable_if<std::is_floating_point<T>::value>::type *) {
+    type_ = NUMBER;
+    number_val_ = val;
+  }
 
   void SetNull() { type_ = NULL_VAL; }
 
   inline bool IsNull() const { return type_ == NULL_VAL; }
 
   bool ToBool(bool def_val = false) const {
-    if (IsBool()) return bool_val_;
-    else return def_val;
+    if (IsBool())
+      return bool_val_;
+    else
+      return def_val;
   }
 
   inline bool IsBool() const { return (type_ == BOOLEAN); }
@@ -203,20 +214,25 @@ public:
   }
 
   inline const std::string &ToString(const std::string &def_val) const {
-    if (IsString()) return *string_;
-    else if (IsBool()) return BoolToString(bool_val_);
-    else return def_val;
+    if (IsString())
+      return *string_;
+    else if (IsBool())
+      return BoolToString(bool_val_);
+    else
+      return def_val;
   }
 
   inline std::string &ToString() {
-    if (!IsString()) InitString();
+    if (!IsString())
+      InitString();
     return *string_;
   }
 
   inline std::string ToLowerString(const std::string &def_val) const {
     if (IsString()) {
       std::string str;
-      std::transform(string_->begin(), string_->end(), std::back_inserter(str), ::tolower);
+      std::transform(string_->begin(), string_->end(), std::back_inserter(str),
+                     ::tolower);
       return str;
     } else if (IsBool()) {
       return BoolToString(bool_val_);
@@ -228,7 +244,8 @@ public:
   inline std::string ToLowerString() const {
     if (IsString()) {
       std::string str;
-      std::transform(string_->begin(), string_->end(), std::back_inserter(str), ::tolower);
+      std::transform(string_->begin(), string_->end(), std::back_inserter(str),
+                     ::tolower);
       return str;
     } else if (IsBool()) {
       return BoolToString(bool_val_);
@@ -250,29 +267,37 @@ public:
   }
 
   inline std::vector<JsonObject> &ToArray() {
-    if (!IsArray()) InitArray();
+    if (!IsArray())
+      InitArray();
     return *array_;
   }
 
   inline bool IsArray() const { return (type_ == ARRAY); }
   inline void AddToArray(const JsonObject &node) {
-    if (type_ != ARRAY) InitArray();
+    if (type_ != ARRAY)
+      InitArray();
     array_->push_back(node);
   }
-  inline size_t ArraySize() const { return (type_ == ARRAY) ? array_->size() : 0; }
+  inline size_t ArraySize() const {
+    return (type_ == ARRAY) ? array_->size() : 0;
+  }
 
   inline void GrowArray(size_t size, NodeType type = NULL_VAL) {
-    if (type_ != ARRAY) InitArray();
-    while (size > array_->size()) array_->push_back(JsonObject(type));
+    if (type_ != ARRAY)
+      InitArray();
+    while (size > array_->size())
+      array_->push_back(JsonObject(type));
   }
 
   inline JsonObject &operator[](size_t pos) {
-    if (type_ != ARRAY) InitArray();
+    if (type_ != ARRAY)
+      InitArray();
     GrowArray(pos + 1);
     return (*array_)[pos];
   }
   inline const JsonObject &operator[](size_t pos) const {
-    if (type_ != ARRAY || pos > (array_->size() - 1)) return NullNode();
+    if (type_ != ARRAY || pos > (array_->size() - 1))
+      return NullNode();
     return (*array_)[pos];
   }
 
@@ -287,29 +312,33 @@ public:
   }
 
   inline std::map<std::string, JsonObject> &ToObject() {
-    if (!IsObject()) InitObject();
+    if (!IsObject())
+      InitObject();
     return *object_;
   }
 
   inline JsonObject &operator[](std::string key) {
-    if (type_ != OBJECT) InitObject();
+    if (type_ != OBJECT)
+      InitObject();
     return (*object_)[key];
   }
 
   inline const JsonObject &operator[](std::string key) const {
-    if (type_ != OBJECT) return NullNode();
+    if (type_ != OBJECT)
+      return NullNode();
     return (*object_)[key];
   }
 
 
   inline bool Contains(std::string key) const {
-    if (IsObject()) return object_->count(key);
+    if (IsObject())
+      return object_->count(key);
     return false;
   }
 
-  template<typename T>
-  inline void AddToObject(std::string key, T value) {
-    if (type_ != OBJECT) InitObject();
+  template <typename T> inline void AddToObject(std::string key, T value) {
+    if (type_ != OBJECT)
+      InitObject();
     (*object_)[key] = JsonObject(value);
   }
 
@@ -320,29 +349,32 @@ public:
 
   inline std::string to_str() const {
     switch (type_) {
-      case NULL_VAL:
-        return "null";
-      case BOOLEAN:
-        return bool_val_ ? "true" : "false";
-      case NUMBER: {
-          char buf[256];
-          double tmp;
-          SNPRINTF(buf, sizeof(buf), fabs(number_val_) < (1ULL << 53) && modf(number_val_, &tmp) == 0 ? "%.f" : "%.17g", number_val_);
-          return buf;
-        }
-      case STRING:
-        return *string_;
-      case ARRAY:
-        return "array";
-      case OBJECT:
-        return "object";
-      default:
-        return std::string();
+    case NULL_VAL:
+      return "null";
+    case BOOLEAN:
+      return bool_val_ ? "true" : "false";
+    case NUMBER: {
+      char buf[256];
+      double tmp;
+      SNPRINTF(buf, sizeof(buf),
+               fabs(number_val_) < (1ULL << 53) && modf(number_val_, &tmp) == 0
+                   ? "%.f"
+                   : "%.17g",
+               number_val_);
+      return buf;
+    }
+    case STRING:
+      return *string_;
+    case ARRAY:
+      return "array";
+    case OBJECT:
+      return "object";
+    default:
+      return std::string();
     }
   }
 
-  template <typename Iter>
-  void static copy(const std::string &s, Iter oi) {
+  template <typename Iter> void static copy(const std::string &s, Iter oi) {
     std::copy(s.begin(), s.end(), oi);
   }
 
@@ -351,7 +383,10 @@ public:
     *oi++ = '"';
     for (std::string::const_iterator i = s.begin(); i != s.end(); ++i) {
       switch (*i) {
-#define MAP(val, sym) case val: copy(sym, oi); break
+#define MAP(val, sym)                                                          \
+  case val:                                                                    \
+    copy(sym, oi);                                                             \
+    break
         MAP('"', "\\\"");
         MAP('\\', "\\\\");
         MAP('/', "\\/");
@@ -361,113 +396,104 @@ public:
         MAP('\r', "\\r");
         MAP('\t', "\\t");
 #undef MAP
-        default:
-          if ((unsigned char)*i < 0x20 || *i == 0x7f) {
-            char buf[7];
-            SNPRINTF(buf, sizeof(buf), "\\u%04x", *i & 0xff);
-            std::copy(buf, buf + 6, oi);
-          } else {
-            *oi++ = *i;
-          }
-          break;
+      default:
+        if ((unsigned char)*i < 0x20 || *i == 0x7f) {
+          char buf[7];
+          SNPRINTF(buf, sizeof(buf), "\\u%04x", *i & 0xff);
+          std::copy(buf, buf + 6, oi);
+        } else {
+          *oi++ = *i;
+        }
+        break;
       }
     }
     *oi++ = '"';
   }
 
-  template <typename Iter>
-  void Serialize(Iter oi) const {
+  template <typename Iter> void Serialize(Iter oi) const {
     switch (type_) {
-      case STRING:
-        serialize_str(*string_, oi);
-        break;
-      case ARRAY: {
-          *oi++ = '[';
-          for (ArrayType::const_iterator i = array_->begin();
-               i != array_->end();
-               ++i)
-          {
-            if (i != array_->begin()) {
-              *oi++ = ',';
-            }
-            i->Serialize(oi);
-          }
-          *oi++ = ']';
-          break;
+    case STRING:
+      serialize_str(*string_, oi);
+      break;
+    case ARRAY: {
+      *oi++ = '[';
+      for (ArrayType::const_iterator i = array_->begin(); i != array_->end();
+           ++i) {
+        if (i != array_->begin()) {
+          *oi++ = ',';
         }
-      case OBJECT: {
-          *oi++ = '{';
-          for (ObjectType::const_iterator i = object_->begin();
-               i != object_->end();
-               ++i)
-          {
-            if (i != object_->begin()) {
-              *oi++ = ',';
-            }
-            serialize_str(i->first, oi);
-            *oi++ = ':';
-            i->second.Serialize(oi);
-          }
-          *oi++ = '}';
-          break;
+        i->Serialize(oi);
+      }
+      *oi++ = ']';
+      break;
+    }
+    case OBJECT: {
+      *oi++ = '{';
+      for (ObjectType::const_iterator i = object_->begin(); i != object_->end();
+           ++i) {
+        if (i != object_->begin()) {
+          *oi++ = ',';
         }
-      default:
-        copy(to_str(), oi);
-        break;
+        serialize_str(i->first, oi);
+        *oi++ = ':';
+        i->second.Serialize(oi);
+      }
+      *oi++ = '}';
+      break;
+    }
+    default:
+      copy(to_str(), oi);
+      break;
     }
   }
 
   template <typename Iter>
   void PrettySerialize(Iter oi, size_t indent = 0) const {
     switch (type_) {
-      case STRING:
-        serialize_str(*string_, oi);
-        break;
-      case ARRAY: {
-          *oi++ = '[';
+    case STRING:
+      serialize_str(*string_, oi);
+      break;
+    case ARRAY: {
+      *oi++ = '[';
+      *oi++ = '\n';
+      for (ArrayType::const_iterator i = array_->begin(); i != array_->end();
+           ++i) {
+        if (i != array_->begin()) {
+          *oi++ = ',';
           *oi++ = '\n';
-          for (ArrayType::const_iterator i = array_->begin();
-               i != array_->end();
-               ++i)
-          {
-            if (i != array_->begin()) {
-              *oi++ = ',';
-              *oi++ = '\n';
-            }
-            Indent(oi, indent + 1);
-            i->PrettySerialize(oi, indent + 1);
-          }
-          *oi++ = '\n';
-          Indent(oi, indent);
-          *oi++ = ']';
-          break;
         }
-      case OBJECT: {
-          *oi++ = '{';
+        Indent(oi, indent + 1);
+        i->PrettySerialize(oi, indent + 1);
+      }
+      *oi++ = '\n';
+      Indent(oi, indent);
+      *oi++ = ']';
+      break;
+    }
+    case OBJECT: {
+      *oi++ = '{';
+      *oi++ = '\n';
+      for (ObjectType::const_iterator i = object_->begin(); i != object_->end();
+           ++i) {
+        if (i != object_->begin()) {
+          *oi++ = ',';
           *oi++ = '\n';
-          for (ObjectType::const_iterator i = object_->begin();
-               i != object_->end();
-               ++i)
-          {
-            if (i != object_->begin()) {
-              *oi++ = ',';
-              *oi++ = '\n';
-            }
-            Indent(oi, indent + 1);
-            serialize_str(i->first, oi);
-            *oi++ = ' ';
-            *oi++ = ':';
-            *oi++ = ' ';
-            i->second.PrettySerialize(oi, indent + 1);
-          }
-          *oi++ = '\n';
-          Indent(oi, indent);
-          *oi++ = '}';
-          break;
         }
-      default:
-        copy(to_str(), oi);
-        break;
+        Indent(oi, indent + 1);
+        serialize_str(i->first, oi);
+        *oi++ = ' ';
+        *oi++ = ':';
+        *oi++ = ' ';
+        i->second.PrettySerialize(oi, indent + 1);
+      }
+      *oi++ = '\n';
+      Indent(oi, indent);
+      *oi++ = '}';
+      break;
+    }
+    default:
+      copy(to_str(), oi);
+      break;
     }
   }
 
@@ -491,29 +517,37 @@ public:
     return s;
   }
 
-  inline static std::string Indent(size_t indent) { return std::string(indent, '\t'); }
+  inline static std::string Indent(size_t indent) {
+    return std::string(indent, '\t');
+  }
 
-  template<typename Iter>
-  inline static void Indent(Iter oi, size_t indent) {
-    for (size_t i = 0; i < (indent * 2); ++i) *oi++ = ' ';
+  template <typename Iter> inline static void Indent(Iter oi, size_t indent) {
+    for (size_t i = 0; i < (indent * 2); ++i)
+      *oi++ = ' ';
   }
 
 private:
   void InitString() {
-    if (!string_) string_.reset(new std::string);
-    else string_->clear();
+    if (!string_)
+      string_.reset(new std::string);
+    else
+      string_->clear();
     type_ = STRING;
   }
 
   void InitArray() {
-    if (!array_) array_.reset(new std::vector<JsonObject>);
-    else array_->clear();
+    if (!array_)
+      array_.reset(new std::vector<JsonObject>);
+    else
+      array_->clear();
     type_ = ARRAY;
   }
 
   void InitObject() {
-    if (!object_) object_.reset(new std::map<std::string, JsonObject>);
-    else object_->clear();
+    if (!object_)
+      object_.reset(new std::map<std::string, JsonObject>);
+    else
+      object_->clear();
     type_ = OBJECT;
   }
 

@@ -15,13 +15,13 @@
 namespace stego_disk {
 
 IdentityPermutation::IdentityPermutation() {
-  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::Permutation: constructor called for: "
+            << GetNameInstance());
 }
 
 IdentityPermutation::~IdentityPermutation() {
-  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: "
+            << GetNameInstance());
 }
 
 void IdentityPermutation::Init(PermElem requested_size, Key& /*key*/) {

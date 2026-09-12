@@ -33,7 +33,6 @@
 namespace stego_disk {
 
 
-
 /**
  * The CarrierFile class.
  *
@@ -43,8 +42,7 @@ namespace stego_disk {
 class CarrierFile {
 
 public:
-  CarrierFile(File file,
-              std::shared_ptr<Encoder> encoder,
+  CarrierFile(File file, std::shared_ptr<Encoder> encoder,
               std::shared_ptr<Permutation> permutation,
               std::unique_ptr<Fitness> fitness);
 
@@ -67,15 +65,15 @@ public:
   virtual void SaveFile() = 0;
 
   void SetSubkey(const Key& subkey_);
-  int AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage, uint64 offSet,
-                          uint64 bytes_used);
+  int AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage,
+                          uint64 offSet, uint64 bytes_used);
 
   Key GetPermKey();
   uint32 GetWidth();
   uint32 GetHeight();
   bool IsGrayscale();
 
-  bool operator< (const CarrierFile& val) const;
+  bool operator<(const CarrierFile& val) const;
 
   static bool CompareByPointers(CarrierFile* a, CarrierFile* b);
   static bool CompareBySharedPointers(std::shared_ptr<CarrierFile> a,
@@ -89,8 +87,8 @@ protected:
 
   // Bulk equivalents of the two calls above for carriers whose bits sit in
   // consecutive bytes. They do the range checks once instead of per bit.
-  void ExtractLsbToBufferPermuted(const uint8 *source, uint64 count);
-  void ApplyBufferPermutedToLsb(uint8 *destination, uint64 count);
+  void ExtractLsbToBufferPermuted(const uint8* source, uint64 count);
+  void ApplyBufferPermutedToLsb(uint8* destination, uint64 count);
   uint64 PermutedBitCapacity() const;
 
   int ExtractBufferUsingEncoder();

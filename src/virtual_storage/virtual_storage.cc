@@ -46,13 +46,16 @@ std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance() {
   return virtual_storage;
 }
 
-std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(string permutation) {
+std::shared_ptr<VirtualStorage>
+VirtualStorage::GetNewInstance(string permutation) {
   std::shared_ptr<VirtualStorage> virtual_storage =
       shared_ptr<VirtualStorage>(new VirtualStorage());
   try {
     virtual_storage->SetPermutation(
-          PermutationFactory::GetPermutation(permutation));
-  } catch (...) { throw; }
+        PermutationFactory::GetPermutation(permutation));
+  } catch (...) {
+    throw;
+  }
 
   return virtual_storage;
 }
@@ -118,15 +121,18 @@ void VirtualStorage::UnSetPermutation() {
  * @param[in] globalPermutation Correctly Initialized permutation
  */
 void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
-  if ( !global_permutation_ )
+  if (!global_permutation_)
     throw exception::InvalidState{exception::Operation::getCapacity,
                                   exception::Component::permutation,
                                   exception::ComponentState::notSetted};
 
-  try { global_permutation_->Init(requested_size, key); }
-  catch (...) { throw; }
+  try {
+    global_permutation_->Init(requested_size, key);
+  } catch (...) {
+    throw;
+  }
 
-  if ( global_permutation_->GetSize() == 0 ) {
+  if (global_permutation_->GetSize() == 0) {
     string str = "VirtualStorage::applyPermutation: size of ";
     str += global_permutation_->GetNameInstance();
     str += " is Initialized by requested size (";
@@ -165,7 +171,7 @@ uint8 VirtualStorage::ReadByte(uint64 position) {
   if (!global_permutation_)
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notInitialized};
+                                  exception::ComponentState::notInitialized};
 
   return data_[global_permutation_->Permute(position)];
 }
@@ -186,7 +192,7 @@ void VirtualStorage::WriteByte(uint64 position, uint8 value) {
   if (!global_permutation_)
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notInitialized};
+                                  exception::ComponentState::notInitialized};
 
   data_[global_permutation_->Permute(position)] = value;
 }
@@ -201,8 +207,8 @@ void VirtualStorage::WriteByte(uint64 position, uint8 value) {
  * @param[in]  length   the number of bytes to read
  * @param[out] buffer   output buffer
  */
-void VirtualStorage::Read(uint64 offset,
-                          std::size_t length, uint8* buffer) const {
+void VirtualStorage::Read(uint64 offset, std::size_t length,
+                          uint8* buffer) const {
   // Written so that offset + length cannot overflow uint64 and wrap back
   // under the capacity, which would let a huge offset pass this check.
   if (length > usable_capacity_ || offset > usable_capacity_ - length)
@@ -214,7 +220,7 @@ void VirtualStorage::Read(uint64 offset,
   if (data_.GetConstRawPointer() == nullptr)
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notInitialized};
+                                  exception::ComponentState::notInitialized};
 
   memcpy(buffer, (void*)(data_.GetConstRawPointer() + offset), length);
 }
@@ -229,8 +235,8 @@ void VirtualStorage::Read(uint64 offset,
  * @param[in]  length   the number of bytes to write
  * @param[in]  buffer   data_ input buffer
  */
-void VirtualStorage::Write(uint64 offset,
-                           std::size_t length, const uint8* buffer) {
+void VirtualStorage::Write(uint64 offset, std::size_t length,
+                           const uint8* buffer) {
   // Written so that offset + length cannot overflow uint64 and wrap back
   // under the capacity, which would let a huge offset pass this check.
   if (length > usable_capacity_ || offset > usable_capacity_ - length)
@@ -242,7 +248,7 @@ void VirtualStorage::Write(uint64 offset,
   if (data_.GetConstRawPointer() == nullptr)
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notInitialized};
+                                  exception::ComponentState::notInitialized};
 
   memcpy(data_.GetRawPointer() + offset, buffer, length);
 }
@@ -297,10 +303,10 @@ bool VirtualStorage::IsValidChecksum() {
             << StegoMath::HexBufferToStr(stored_checksum));
   LOG_DEBUG("VirtualStorage::isValidChecksum: Computed CHECKSUM: "
             << StegoMath::HexBufferToStr(checksum.GetState()));
-  LOG_TRACE("VirtualStorage::isValidChecksum: data_ (raw Capacity = "
-            << raw_capacity_ << "): "
-            << StegoMath::HexBufferToStr(&data_[0],
-            static_cast<int>(raw_capacity_)));
+  LOG_TRACE(
+      "VirtualStorage::isValidChecksum: data_ (raw Capacity = "
+      << raw_capacity_ << "): "
+      << StegoMath::HexBufferToStr(&data_[0], static_cast<int>(raw_capacity_)));
 
   return (stored_checksum == checksum.GetState());
 }
@@ -314,7 +320,7 @@ void VirtualStorage::WriteChecksum() {
   if ((data_.GetSize() == 0) || (usable_capacity_ == 0))
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notInitialized};
+                                  exception::ComponentState::notInitialized};
 
   //TODO:    #warning Sync hash length with SFS_STORAGE_HASH_LENGTH
 
@@ -324,10 +330,10 @@ void VirtualStorage::WriteChecksum() {
               checksum.GetStateSize());
   LOG_DEBUG("VirtualStorage::WriteChecksum: Computed CHECKSUM: "
             << StegoMath::HexBufferToStr(checksum.GetState()));
-  LOG_TRACE("VirtualStorage::WriteChecksum: data_ (raw Capacity = "
-            << raw_capacity_ << "): "
-            << StegoMath::HexBufferToStr(&data_[0],
-            static_cast<int>(raw_capacity_)));
+  LOG_TRACE(
+      "VirtualStorage::WriteChecksum: data_ (raw Capacity = "
+      << raw_capacity_ << "): "
+      << StegoMath::HexBufferToStr(&data_[0], static_cast<int>(raw_capacity_)));
 }
 
 } // stego_disk

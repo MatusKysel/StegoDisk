@@ -1,0 +1,9 @@
+# Revisions to skip when running git blame, because they only move whitespace.
+#
+# Enable locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub applies this file automatically in its blame view.
+
+# style: apply clang-format to the whole source tree
+2246a5ad2b2aa61b6ee3569632496b789735f57e

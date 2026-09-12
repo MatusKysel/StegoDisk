@@ -19,13 +19,13 @@
 
 namespace stego_disk {
 
-StegoStorage::StegoStorage() :
-  carrier_files_manager_(new CarrierFilesManager()), opened_(false) {}
+StegoStorage::StegoStorage()
+    : carrier_files_manager_(new CarrierFilesManager()), opened_(false) {}
 
 StegoStorage::~StegoStorage() {}
 
-void StegoStorage::Open(const std::string &storage_base_path,
-                        const std::string &password) {
+void StegoStorage::Open(const std::string& storage_base_path,
+                        const std::string& password) {
   opened_ = false;
   virtual_storage_.reset();
 
@@ -35,13 +35,14 @@ void StegoStorage::Open(const std::string &storage_base_path,
   opened_ = true;
 }
 
-void StegoStorage::Configure(const std::string &config_path) const {
+void StegoStorage::Configure(const std::string& config_path) const {
   std::ifstream ifs(config_path.c_str());
   if (!ifs.is_open()) {
     throw exception::ErrorOpenFIle{config_path};
   }
 
-  std::string json_string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+  std::string json_string((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
   ifs.close();
 
   json::JsonObject config;
@@ -59,14 +60,17 @@ void StegoStorage::Configure() const {
             PermutationFactory::GetDefaultPermutationType());
 }
 
-void StegoStorage::Configure(const EncoderFactory::EncoderType encoder,
-                             const PermutationFactory::PermutationType global_perm,
-                             const PermutationFactory::PermutationType local_perm) const {
+void StegoStorage::Configure(
+    const EncoderFactory::EncoderType encoder,
+    const PermutationFactory::PermutationType global_perm,
+    const PermutationFactory::PermutationType local_perm) const {
 
   json::JsonObject config;
   config.AddToObject("encoder", EncoderFactory::GetEncoderName(encoder));
-  config.AddToObject("glob_perm", PermutationFactory::GetPermutationName(global_perm));
-  config.AddToObject("local_perm",  PermutationFactory::GetPermutationName(local_perm));
+  config.AddToObject("glob_perm",
+                     PermutationFactory::GetPermutationName(global_perm));
+  config.AddToObject("local_perm",
+                     PermutationFactory::GetPermutationName(local_perm));
   StegoConfig::Init(config);
 }
 
@@ -75,25 +79,25 @@ void StegoStorage::Load() {
   if (!StegoConfig::initialized()) {
     throw exception::InvalidState{exception::Operation::loadStegoStrorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notConfigured};
+                                  exception::ComponentState::notConfigured};
   }
   if (!opened_) {
     throw exception::InvalidState{exception::Operation::loadStegoStrorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notOpened};
+                                  exception::ComponentState::notOpened};
   }
-  
+
   // A new load invalidates whatever was loaded before, including when it fails
   // part way through; the storage must not keep reporting the old capacity.
   virtual_storage_.reset();
 
   carrier_files_manager_->SetEncoder(
-        EncoderFactory::GetEncoder(StegoConfig::encoder()));
+      EncoderFactory::GetEncoder(StegoConfig::encoder()));
   carrier_files_manager_->ApplyEncoder();
 
   auto virtual_storage = std::make_shared<VirtualStorage>();
   virtual_storage->SetPermutation(
-        PermutationFactory::GetPermutation(StegoConfig::global_perm()));
+      PermutationFactory::GetPermutation(StegoConfig::global_perm()));
   // Published only once every carrier has been read successfully.
   carrier_files_manager_->LoadVirtualStorage(virtual_storage);
   virtual_storage_ = std::move(virtual_storage);
@@ -103,17 +107,18 @@ void StegoStorage::Save() {
   if (!opened_)
     throw exception::InvalidState{exception::Operation::saveStegoStrorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notOpened};
+                                  exception::ComponentState::notOpened};
 
   if (virtual_storage_ == nullptr)
     throw exception::InvalidState{exception::Operation::saveStegoStrorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notLoaded};
+                                  exception::ComponentState::notLoaded};
 
   try {
     carrier_files_manager_->SaveVirtualStorage();
+  } catch (...) {
+    throw;
   }
-  catch (...) { throw; }
 }
 
 void StegoStorage::Read(void* destination, const std::size_t offSet,
@@ -121,12 +126,13 @@ void StegoStorage::Read(void* destination, const std::size_t offSet,
   if (virtual_storage_ == nullptr)
     throw exception::InvalidState{exception::Operation::ioStegoStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notLoaded};
+                                  exception::ComponentState::notLoaded};
 
   try {
     virtual_storage_->Read(offSet, length, (uint8*)destination);
+  } catch (...) {
+    throw;
   }
-  catch (...) { throw; }
 }
 
 void StegoStorage::Write(const void* source, const std::size_t offSet,
@@ -134,12 +140,13 @@ void StegoStorage::Write(const void* source, const std::size_t offSet,
   if (virtual_storage_ == nullptr)
     throw exception::InvalidState{exception::Operation::ioStegoStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notLoaded};
+                                  exception::ComponentState::notLoaded};
 
   try {
     virtual_storage_->Write(offSet, length, (uint8*)source);
+  } catch (...) {
+    throw;
   }
-  catch (...) { throw; }
 }
 
 std::size_t StegoStorage::GetSize() const {
@@ -148,11 +155,12 @@ std::size_t StegoStorage::GetSize() const {
 
   try {
     return virtual_storage_->GetUsableCapacity();
+  } catch (...) {
+    throw;
   }
-  catch (...) { throw; }
 }
 
-void StegoStorage::ChangeEncoder(std::string &config) const {
+void StegoStorage::ChangeEncoder(std::string& config) const {
 
   json::JsonObject json_config;
   std::string parse_error = json::Parse(config, &json_config);
@@ -162,9 +170,10 @@ void StegoStorage::ChangeEncoder(std::string &config) const {
   }
 
   try {
-//    return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+    //    return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+  } catch (...) {
+    throw;
   }
-  catch (...) { throw; }
 }
 
 } // stego_disk

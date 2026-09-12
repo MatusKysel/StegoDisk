@@ -25,10 +25,10 @@ public:
   MemoryBuffer(const uint8* data, std::size_t length);
 
   MemoryBuffer(const MemoryBuffer& other); // copy constructor
-  MemoryBuffer(MemoryBuffer&& other); // move constructor
+  MemoryBuffer(MemoryBuffer&& other);      // move constructor
 
   MemoryBuffer& operator=(const MemoryBuffer& other); // copy assignment
-  MemoryBuffer& operator=(MemoryBuffer&& other); // move assignment
+  MemoryBuffer& operator=(MemoryBuffer&& other);      // move assignment
 
   bool operator==(const MemoryBuffer& other);
   bool operator!=(const MemoryBuffer& other);
@@ -48,8 +48,8 @@ public:
   uint8* GetRawPointer() const;
   const uint8* GetConstRawPointer() const;
 
-  void Clear(); // set content to zero
-  void Randomize(); // replace content by random data
+  void Clear();           // set content to zero
+  void Randomize();       // replace content by random data
   void Fill(uint8 value); // fill entire buffer with value
 
 private:

@@ -20,19 +20,19 @@
 namespace stego_disk {
 
 uint64 StegoMath::Gcd(uint64 a, uint64 b) {
-  while ( 1 ) {
+  while (1) {
     a = a % b;
-    if( a == 0 )
+    if (a == 0)
       return b;
     b = b % a;
 
-    if( b == 0 )
+    if (b == 0)
       return a;
   }
 }
 
 uint64 StegoMath::Lcm(uint64 a, uint64 b) {
-  return a * b / Gcd(a,b);
+  return a * b / Gcd(a, b);
 }
 
 /*
@@ -41,10 +41,10 @@ uint64 StegoMath::Lcm(uint64 a, uint64 b) {
  * source: http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=primalityTesting
  */
 bool StegoMath::MillerRabin(uint64 p) {
-  if(p < 2) {
+  if (p < 2) {
     return false;
   }
-  if(p != 2 && p %2 == 0) {
+  if (p != 2 && p % 2 == 0) {
     return false;
   }
   uint64 s = p - 1;
@@ -62,8 +62,8 @@ bool StegoMath::MillerRabin(uint64 p) {
     if n < 341,550,071,728,321, it is enough to test a = 2, 3, 5, 7, 11, 13, and 17.
     */
 
-  uint64 witness[] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,
-                      73,79,83,89,97,1662803};
+  uint64 witness[] = {2,  3,  5,  7,  11, 13, 17, 19, 23, 29, 31, 37, 41,
+                      43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 1662803};
   //if (iterations > (sizeof(witness) >> 3)) iterations = it;
   int iterations = (sizeof(witness) >> 3);
 
@@ -75,7 +75,7 @@ bool StegoMath::MillerRabin(uint64 p) {
       mod = Mulmod(mod, mod, p);
       temp *= 2;
     }
-    if(mod != p - 1 && temp % 2 == 0) {
+    if (mod != p - 1 && temp % 2 == 0) {
       return false;
     }
   }
@@ -97,8 +97,8 @@ uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
 #endif
 
   while (b > 0) {
-    if( b % 2 == 1) {
-      x=(x * y) % c;
+    if (b % 2 == 1) {
+      x = (x * y) % c;
     }
     y = (y * y) % c; // squaring the base
     b /= 2;
@@ -106,14 +106,15 @@ uint64 StegoMath::Modulo(uint64 a, uint64 b, uint64 c) {
   return x % c;
 }
 
-uint64 StegoMath::Mulmod(uint64 a,uint64 b,uint64 m) {
+uint64 StegoMath::Mulmod(uint64 a, uint64 b, uint64 m) {
   if ((a < 0xFFFFFF) && (b < 0xFFFFFF)) {
     return (a * b) % m;
   }
 
   uint64 res = 0;
   while (a != 0) {
-    if (a & 1) res = (res + b) % m;
+    if (a & 1)
+      res = (res + b) % m;
     a >>= 1;
     b = (b << 1) % m;
   }
@@ -126,8 +127,10 @@ uint64 StegoMath::Mulmod(uint64 a,uint64 b,uint64 m) {
  * @return closest smaller prime or 0 if there is no smaller prime than number
  */
 uint64 StegoMath::ClosestSmallerPrime(uint64 number) {
-  if (number < 2) return 0;
-  if (number % 2 == 0) number--;
+  if (number < 2)
+    return 0;
+  if (number % 2 == 0)
+    number--;
 
   srand(2);
 
@@ -140,7 +143,6 @@ uint64 StegoMath::ClosestSmallerPrime(uint64 number) {
   } else {
     return 0;
   }
-
 }
 
 void StegoMath::PrintHexBuffer(const uint8 *buffer, std::size_t length) {
@@ -170,7 +172,7 @@ string StegoMath::HexBufferToStr(const uint8 *buffer, std::size_t length) {
 }
 
 
-string StegoMath::HexBufferToStr(const MemoryBuffer& buffer) {
+string StegoMath::HexBufferToStr(const MemoryBuffer &buffer) {
   return HexBufferToStr(buffer.GetConstRawPointer(), buffer.GetSize());
 }
 

@@ -43,10 +43,10 @@ class STEGO_DISK_EXPORT FuseService {
 public:
   static const char* virtual_file_name_;
 
-  int Init(StegoStorage *stego_storage);
+  int Init(StegoStorage* stego_storage);
   std::string MountFuse();
-  int MountFuse(const std::string &mount_point);
-  static int UnmountFuse(const std::string &mount_point);
+  int MountFuse(const std::string& mount_point);
+  static int UnmountFuse(const std::string& mount_point);
 
 private:
   FuseContext* ctx_ = nullptr;

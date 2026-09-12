@@ -31,7 +31,7 @@ public:
   const std::string GetNameInstance() const { return "NumericFeistel"; }
 
 private:
-  std::vector< std::vector<uint32> > hash_tables_;
+  std::vector<std::vector<uint32>> hash_tables_;
 
   uint32 modulus_;
 };

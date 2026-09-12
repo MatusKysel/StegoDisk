@@ -18,7 +18,8 @@
 
 namespace stego_disk {
 
-std::unique_ptr<HashImpl> Hash::default_hash_impl_ = std::unique_ptr<HashImpl>(new KeccakHashImpl());
+std::unique_ptr<HashImpl> Hash::default_hash_impl_ =
+    std::unique_ptr<HashImpl>(new KeccakHashImpl());
 
 
 void Hash::Init() {
@@ -48,9 +49,7 @@ void Hash::Process(const std::string& data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Process(state_,
-                              (uint8*)data.c_str(),
-                              data.length());
+  default_hash_impl_->Process(state_, (uint8*)data.c_str(), data.length());
 }
 
 void Hash::Process(const MemoryBuffer& data) {
@@ -60,8 +59,7 @@ void Hash::Process(const MemoryBuffer& data) {
   if (data.GetSize() == 0)
     throw exception::NullptrArgument{"data"};
 
-  default_hash_impl_->Process(state_,
-                              data.GetConstRawPointer(),
+  default_hash_impl_->Process(state_, data.GetConstRawPointer(),
                               data.GetSize());
 }
 
@@ -76,9 +74,7 @@ void Hash::Append(const std::string& data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Append(state_,
-                             (uint8*)data.c_str(),
-                             data.length());
+  default_hash_impl_->Append(state_, (uint8*)data.c_str(), data.length());
 }
 
 void Hash::Append(const uint8* data, std::size_t length) {

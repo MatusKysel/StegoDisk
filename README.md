@@ -74,6 +74,26 @@ The `Clang-Tidy` and `Cppcheck` workflows check the Linux Debug library sources 
 
 Source findings are initially **advisory** while the existing backlog is reviewed. A green analysis job does not mean there are no findings. Tool, configuration, and parsing failures fail the job. Findings appear in the job summary and full diagnostics are retained in the `clang-tidy-reports` and `cppcheck-reports` artifacts.
 
+#### Code formatting
+The `Clang-format` workflow checks pull requests against `.clang-format`. That configuration was tuned to match the code already in the tree rather than to impose a new style, so reformatting is not required of existing files.
+
+Only the lines a pull request actually changes are checked, because the tree predates the configuration and reformatting it wholesale would bury real changes in noise.
+
+The workflow pins **clang-format 22.1.8**, matching `CLANG_VERSION` in `ci.yml`. Note this is deliberately not the Clang 18 used by the sanitizer and static analysis workflows above: formatting output can change between major releases, so the version is pinned independently of the compiler. Releases 22 and 23 were verified to format this tree identically, so either reproduces CI.
+
+To check the lines you touched, with the same version CI uses:
+
+```Bash
+python3 -m pip install clang-format==22.1.8
+python3 .github/scripts/check-format.py $(git merge-base HEAD origin/master) src
+```
+
+The tree was formatted in one pass when the configuration was introduced. That commit moved whitespace only and is listed in `.git-blame-ignore-revs`, which GitHub honours automatically; to skip it in local blame as well:
+
+```Bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
 

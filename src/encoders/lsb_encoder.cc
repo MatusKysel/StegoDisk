@@ -90,15 +90,17 @@ shared_ptr<Encoder> LsbEncoder::GetNewInstance() {
 void LsbEncoder::Init(uint32 block_size) {
   // is block_size power  2?
   if (StegoMath::Popcount(block_size) != 1)
-    throw std::invalid_argument("LsbEncoder::init: 'block_size' should be power of "
-                            "two, but is " +
-                            std::to_string(static_cast<uint64>(block_size)));
+    throw std::invalid_argument(
+        "LsbEncoder::init: 'block_size' should be power of "
+        "two, but is " +
+        std::to_string(static_cast<uint64>(block_size)));
   // is block_size in range
   if ((block_size < kEncoderLsbBlockSizeMin) ||
       (block_size > kEncoderLsbBlockSizeMax)) {
-    string err = "LsbEncoder::init: 'block_size' is "
-                 + std::to_string(static_cast<uint64>(block_size));
-    err += ", but should be in range <" + std::to_string(static_cast<uint64>(kEncoderLsbBlockSizeMin));
+    string err = "LsbEncoder::init: 'block_size' is " +
+                 std::to_string(static_cast<uint64>(block_size));
+    err += ", but should be in range <" +
+           std::to_string(static_cast<uint64>(kEncoderLsbBlockSizeMin));
     err += "," + std::to_string(static_cast<uint64>(kEncoderLsbBlockSizeMax));
     err += ">";
     throw std::invalid_argument(err);
@@ -106,9 +108,9 @@ void LsbEncoder::Init(uint32 block_size) {
   data_block_size_ = block_size;
   codeword_block_size_ = block_size;
 
-  LOG_DEBUG("LsbEncoder::init: block_size: " << block_size << ", " <<
-            "dataBlockSize: " << data_block_size_ << ", " <<
-            "codewordBlockSize: " << codeword_block_size_);
+  LOG_DEBUG("LsbEncoder::init: block_size: "
+            << block_size << ", " << "dataBlockSize: " << data_block_size_
+            << ", " << "codewordBlockSize: " << codeword_block_size_);
 }
 
 /**
@@ -177,13 +179,12 @@ const string LsbEncoder::GetNameInstance() const {
  * @return Exception std::invalid_argument, if 'codeword' or 'data' are NULL pointer, otherwise 0
  */
 int LsbEncoder::Embed(uint8 *codeword, const uint8 *data) {
-  if ( !codeword )
+  if (!codeword)
     throw exception::NullptrArgument{"codeword"};
-  if ( !data )
+  if (!data)
     throw exception::NullptrArgument{"data"};
   memcpy(codeword, data, data_block_size_);
   return 0;
-
 }
 
 /**
@@ -200,9 +201,9 @@ int LsbEncoder::Embed(uint8 *codeword, const uint8 *data) {
  * @return Exception std::invalid_argument, if 'codeword' or 'data' are NULL pointer, otherwise 0
  */
 int LsbEncoder::Extract(const uint8 *codeword, uint8 *data) {
-  if ( !codeword )
+  if (!codeword)
     throw exception::NullptrArgument{"codeword"};
-  if ( !data )
+  if (!data)
     throw exception::NullptrArgument{"data"};
   memcpy(data, codeword, codeword_block_size_);
   return 0;
@@ -241,17 +242,24 @@ void LsbEncoder::SetArgByName(const string &param, const string &val) {
     int block_size;
 
     is_valid_param = true;
-    try { block_size = stoi(val); }
-    catch (const std::invalid_argument& ) { throw; }
-    catch (const std::out_of_range& ) { throw; }
+    try {
+      block_size = stoi(val);
+    } catch (const std::invalid_argument &) {
+      throw;
+    } catch (const std::out_of_range &) {
+      throw;
+    }
 
     if (block_size < 0)
       throw std::invalid_argument("LsbEncoder::setArgByName: 'block_size' "
-                              "should be positive, but is " +
-                              to_string(static_cast<uint64>(block_size)));
+                                  "should be positive, but is " +
+                                  to_string(static_cast<uint64>(block_size)));
 
-    try { Init(block_size); }
-    catch (const std::out_of_range& ) { throw; }
+    try {
+      Init(block_size);
+    } catch (const std::out_of_range &) {
+      throw;
+    }
   }
 
   // other parameters...

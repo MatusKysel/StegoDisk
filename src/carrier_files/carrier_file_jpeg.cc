@@ -25,11 +25,10 @@
 
 namespace stego_disk {
 
-CarrierFileJPEG::CarrierFileJPEG(File file,
-                                 std::shared_ptr<Encoder> encoder,
+CarrierFileJPEG::CarrierFileJPEG(File file, std::shared_ptr<Encoder> encoder,
                                  std::shared_ptr<Permutation> permutation,
-                                 std::unique_ptr<Fitness> fitness) :
-  CarrierFile(file, encoder, permutation, std::move(fitness)) {
+                                 std::unique_ptr<Fitness> fitness)
+    : CarrierFile(file, encoder, permutation, std::move(fitness)) {
   ComputeCapacity();
 }
 
@@ -68,13 +67,16 @@ void CarrierFileJPEG::ComputeCapacity() {
   for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; by < compptr->height_in_blocks; ++by) {
-      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
-                          ((j_common_ptr)&cinfo_decompress, coeff_arrays[ci],
-                           by, (JDIMENSION)1, FALSE);
+      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)(
+          (j_common_ptr)&cinfo_decompress, coeff_arrays[ci], by, (JDIMENSION)1,
+          FALSE);
       for (bx = 0; bx < compptr->width_in_blocks; ++bx) {
         blockptr = jpeg_block_buffer[0][bx];
-        for (bi = 1; bi < 64; ++bi) { // skip the first coeff (DC) - first index is 1 (first AC coeff)
-          if (blockptr[bi] & 0xFFFE) ++capacity_in_bits; // ignore coeffs 0,1
+        for (
+            bi = 1; bi < 64;
+            ++bi) { // skip the first coeff (DC) - first index is 1 (first AC coeff)
+          if (blockptr[bi] & 0xFFFE)
+            ++capacity_in_bits; // ignore coeffs 0,1
         }
       }
     }
@@ -87,7 +89,8 @@ void CarrierFileJPEG::ComputeCapacity() {
 }
 
 void CarrierFileJPEG::LoadFile() {
-  if (file_loaded_) return;
+  if (file_loaded_)
+    return;
 
   auto file_ptr = file_.Open();
 
@@ -130,25 +133,29 @@ void CarrierFileJPEG::LoadFile() {
 
   uint64 bits_to_modify = permutation_->GetSize();
 
-  LOG_TRACE("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath() <<
-            ", bits to modify: " << bits_to_modify);
+  LOG_TRACE("CarrierFileJPEG::loadFile: file "
+            << file_.GetRelativePath()
+            << ", bits to modify: " << bits_to_modify);
 
   for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; (by < compptr->height_in_blocks) && should_read; ++by) {
-      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
-                          ((j_common_ptr)&cinfo_decompress, coeff_arrays[ci],
-                           by, (JDIMENSION)1, FALSE);
+      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)(
+          (j_common_ptr)&cinfo_decompress, coeff_arrays[ci], by, (JDIMENSION)1,
+          FALSE);
       for (bx = 0; (bx < compptr->width_in_blocks) && should_read; ++bx) {
         blockptr = jpeg_block_buffer[0][bx];
-        for (bi = 1; (bi < 64) && should_read; ++bi) { // skip the first coeff (DC) - first index is 1 (first AC coeff)
+        for (
+            bi = 1; (bi < 64) && should_read;
+            ++bi) { // skip the first coeff (DC) - first index is 1 (first AC coeff)
           if (blockptr[bi] & 0xFFFE) { // ignore 0, 1 coeffs
 
-            if ((blockptr[bi] & 0x1)) SetBitInBufferPermuted(coeff_counter);
+            if ((blockptr[bi] & 0x1))
+              SetBitInBufferPermuted(coeff_counter);
 
             ++coeff_counter;
-            if (coeff_counter >= bits_to_modify) should_read = false;
-
+            if (coeff_counter >= bits_to_modify)
+              should_read = false;
           }
         }
       }
@@ -157,14 +164,16 @@ void CarrierFileJPEG::LoadFile() {
 
   LOG_TRACE(file_.GetRelativePath() << ", coeff_counter:" << coeff_counter);
 
-  LOG_TRACE(file_.GetRelativePath() << ", unpacked buffer: " <<
-            StegoMath::HexBufferToStr(buffer_.GetRawPointer(), 10));
+  LOG_TRACE(file_.GetRelativePath()
+            << ", unpacked buffer: "
+            << StegoMath::HexBufferToStr(buffer_.GetRawPointer(), 10));
 
   if (ExtractBufferUsingEncoder()) {
-    LOG_ERROR("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath()
+    LOG_ERROR("CarrierFileJPEG::loadFile: file "
+              << file_.GetRelativePath()
               << ", saving: buffer extracting failed!");
     throw std::runtime_error("File " + file_.GetFileName() +
-                                                  " buffer extracting failed!");
+                             " buffer extracting failed!");
   }
 
   file_loaded_ = true;
@@ -173,18 +182,17 @@ void CarrierFileJPEG::LoadFile() {
   jpeg_destroy_decompress(&cinfo_decompress);
 
   LOG_TRACE("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath()
-            << " loaded");
-
+                                               << " loaded");
 }
 
 void CarrierFileJPEG::SaveFile() {
 
   auto file_ptr = file_.Open();
 
-  if(!file_loaded_)
+  if (!file_loaded_)
     throw exception::InvalidState{exception::Operation::save,
                                   exception::Component::file,
-								  exception::ComponentState::notLoaded};
+                                  exception::ComponentState::notLoaded};
 
   LOG_TRACE("Saving file " << file_.GetRelativePath());
 
@@ -244,19 +252,22 @@ void CarrierFileJPEG::SaveFile() {
   for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; (by < compptr->height_in_blocks) && should_read; ++by) {
-      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
-                          ((j_common_ptr)&cinfo_decompress, coeff_arrays[ci],
-                           by, (JDIMENSION)1, FALSE);
+      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)(
+          (j_common_ptr)&cinfo_decompress, coeff_arrays[ci], by, (JDIMENSION)1,
+          FALSE);
       for (bx = 0; (bx < compptr->width_in_blocks) && should_read; ++bx) {
         blockptr = jpeg_block_buffer[0][bx];
-        for (bi = 1; (bi < 64) && should_read; ++bi) {// skip the first coeff (DC) - first index is 1 (first AC coeff)
+        for (
+            bi = 1; (bi < 64) && should_read;
+            ++bi) { // skip the first coeff (DC) - first index is 1 (first AC coeff)
           if (blockptr[bi] & 0xFFFE) { // ignore 0, 1 coeffs
 
-            if ((blockptr[bi] & 0x1)) SetBitInBufferPermuted(coeff_counter);
+            if ((blockptr[bi] & 0x1))
+              SetBitInBufferPermuted(coeff_counter);
 
             ++coeff_counter;
-            if (coeff_counter >= bits_to_modify) should_read = false;
-
+            if (coeff_counter >= bits_to_modify)
+              should_read = false;
           }
         }
       }
@@ -271,10 +282,10 @@ void CarrierFileJPEG::SaveFile() {
 
   // TODO: what with this error?
   if (EmbedBufferUsingEncoder()) {
-    LOG_ERROR("CarrierFileJPEG::saveFile: '" << file_.GetRelativePath() <<
-              "': buffer embedding failed!");
+    LOG_ERROR("CarrierFileJPEG::saveFile: '" << file_.GetRelativePath()
+                                             << "': buffer embedding failed!");
     throw std::runtime_error("File " + file_.GetFileName() +
-                                                  " buffer extracting failed!");
+                             " buffer extracting failed!");
   }
 
   //LOG_INFO(_relativePath << ", embedded buffer: " << StegoMath::hexBufferToStr(buffer_, 10));
@@ -283,28 +294,28 @@ void CarrierFileJPEG::SaveFile() {
   // write down permuted and encoded LSBs into DCT coefficients
 
   coeff_counter = 0;
-//  uint8 tmp_lsb = 0;
+  //  uint8 tmp_lsb = 0;
 
-  for (ci = 0; ci < COLOR_SPACE; ++ci){
+  for (ci = 0; ci < COLOR_SPACE; ++ci) {
     compptr = cinfo_decompress.comp_info + ci;
     for (by = 0; (by < compptr->height_in_blocks) && should_write; ++by) {
-      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)
-                          ((j_common_ptr)&cinfo_decompress, coeff_arrays[ci],
-                           by, (JDIMENSION)1, FALSE);
+      jpeg_block_buffer = (cinfo_decompress.mem->access_virt_barray)(
+          (j_common_ptr)&cinfo_decompress, coeff_arrays[ci], by, (JDIMENSION)1,
+          FALSE);
       for (bx = 0; (bx < compptr->width_in_blocks) && should_write; ++bx) {
         blockptr = jpeg_block_buffer[0][bx];
-        for (bi=1; (bi<64) && should_write; bi++)
-        {
+        for (bi = 1; (bi < 64) && should_write; bi++) {
           if (blockptr[bi] & 0xFFFE) { // ignore 0, 1 coeffs
 
-//            tmp_lsb = GetBitInBufferPermuted(coeff_counter);
+            //            tmp_lsb = GetBitInBufferPermuted(coeff_counter);
 
-            blockptr[bi] = (blockptr[bi] & 0xFFFE) |
-                           GetBitInBufferPermuted(coeff_counter);
-//            blockptr[bi] |= (tmp_lsb & 0x01);
+            blockptr[bi] =
+                (blockptr[bi] & 0xFFFE) | GetBitInBufferPermuted(coeff_counter);
+            //            blockptr[bi] |= (tmp_lsb & 0x01);
 
             coeff_counter++;
-            if (coeff_counter >= bits_to_modify) should_write = false;
+            if (coeff_counter >= bits_to_modify)
+              should_write = false;
           }
         }
       }
@@ -344,27 +355,21 @@ void CarrierFileJPEG::SaveFile() {
 
   // write markers; see libjpeg-turbo/transupp.c:jcopy_markers_execute()
   jpeg_saved_marker_ptr marker;
-  for(marker = cinfo_decompress.marker_list;
-      marker != NULL;
-      marker = marker->next) {
-    if (cinfo_compress.write_JFIF_header &&
-        marker->marker == JPEG_APP0 &&
-        marker->data_length >= 5 &&
-        GETJOCTET(marker->data[0]) == 0x4A &&
+  for (marker = cinfo_decompress.marker_list; marker != NULL;
+       marker = marker->next) {
+    if (cinfo_compress.write_JFIF_header && marker->marker == JPEG_APP0 &&
+        marker->data_length >= 5 && GETJOCTET(marker->data[0]) == 0x4A &&
         GETJOCTET(marker->data[1]) == 0x46 &&
         GETJOCTET(marker->data[2]) == 0x49 &&
-        GETJOCTET(marker->data[3]) == 0x46 &&
-        GETJOCTET(marker->data[4]) == 0)
-      continue;                 // reject duplicate JFIF
-    if (cinfo_compress.write_Adobe_marker &&
-        marker->marker == JPEG_APP0 + 14 &&
-        marker->data_length >= 5 &&
-        GETJOCTET(marker->data[0]) == 0x41 &&
+        GETJOCTET(marker->data[3]) == 0x46 && GETJOCTET(marker->data[4]) == 0)
+      continue; // reject duplicate JFIF
+    if (cinfo_compress.write_Adobe_marker && marker->marker == JPEG_APP0 + 14 &&
+        marker->data_length >= 5 && GETJOCTET(marker->data[0]) == 0x41 &&
         GETJOCTET(marker->data[1]) == 0x64 &&
         GETJOCTET(marker->data[2]) == 0x6F &&
         GETJOCTET(marker->data[3]) == 0x62 &&
         GETJOCTET(marker->data[4]) == 0x65)
-      continue;                 // reject duplicate Adobe
+      continue; // reject duplicate Adobe
     jpeg_write_marker(&cinfo_compress, marker->marker, marker->data,
                       marker->data_length);
   }
@@ -378,14 +383,13 @@ void CarrierFileJPEG::SaveFile() {
   jpeg_finish_decompress(&cinfo_decompress);
   jpeg_destroy_decompress(&cinfo_decompress);
 
-  LOG_TRACE("CarrierFileJPEG::saveFile: file " << file_.GetRelativePath() <<
-            " saved");
+  LOG_TRACE("CarrierFileJPEG::saveFile: file " << file_.GetRelativePath()
+                                               << " saved");
 
   //file_loaded_ = false;
 }
 
-int CarrierFileJPEG::GetHistogram()
-{
+int CarrierFileJPEG::GetHistogram() {
   /*
     if (loadFile()) return -1;
 
@@ -425,7 +429,6 @@ int CarrierFileJPEG::GetHistogram()
     }
     */
   return 0;
-
 }
 
 } // stego_disk

@@ -39,12 +39,10 @@ using namespace std;
 
 namespace stego_disk {
 
-CarrierFilesManager::CarrierFilesManager() :
-  capacity_(0),
-  files_in_directory_(0),
-  virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
-  encoder_(std::shared_ptr<Encoder>(nullptr)),
-  is_active_encoder_(false) {}
+CarrierFilesManager::CarrierFilesManager()
+    : capacity_(0), files_in_directory_(0),
+      virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
+      encoder_(std::shared_ptr<Encoder>(nullptr)), is_active_encoder_(false) {}
 
 CarrierFilesManager::~CarrierFilesManager() {
   carrier_files_.clear();
@@ -62,17 +60,19 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
   base_path_ = directory;
 
-  vector<File> files = File::GetFilesInDir(directory, ""); //PSTODO neskodila by nejaka filtracia
+  vector<File> files =
+      File::GetFilesInDir(directory, ""); //PSTODO neskodila by nejaka filtracia
 
   files_in_directory_ = files.size();
 
-  for(auto &file: files) {
-     LOG_TRACE(file.GetBasePath() + " - " + file.GetRelativePath());
+  for (auto &file : files) {
+    LOG_TRACE(file.GetBasePath() + " - " + file.GetRelativePath());
   }
 
   std::vector<File> eligible_files;
   for (auto &file : files) {
-    if (StegoConfig::exclude_list().find(file.GetExtension()) == StegoConfig::exclude_list().end()) {
+    if (StegoConfig::exclude_list().find(file.GetExtension()) ==
+        StegoConfig::exclude_list().end()) {
       eligible_files.push_back(file);
     }
   }
@@ -80,17 +80,17 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
   std::vector<CarrierFilePtr> created(eligible_files.size());
   std::exception_ptr first_exception;
   std::mutex exception_mutex;
-  std::for_each(std::execution::par, eligible_files.begin(), eligible_files.end(),
-          [&](auto &file) {
-                try{
-                  auto idx = &file - &eligible_files[0];
-                  created[idx] = CarrierFileFactory::CreateCarrierFile(file);
-                } catch (...) {
-                  std::lock_guard<std::mutex> lock(exception_mutex);
-                  if (!first_exception)
-                    first_exception = std::current_exception();
-                }
-          });
+  std::for_each(std::execution::par, eligible_files.begin(),
+                eligible_files.end(), [&](auto &file) {
+                  try {
+                    auto idx = &file - &eligible_files[0];
+                    created[idx] = CarrierFileFactory::CreateCarrierFile(file);
+                  } catch (...) {
+                    std::lock_guard<std::mutex> lock(exception_mutex);
+                    if (!first_exception)
+                      first_exception = std::current_exception();
+                  }
+                });
   if (first_exception)
     std::rethrow_exception(first_exception);
 
@@ -102,9 +102,9 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
 
   for (uint64 i = 0; i < carrier_files_.size(); ++i) {
-    LOG_TRACE("CarrierFilesManager::loadDirectory: '" <<
-              carrier_files_[i]->GetFile().GetRelativePath() <<
-              "' has raw capacity " << carrier_files_[i]->GetRawCapacity());
+    LOG_TRACE("CarrierFilesManager::loadDirectory: '"
+              << carrier_files_[i]->GetFile().GetRelativePath()
+              << "' has raw capacity " << carrier_files_[i]->GetRawCapacity());
   }
 
   std::sort(carrier_files_.begin(), carrier_files_.end(),
@@ -113,22 +113,26 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory) {
 
 // return false, if checksum is not valid, true otherwise
 // TODO mY check PERMUTATION init by PASSWORD
-bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage) {
+bool CarrierFilesManager::LoadVirtualStorage(
+    std::shared_ptr<VirtualStorage> storage) {
   if (!storage)
     throw exception::InvalidState{exception::Operation::loadVirtualStorage,
                                   exception::Component::storage,
-								  exception::ComponentState::notInitialized};
+                                  exception::ComponentState::notInitialized};
   if (!encoder_)
     throw exception::InvalidState(exception::Operation::loadVirtualStorage,
                                   exception::Component::encoder,
-								  exception::ComponentState::notSetted);
+                                  exception::ComponentState::notSetted);
   if (!is_active_encoder_)
     throw exception::InvalidState(exception::Operation::loadVirtualStorage,
                                   exception::Component::encoder,
-								  exception::ComponentState::notActive);
+                                  exception::ComponentState::notActive);
 
-  try { storage->ApplyPermutation(this->GetCapacity(), master_key_); }
-  catch (...) { throw; }
+  try {
+    storage->ApplyPermutation(this->GetCapacity(), master_key_);
+  } catch (...) {
+    throw;
+  }
 
   uint64 offset = 0;
 
@@ -150,26 +154,28 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
 
   std::exception_ptr first_exception;
   std::mutex exception_mutex;
-  std::for_each(std::execution::par, carrier_files_.begin(), carrier_files_.end(),
-          [&](auto &file) {
-                try {
-                  file->LoadFile();
-                } catch (...) {
-                  std::lock_guard<std::mutex> lock(exception_mutex);
-                  if (!first_exception)
-                    first_exception = std::current_exception();
-                }
-          });
+  std::for_each(std::execution::par, carrier_files_.begin(),
+                carrier_files_.end(), [&](auto &file) {
+                  try {
+                    file->LoadFile();
+                  } catch (...) {
+                    std::lock_guard<std::mutex> lock(exception_mutex);
+                    if (!first_exception)
+                      first_exception = std::current_exception();
+                  }
+                });
   if (first_exception)
     std::rethrow_exception(first_exception);
 
   virtual_storage_ = storage;
   try {
-    if ( virtual_storage_->IsValidChecksum() == false ) {
+    if (virtual_storage_->IsValidChecksum() == false) {
       LOG_DEBUG("Data integrity test: checksum is NOT valid");
       return false;
     }
-  } catch (...) { throw; }
+  } catch (...) {
+    throw;
+  }
   LOG_DEBUG("Data integrity test: checksum is valid");
 
   return true;
@@ -177,9 +183,9 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
 
 void CarrierFilesManager::SaveVirtualStorage() {
   if (!virtual_storage_)
-	  throw exception::InvalidState(exception::Operation::saveVirtualStorage,
-			                        exception::Component::virtualStorage,
-									exception::ComponentState::notInitialized);
+    throw exception::InvalidState(exception::Operation::saveVirtualStorage,
+                                  exception::Component::virtualStorage,
+                                  exception::ComponentState::notInitialized);
 
   virtual_storage_->WriteChecksum();
 
@@ -197,8 +203,11 @@ void CarrierFilesManager::SetEncoderArg(const string &param,
                                   exception::Component::encoder,
                                   exception::ComponentState::isActive);
 
-  try { EncoderFactory::SetEncoderArg(encoder_, param, val); }
-  catch (...) { throw; }
+  try {
+    EncoderFactory::SetEncoderArg(encoder_, param, val);
+  } catch (...) {
+    throw;
+  }
 }
 
 void CarrierFilesManager::UnSetEncoder() {
@@ -234,15 +243,18 @@ void CarrierFilesManager::ApplyEncoder() {
 
   for (size_t i = 0; i < carrier_files_.size(); ++i) {
     const auto &file_config = StegoConfig::file_config();
-    const auto override = file_config.find(carrier_files_[i]->GetFile().GetExtension());
-    carrier_files_[i]->SetEncoder(override == file_config.end()
-        ? encoder_ : EncoderFactory::GetEncoder(override->second.first));
+    const auto override =
+        file_config.find(carrier_files_[i]->GetFile().GetExtension());
+    carrier_files_[i]->SetEncoder(
+        override == file_config.end()
+            ? encoder_
+            : EncoderFactory::GetEncoder(override->second.first));
     capacity += carrier_files_[i]->GetCapacity();
     raw_cap += carrier_files_[i]->GetRawCapacity();
-    LOG_DEBUG("CarrierFilesManager::applyEncoder: file '" <<
-              carrier_files_[i]->GetFile().GetRelativePath() <<
-              "': raw=" << carrier_files_[i]->GetRawCapacity() <<
-              ", cap=" << carrier_files_[i]->GetCapacity());
+    LOG_DEBUG("CarrierFilesManager::applyEncoder: file '"
+              << carrier_files_[i]->GetFile().GetRelativePath()
+              << "': raw=" << carrier_files_[i]->GetRawCapacity()
+              << ", cap=" << carrier_files_[i]->GetCapacity());
   }
   if (capacity == 0)
     throw exception::ZeroAllocatedSize{};
@@ -256,8 +268,8 @@ void CarrierFilesManager::ApplyEncoder() {
 
 void CarrierFilesManager::SetPassword(const std::string &password) {
   password_hash_.Process(password);
-  LOG_DEBUG("CarrierFilesManager::SetPassword: Setting password: '"
-            << password << "'");
+  LOG_DEBUG("CarrierFilesManager::SetPassword: Setting password: '" << password
+                                                                    << "'");
 }
 
 
@@ -267,7 +279,7 @@ void CarrierFilesManager::SetPassword(const std::string &password) {
 void CarrierFilesManager::GenerateMasterKey() {
   if (carrier_files_.size() < 1) {
     LOG_ERROR("Nothing to hash, no files loaded...");
-	throw exception::EmptyMember{"carrier_files"};
+    throw exception::EmptyMember{"carrier_files"};
   }
 
   LOG_DEBUG("CarrierFilesManager::generateMasterKey: PSWD HASH is "
@@ -305,26 +317,25 @@ void CarrierFilesManager::DeriveSubkeys() {
     carrier_files_[i]->SetSubkey(Key(hash.GetState()));
 
     LOG_DEBUG("CarrierFilesManager::deriveSubkeys: subkey for carrier '"
-              << carrier_files_[i]->GetFile().GetAbsolutePath() << "' is " <<
-              StegoMath::HexBufferToStr(hash.GetState()));
+              << carrier_files_[i]->GetFile().GetAbsolutePath() << "' is "
+              << StegoMath::HexBufferToStr(hash.GetState()));
   }
-
 }
 
 
 void CarrierFilesManager::SaveAllFiles() {
   std::exception_ptr first_exception;
   std::mutex exception_mutex;
-  std::for_each(std::execution::par, carrier_files_.begin(), carrier_files_.end(),
-          [&](auto &file) {
-                try {
-                  file->SaveFile();
-                } catch (...) {
-                  std::lock_guard<std::mutex> lock(exception_mutex);
-                  if (!first_exception)
-                    first_exception = std::current_exception();
-                }
-          });
+  std::for_each(std::execution::par, carrier_files_.begin(),
+                carrier_files_.end(), [&](auto &file) {
+                  try {
+                    file->SaveFile();
+                  } catch (...) {
+                    std::lock_guard<std::mutex> lock(exception_mutex);
+                    if (!first_exception)
+                      first_exception = std::current_exception();
+                  }
+                });
   if (first_exception)
     std::rethrow_exception(first_exception);
 }
@@ -350,13 +361,14 @@ uint64 CarrierFilesManager::GetRawCapacity() {
   return capacity;
 }
 
-uint64 CarrierFilesManager::GetCapacityUsingEncoder(
-    std::shared_ptr<Encoder> encoder) {
+uint64
+CarrierFilesManager::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) {
   if (!encoder)
     throw exception::InvalidState(exception::Operation::getCapacity,
                                   exception::Component::encoder,
                                   exception::ComponentState::notSetted);
-  if (carrier_files_.empty()) return 0;
+  if (carrier_files_.empty())
+    return 0;
 
   // Capacity may depend on keyed permutations even before ApplyEncoder().
   GenerateMasterKey();

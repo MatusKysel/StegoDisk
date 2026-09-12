@@ -34,8 +34,7 @@ public:
   //    static shared_ptr<Permutation> getNew();
 
 private:
-
-  std::vector< std::vector<uint32> > hash_tables_;
+  std::vector<std::vector<uint32>> hash_tables_;
 
   uint8 left_bits_;
   uint64 left_mod_;

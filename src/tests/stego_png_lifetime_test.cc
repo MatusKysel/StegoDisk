@@ -13,17 +13,19 @@ namespace {
 namespace fs = std::filesystem;
 
 void Require(bool condition, const char* message) {
-  if (!condition) throw std::runtime_error(message);
+  if (!condition)
+    throw std::runtime_error(message);
 }
 
 class TestDirectory {
- public:
+public:
   TestDirectory() {
     std::random_device random;
     for (int attempt = 0; attempt < 100; ++attempt) {
       path = fs::temp_directory_path() /
-          ("stegodisk-png-lifetime-" + std::to_string(random()));
-      if (fs::create_directory(path)) return;
+             ("stegodisk-png-lifetime-" + std::to_string(random()));
+      if (fs::create_directory(path))
+        return;
     }
     throw std::runtime_error("Cannot create PNG test directory");
   }
@@ -42,7 +44,8 @@ void TestMetadataLifetime() {
   const std::string title = "StegoDisk PNG lifetime regression";
   std::vector<unsigned char> pixels(64 * 64 * 3);
   std::mt19937 random(42);
-  for (auto& pixel : pixels) pixel = static_cast<unsigned char>(random());
+  for (auto& pixel : pixels)
+    pixel = static_cast<unsigned char>(random());
 
   lodepng::State encoder;
   encoder.info_raw.colortype = LCT_RGB;
@@ -53,15 +56,17 @@ void TestMetadataLifetime() {
   std::vector<unsigned char> encoded;
   Require(lodepng::encode(encoded, pixels, 64, 64, encoder) == 0,
           "Cannot encode PNG fixture");
-  Require(lodepng::save_file(encoded, filename) == 0, "Cannot save PNG fixture");
+  Require(lodepng::save_file(encoded, filename) == 0,
+          "Cannot save PNG fixture");
 
   const std::vector<unsigned char> payload(128, 0x5a);
   for (int iteration = 0; iteration < 3; ++iteration) {
     {
       stego_disk::StegoStorage storage;
-      storage.Configure(stego_disk::EncoderFactory::EncoderType::LSB,
-                        stego_disk::PermutationFactory::PermutationType::IDENTITY,
-                        stego_disk::PermutationFactory::PermutationType::IDENTITY);
+      storage.Configure(
+          stego_disk::EncoderFactory::EncoderType::LSB,
+          stego_disk::PermutationFactory::PermutationType::IDENTITY,
+          stego_disk::PermutationFactory::PermutationType::IDENTITY);
       storage.Open(directory.path.string(), "");
       storage.Load();
       if (iteration > 0) {
@@ -83,7 +88,8 @@ void TestMetadataLifetime() {
     bool found_title = false;
     for (std::size_t i = 0; i < decoder.info_png.text_num; ++i) {
       if (std::string(decoder.info_png.text_keys[i]) == "Title") {
-        Require(decoder.info_png.text_strings[i] == title, "PNG metadata changed");
+        Require(decoder.info_png.text_strings[i] == title,
+                "PNG metadata changed");
         found_title = true;
       }
     }

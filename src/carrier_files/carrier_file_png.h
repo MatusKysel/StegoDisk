@@ -26,8 +26,7 @@ namespace stego_disk {
 class CarrierFilePNG : public CarrierFile {
 
 public:
-  CarrierFilePNG(File file,
-                 std::shared_ptr<Encoder> encoder,
+  CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
                  std::shared_ptr<Permutation> permutation,
                  std::unique_ptr<Fitness> fitness);
 
