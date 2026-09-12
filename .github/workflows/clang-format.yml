@@ -1,0 +1,53 @@
+name: Clang-format
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clang-format-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: clang-format (changed lines)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      # Matches CLANG_VERSION in ci.yml. Formatting output can differ between
+      # major releases, so the version is pinned rather than taken from the
+      # distribution; 22 and 23 were checked to format this tree identically.
+      CLANG_FORMAT_VERSION: 22.1.8
+
+    steps:
+      # The merge base is needed to work out which lines this branch touched.
+      - name: Checkout repository with full history
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Install clang-format ${{ env.CLANG_FORMAT_VERSION }}
+        run: |
+          python -m pip install "clang-format==$CLANG_FORMAT_VERSION"
+          clang-format --version
+
+      - name: Test the checker itself
+        working-directory: .github/scripts
+        run: python -m unittest discover -p 'test_check_format.py' -v
+
+      # Only the lines this pull request touches are checked. The tree predates
+      # .clang-format, so existing code is left alone until it is edited anyway.
+      - name: Check formatting of changed lines
+        run: |
+          base=$(git merge-base HEAD "origin/${{ github.base_ref }}")
+          echo "Comparing against $base"
+          python3 .github/scripts/check-format.py "$base" src

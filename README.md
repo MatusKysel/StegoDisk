@@ -74,6 +74,17 @@ The `Clang-Tidy` and `Cppcheck` workflows check the Linux Debug library sources 
 
 Source findings are initially **advisory** while the existing backlog is reviewed. A green analysis job does not mean there are no findings. Tool, configuration, and parsing failures fail the job. Findings appear in the job summary and full diagnostics are retained in the `clang-tidy-reports` and `cppcheck-reports` artifacts.
 
+#### Code formatting
+The `Clang-format` workflow checks pull requests against `.clang-format`. That configuration was tuned to match the code already in the tree rather than to impose a new style, so reformatting is not required of existing files.
+
+Only the lines a pull request actually changes are checked, because the tree predates the configuration and reformatting it wholesale would bury real changes in noise. Format the lines you touched with:
+
+```Bash
+python3 .github/scripts/check-format.py $(git merge-base HEAD origin/master) src
+```
+
+clang-format is pinned to the major version used elsewhere in CI. Releases 22 and 23 were verified to format this tree identically, so either works locally.
+
 ### Usage
 Main interface is defined in stego_storage.h. This is simple example how to use this library
 

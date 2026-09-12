@@ -25,3 +25,7 @@ stego-disk_export.h
 out-coverage/
 out-sanitizers/
 out-static-analysis/
+
+# Python bytecode from the CI helper scripts
+__pycache__/
+*.pyc

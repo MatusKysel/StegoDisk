@@ -1,0 +1,34 @@
+# Tuned to match the code that is already here rather than to impose a new
+# style. Every option below was chosen by measuring how much of the tree it
+# would rewrite; see the pull request that introduced this file.
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# The project writes 2-space indents at 80 columns, which LLVM already does.
+ColumnLimit: 80
+IndentWidth: 2
+
+# Namespaces are closed with "} // stego_disk", not "} // namespace stego_disk".
+FixNamespaceComments: false
+
+# Pointer placement is mixed across the tree ("uint8* p" in headers,
+# "uint8 *p" in several sources). Deriving it per file keeps each file
+# internally consistent without rewriting the other half.
+DerivePointerAlignment: true
+PointerAlignment: Left
+
+# Includes are grouped by hand in a deliberate order (own header, C, C++,
+# project). Re-sorting them would churn nearly every file and lose that.
+SortIncludes: Never
+
+# Doxygen headers and comment blocks are left as they are; reflowing them
+# rewrites roughly 1500 lines to no benefit.
+ReflowComments: false
+
+# Accessors such as "bool IsInitialized() const { return initialized_; }" are
+# already written inline in headers, while out-of-line definitions in .cc
+# files stay expanded.
+AllowShortFunctionsOnASingleLine: Inline
+
+MaxEmptyLinesToKeep: 2
