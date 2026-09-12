@@ -38,7 +38,7 @@ jobs:
       - name: Install analysis tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-18 clang-tidy-18 libtbb-dev
+          sudo apt-get install -y clang-18 clang-tidy-18 libtbb-dev zlib1g-dev
           python -m pip install "cmake==$CMAKE_VERSION" ninja PyYAML
           clang-tidy-18 --version
 
