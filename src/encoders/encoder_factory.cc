@@ -66,7 +66,6 @@ vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
   // Other encoders ...
 
   return list;
-
 }
 
 /**
@@ -79,8 +78,7 @@ vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
  * @return A std::exception if some error occurs in encoder->setArgByName()
  */
 void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
-                                         const string &param,
-                                         const string &val) {
+                                   const string &param, const string &val) {
   if (!encoder)
     throw exception::NullptrArgument{"encoder"};
   if (param.empty())
@@ -88,8 +86,11 @@ void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
   if (val.empty())
     throw exception::EmptyArgument{"val"};
 
-  try { encoder->SetArgByName(param,val); }
-  catch (...) { throw; }
+  try {
+    encoder->SetArgByName(param, val);
+  } catch (...) {
+    throw;
+  }
 }
 
 /**
@@ -143,24 +144,25 @@ vector<string> EncoderFactory::GetEncoderNames() {
 
 std::shared_ptr<Encoder> EncoderFactory::GetEncoder(const EncoderType encoder) {
 
-  switch(encoder) {
-    case EncoderType::LSB:
-      return std::make_shared<LsbEncoder>();
-    case EncoderType::HAMMING:
-      return std::make_shared<HammingEncoder>();
-    default:
-      return nullptr;
+  switch (encoder) {
+  case EncoderType::LSB:
+    return std::make_shared<LsbEncoder>();
+  case EncoderType::HAMMING:
+    return std::make_shared<HammingEncoder>();
+  default:
+    return nullptr;
   }
 }
 
 
-EncoderFactory::EncoderType EncoderFactory::GetEncoderType(const std::string &encoder) {
+EncoderFactory::EncoderType
+EncoderFactory::GetEncoderType(const std::string &encoder) {
   std::string l_encoder(encoder.size(), '\0');
   std::transform(encoder.begin(), encoder.end(), l_encoder.begin(), ::tolower);
 
   if (l_encoder == "lsb") {
     return EncoderType::LSB;
-  } else if (l_encoder == "hamming"){
+  } else if (l_encoder == "hamming") {
     return EncoderType::HAMMING;
   } else {
     return GetDefaultEncoderType();

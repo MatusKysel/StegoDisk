@@ -62,9 +62,9 @@ public:
 
 private:
   std::shared_ptr<Permutation> global_permutation_;
-  bool   is_set_global_permutation_;
-  uint64 raw_capacity_;                // raw capacity (hash + storage)
-  uint64 usable_capacity_;             // usable capacity (storage only)
+  bool is_set_global_permutation_;
+  uint64 raw_capacity_;    // raw capacity (hash + storage)
+  uint64 usable_capacity_; // usable capacity (storage only)
   MemoryBuffer data_;
 };
 

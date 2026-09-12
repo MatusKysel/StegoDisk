@@ -22,28 +22,32 @@ int main() {
       stego_disk::MemoryBuffer previous(buffer);
 
       ++ready;
-      while (!start.load()) std::this_thread::yield();
+      while (!start.load())
+        std::this_thread::yield();
 
       for (unsigned round = 0; round < rounds; ++round) {
         buffer.Randomize();
         // A complete 4096-byte sample repeating is negligibly probable. This
         // also catches randomization becoming a no-op or a constant fill.
-        if (buffer == previous) ++failures[worker];
+        if (buffer == previous)
+          ++failures[worker];
         previous = buffer;
       }
       // Both buffers also randomize their contents during destruction.
     });
   }
 
-  while (ready.load() != worker_count) std::this_thread::yield();
+  while (ready.load() != worker_count)
+    std::this_thread::yield();
   start.store(true);
-  for (auto &worker : workers) worker.join();
+  for (auto &worker : workers)
+    worker.join();
 
   unsigned total_failures = 0;
-  for (const auto count : failures) total_failures += count;
+  for (const auto count : failures)
+    total_failures += count;
   if (total_failures != 0) {
-    std::cerr << "Randomize left " << total_failures
-              << " buffers unchanged\n";
+    std::cerr << "Randomize left " << total_failures << " buffers unchanged\n";
     return 1;
   }
   return 0;

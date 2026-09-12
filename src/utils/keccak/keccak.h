@@ -27,4 +27,3 @@ int keccak(const uint8_t *in, int inlen, uint8_t *md, int mdlen);
 void keccakf(uint64_t st[25], int norounds);
 
 #endif // STEGODISK_UTILS_KECCAK_KECCAK_H_
-

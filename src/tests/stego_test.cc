@@ -36,39 +36,45 @@ bool LoggerInit() {
 }
 
 static void PrintHelp(char *name) {
-  std::cerr << "Usage: " << name << " <option(s)> \n"
-            << "Options:\n"
-            << "\t-h,--help\t\tShow this help message\n"
-            << "\t-e,--encoder ENCODER\tSpecify the encoder\n"
-            << "\t-p,--permutation PERMUTATION\tSpecify the permutation (both global and local)\n"
-            << "\t--global_perm PERMUTATION\tSpecify the global permutation only\n"
-            << "\t--local_perm PERMUTATION\tSpecify the local permutation only\n"
-            << "\t-g,--gen_file_size GEN_SIZE\tSpecify size of generated data\n"
-            << "\t-o,--offset OFFSET\tSpecify the byte offset to write and read at\n"
-            << "\t-%,--percent PERCENT\tSpecify percentage of carrier loading\n"
-            << "\t-d,--directory DIRECTORY\tSpecify the source directory\n"
-            << "\t-t,--test_directory \tSpecify that this directory is only for"
-               " testing and it will create copy of it\n"
-            << "\t-i,--invert \tWrite the bitwise inverse of the current storage content\n"
-            << "\t-w,--password 0|1\tSpecify if the password should be used\n"
-            << "\t--wrong_password \tReopen with a different password and expect a mismatch\n"
-            << std::endl;
+  std::cerr
+      << "Usage: " << name << " <option(s)> \n"
+      << "Options:\n"
+      << "\t-h,--help\t\tShow this help message\n"
+      << "\t-e,--encoder ENCODER\tSpecify the encoder\n"
+      << "\t-p,--permutation PERMUTATION\tSpecify the permutation (both global "
+         "and local)\n"
+      << "\t--global_perm PERMUTATION\tSpecify the global permutation only\n"
+      << "\t--local_perm PERMUTATION\tSpecify the local permutation only\n"
+      << "\t-g,--gen_file_size GEN_SIZE\tSpecify size of generated data\n"
+      << "\t-o,--offset OFFSET\tSpecify the byte offset to write and read at\n"
+      << "\t-%,--percent PERCENT\tSpecify percentage of carrier loading\n"
+      << "\t-d,--directory DIRECTORY\tSpecify the source directory\n"
+      << "\t-t,--test_directory \tSpecify that this directory is only for"
+         " testing and it will create copy of it\n"
+      << "\t-i,--invert \tWrite the bitwise inverse of the current storage "
+         "content\n"
+      << "\t-w,--password 0|1\tSpecify if the password should be used\n"
+      << "\t--wrong_password \tReopen with a different password and expect a "
+         "mismatch\n"
+      << std::endl;
 }
 
-stego_disk::EncoderFactory::EncoderType StrToEncoder(std::string &encoder){
+stego_disk::EncoderFactory::EncoderType StrToEncoder(std::string &encoder) {
   std::transform(encoder.begin(), encoder.end(), encoder.begin(), ::tolower);
 
   if (encoder == "lsb") {
     return stego_disk::EncoderFactory::EncoderType::LSB;
-  } else if (encoder == "hamming"){
+  } else if (encoder == "hamming") {
     return stego_disk::EncoderFactory::EncoderType::HAMMING;
   } else {
     return stego_disk::EncoderFactory::GetDefaultEncoderType();
   }
 }
 
-stego_disk::PermutationFactory::PermutationType StrToPermutation(std::string &permutation){
-  std::transform(permutation.begin(), permutation.end(), permutation.begin(), ::tolower);
+stego_disk::PermutationFactory::PermutationType
+StrToPermutation(std::string &permutation) {
+  std::transform(permutation.begin(), permutation.end(), permutation.begin(),
+                 ::tolower);
 
   if (permutation == "identity") {
     return stego_disk::PermutationFactory::PermutationType::IDENTITY;
@@ -78,7 +84,7 @@ stego_disk::PermutationFactory::PermutationType StrToPermutation(std::string &pe
     return stego_disk::PermutationFactory::PermutationType::AFFINE64;
   } else if (permutation == "num_feistel") {
     return stego_disk::PermutationFactory::PermutationType::FEISTEL_NUM;
-  } else if (permutation == "mix_feistel"){
+  } else if (permutation == "mix_feistel") {
     return stego_disk::PermutationFactory::PermutationType::FEISTEL_MIX;
   } else {
     return stego_disk::PermutationFactory::GetDefaultPermutationType();
@@ -91,7 +97,8 @@ int main(int argc, char *argv[]) {
   //! Disables output truncating for ctest xml
   std::cout << "CTEST_FULL_OUTPUT" << std::endl;
 
-  if (!LoggerInit()) return -1;
+  if (!LoggerInit())
+    return -1;
 
   std::string encoder;
   std::string global_perm;
@@ -202,10 +209,10 @@ int main(int argc, char *argv[]) {
   }
 
   size_t size;
-  std::unique_ptr<stego_disk::StegoStorage>
-      stego_storage(new stego_disk::StegoStorage());
+  std::unique_ptr<stego_disk::StegoStorage> stego_storage(
+      new stego_disk::StegoStorage());
 
-  if(!dir.empty() && test_directory) {
+  if (!dir.empty() && test_directory) {
     std::cout << dir << std::endl;
     dir = DST_DIRECTORY + dir;
     std::cout << dir << std::endl;
@@ -225,18 +232,20 @@ int main(int argc, char *argv[]) {
   const size_t capacity = stego_storage->GetSize();
   std::cout << "Storage capacity = " << capacity << "B" << std::endl;
   if (offset >= capacity) {
-    LOG_ERROR("offset " << offset << " is outside the storage capacity " << capacity);
+    LOG_ERROR("offset " << offset << " is outside the storage capacity "
+                        << capacity);
     return -1;
   }
   size = static_cast<size_t>(static_cast<double>(capacity - offset) *
                              static_cast<double>(percent) / 100.0);
-  if (gen_file_size == 0 || gen_file_size > size) gen_file_size = size;
+  if (gen_file_size == 0 || gen_file_size > size)
+    gen_file_size = size;
   std::cout << "Payload size = " << gen_file_size << "B at offset " << offset
             << std::endl;
   std::string input;
   std::string output;
 
-  if ( invert == false ) {
+  if (invert == false) {
     LOG_DEBUG("Generating random string");
     GenerateRandomString(&input, gen_file_size);
   } else {
@@ -257,7 +266,8 @@ int main(int argc, char *argv[]) {
   stego_storage->Configure(StrToEncoder(encoder), StrToPermutation(global_perm),
                            StrToPermutation(local_perm));
   std::string reopen_password = (password) ? PASSWORD : "";
-  if (wrong_password) reopen_password = std::string("wrong-") + PASSWORD;
+  if (wrong_password)
+    reopen_password = std::string("wrong-") + PASSWORD;
   stego_storage->Open(dir, reopen_password);
   LOG_DEBUG("Loading storage");
   stego_storage->Load();
@@ -265,7 +275,8 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Reading from the storage");
   stego_storage->Read(&(output[0]), offset, input.size());
 
-  if(test_directory) FileManager::RemoveDirectory(dir);
+  if (test_directory)
+    FileManager::RemoveDirectory(dir);
 
   if (wrong_password) {
     // A different password must not reproduce the payload.
@@ -274,11 +285,10 @@ int main(int argc, char *argv[]) {
       error = true;
     }
   } else if (input != output) {
-    LOG_ERROR("Not equal! Input size: " << input.size() <<
-              " output size: " << output.size());
+    LOG_ERROR("Not equal! Input size: " << input.size()
+                                        << " output size: " << output.size());
     error = true;
   }
 
   return error;
 }
-

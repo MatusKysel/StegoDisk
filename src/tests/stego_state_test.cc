@@ -29,28 +29,35 @@ namespace fs = std::filesystem;
 
 int failures = 0;
 
-#define EXPECT(expr) do { \
-  if (!(expr)) { \
-    std::cerr << "FAIL line " << __LINE__ << ": " << #expr << '\n'; \
-    ++failures; \
-  } \
-} while (0)
+#define EXPECT(expr)                                                           \
+  do {                                                                         \
+    if (!(expr)) {                                                             \
+      std::cerr << "FAIL line " << __LINE__ << ": " << #expr << '\n';          \
+      ++failures;                                                              \
+    }                                                                          \
+  } while (0)
 
-#define EXPECT_THROWS(stmt, type) do { \
-  bool thrown = false; \
-  try { stmt; } catch (const type &) { thrown = true; } \
-  EXPECT(thrown); \
-} while (0)
+#define EXPECT_THROWS(stmt, type)                                              \
+  do {                                                                         \
+    bool thrown = false;                                                       \
+    try {                                                                      \
+      stmt;                                                                    \
+    } catch (const type &) {                                                   \
+      thrown = true;                                                           \
+    }                                                                          \
+    EXPECT(thrown);                                                            \
+  } while (0)
 
 // Each process owns a unique, small fixture; no checked-in carrier is modified.
 class TestDirectory {
- public:
+public:
   TestDirectory() {
     std::random_device random;
     for (int attempt = 0; attempt < 100; ++attempt) {
       path = fs::temp_directory_path() /
              ("stegodisk-state-" + std::to_string(random()));
-      if (fs::create_directory(path)) return;
+      if (fs::create_directory(path))
+        return;
     }
     throw std::runtime_error("Cannot create test directory");
   }
@@ -64,8 +71,10 @@ class TestDirectory {
     // 64 * 64 * 3 channel LSBs hold exactly 1536 bytes with identity + LSB.
     std::vector<unsigned char> pixels(64 * 64 * 3);
     std::mt19937 random(42);
-    for (auto &pixel : pixels) pixel = static_cast<unsigned char>(random());
-    if (lodepng::encode((path / "carrier.png").string(), pixels, 64, 64, LCT_RGB))
+    for (auto &pixel : pixels)
+      pixel = static_cast<unsigned char>(random());
+    if (lodepng::encode((path / "carrier.png").string(), pixels, 64, 64,
+                        LCT_RGB))
       throw std::runtime_error("Cannot encode test PNG");
   }
 
@@ -75,7 +84,8 @@ class TestDirectory {
 void ConfigureJson(const std::string &text) {
   json::JsonObject config;
   const std::string error = json::Parse(text, &config);
-  if (!error.empty()) throw std::runtime_error(error);
+  if (!error.empty())
+    throw std::runtime_error(error);
   StegoConfig::Init(config);
 }
 
@@ -120,7 +130,8 @@ void TestCapacityEstimate() {
   ConfigureIdentity(storage);
   auto carrier = CarrierFileFactory::CreateCarrierFile(
       File(directory.path.string(), "carrier.png"));
-  if (!carrier) throw std::runtime_error("Test carrier was not recognized");
+  if (!carrier)
+    throw std::runtime_error("Test carrier was not recognized");
   carrier->SetSubkey(Key::FromString("test-key"));
 
   auto lsb = std::make_shared<LsbEncoder>(8);
@@ -129,7 +140,8 @@ void TestCapacityEstimate() {
   EXPECT(carrier->GetCapacityUsingEncoder(lsb) == 1536);
   // p=5 stores 5 bytes per 32-byte codeword block: 48 blocks give 240 bytes.
   EXPECT(carrier->GetCapacityUsingEncoder(hamming) == 240);
-  EXPECT(carrier->GetCapacity() == 1536);  // Query must not change the active encoder.
+  EXPECT(carrier->GetCapacity() ==
+         1536); // Query must not change the active encoder.
   carrier->SetEncoder(hamming);
   EXPECT(carrier->GetCapacity() == 240);
 
@@ -174,9 +186,10 @@ void TestEncoderOverride() {
     const std::string global_encoder = use_lsb ? "hamming" : "lsb";
     const std::string file_encoder = use_lsb ? "lsb" : "hamming";
     ConfigureJson("{\"encoder\":\"" + global_encoder +
-        "\",\"glob_perm\":\"identity\",\"local_perm\":\"identity\",\"file_types\":["
-        "{\"file_type\":\"png\",\"encoder\":\"" + file_encoder +
-        "\",\"permutation\":\"identity\"}]}");
+                  "\",\"glob_perm\":\"identity\",\"local_perm\":\"identity\","
+                  "\"file_types\":["
+                  "{\"file_type\":\"png\",\"encoder\":\"" +
+                  file_encoder + "\",\"permutation\":\"identity\"}]}");
 
     StegoStorage storage;
     storage.Open(directory.path.string(), "test-password");
@@ -184,7 +197,8 @@ void TestEncoderOverride() {
     // 32 bytes are reserved for the checksum.
     const std::size_t expected_size = use_lsb ? 1504 : 208;
     EXPECT(storage.GetSize() == expected_size);
-    if (storage.GetSize() != expected_size) continue;
+    if (storage.GetSize() != expected_size)
+      continue;
     std::vector<unsigned char> payload(expected_size, use_lsb ? 0x5A : 0xA5);
     storage.Write(payload.data(), 0, payload.size());
     storage.Save();
@@ -202,7 +216,8 @@ void ExpectUnloaded(StegoStorage &storage) {
   unsigned char byte = 0;
   EXPECT(storage.GetSize() == 0);
   EXPECT_THROWS(storage.Read(&byte, 0, 1), stego_disk::exception::InvalidState);
-  EXPECT_THROWS(storage.Write(&byte, 0, 1), stego_disk::exception::InvalidState);
+  EXPECT_THROWS(storage.Write(&byte, 0, 1),
+                stego_disk::exception::InvalidState);
   EXPECT_THROWS(storage.Save(), stego_disk::exception::InvalidState);
 }
 
@@ -222,7 +237,8 @@ void TestReopen() {
   storage.Load();
   unsigned char actual[sizeof(payload)] = {};
   storage.Read(actual, 0, sizeof(actual));
-  EXPECT(std::equal(std::begin(payload), std::end(payload), std::begin(actual)));
+  EXPECT(
+      std::equal(std::begin(payload), std::end(payload), std::begin(actual)));
 
   EXPECT_THROWS(storage.Open((directory.path / "missing").string(), ""),
                 std::exception);
@@ -254,7 +270,8 @@ void TestIoBounds() {
 
   const std::size_t size = storage.GetSize();
   EXPECT(size > 0);
-  if (size == 0) return;
+  if (size == 0)
+    return;
 
   std::vector<unsigned char> buffer(64, 0);
 
@@ -294,22 +311,31 @@ void TestLoadFailureLeavesNoStaleState() {
   ExpectUnloaded(storage);
 }
 
-}  // namespace
+} // namespace
 
 int main(int argc, char *argv[]) {
   std::string level = "ERROR";
   Logger::SetVerbosityLevel(level, "cout");
-  if (argc != 2) return 2;
+  if (argc != 2)
+    return 2;
   const std::string group = argv[1];
   try {
-    if (group == "config") TestConfigurationReset();
-    else if (group == "capacity") TestCapacityEstimate();
-    else if (group == "encoder_override") TestEncoderOverride();
-    else if (group == "reopen") TestReopen();
-    else if (group == "first_load") TestFirstLoadOnVirginCarriers();
-    else if (group == "io_bounds") TestIoBounds();
-    else if (group == "load_failure") TestLoadFailureLeavesNoStaleState();
-    else return 2;
+    if (group == "config")
+      TestConfigurationReset();
+    else if (group == "capacity")
+      TestCapacityEstimate();
+    else if (group == "encoder_override")
+      TestEncoderOverride();
+    else if (group == "reopen")
+      TestReopen();
+    else if (group == "first_load")
+      TestFirstLoadOnVirginCarriers();
+    else if (group == "io_bounds")
+      TestIoBounds();
+    else if (group == "load_failure")
+      TestLoadFailureLeavesNoStaleState();
+    else
+      return 2;
   } catch (const std::exception &error) {
     std::cerr << "Unexpected exception: " << error.what() << '\n';
     return 1;

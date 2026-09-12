@@ -21,17 +21,12 @@ using namespace std;
 
 namespace stego_disk {
 
-class STEGO_DISK_EXPORT EncoderFactory final
-{
-private: 
+class STEGO_DISK_EXPORT EncoderFactory final {
+private:
   EncoderFactory();
 
 public:
-
-  enum class EncoderType {
-    LSB,
-    HAMMING
-  };
+  enum class EncoderType { LSB, HAMMING };
 
   // Get vector of all encoders (each encoder with all possible settings)
   static vector<std::shared_ptr<Encoder>> GetAllEncoders();
@@ -43,7 +38,7 @@ public:
   static std::shared_ptr<Encoder> GetEncoder(const EncoderType encoder);
   // set encoder param by name
   static void SetEncoderArg(std::shared_ptr<Encoder> encoder,
-                                  const string &param, const string &val);
+                            const string &param, const string &val);
   // Get instance of the default encoder
   static std::shared_ptr<Encoder> GetDefaultEncoder();
 

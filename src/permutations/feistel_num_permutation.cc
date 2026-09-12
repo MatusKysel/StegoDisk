@@ -9,7 +9,7 @@
 
 #include "feistel_num_permutation.h"
 
-#include <math.h>       /* sqrt */
+#include <math.h> /* sqrt */
 
 #include <algorithm>
 
@@ -21,41 +21,41 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
-#define FNP_MIN_REQ_SIZE                        1024
-#define FNP_NUMROUNDS                           5
+#define FNP_MIN_REQ_SIZE 1024
+#define FNP_NUMROUNDS 5
 
 namespace stego_disk {
 
 FeistelNumPermutation::FeistelNumPermutation() : modulus_(0) {
-  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::Permutation: constructor called for: "
+            << GetNameInstance());
 }
 
 FeistelNumPermutation::~FeistelNumPermutation() {
-  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: "
+            << GetNameInstance());
 }
 
 
-void FeistelNumPermutation::Init(PermElem requested_size, Key &key) {
+void FeistelNumPermutation::Init(PermElem requested_size, Key& key) {
   if (key.GetSize() == 0)
     throw exception::EmptyArgument{"key"};
 
   if (requested_size < FNP_MIN_REQ_SIZE)
     throw std::invalid_argument("FeistelNumPermutation: "
-                             "requestedSize < FNP_MIN_REQ_SIZE");
+                                "requestedSize < FNP_MIN_REQ_SIZE");
 
   initialized_ = false;
 
   modulus_ = static_cast<uint32>(sqrt(static_cast<double>(requested_size)));
-  size_ = static_cast<size_t>((static_cast<uint64>(modulus_) *
-                               static_cast<uint64>(modulus_)));
+  size_ = static_cast<size_t>(
+      (static_cast<uint64>(modulus_) * static_cast<uint64>(modulus_)));
 
   // precompute hash table
   uint32 max_hash = modulus_;
 
-  hash_tables_ = std::vector<std::vector<uint32> >
-                 (FNP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
+  hash_tables_ = std::vector<std::vector<uint32>>(
+      FNP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
 
   //TODO: hash could be initialized by key and then just append "i" in each iteration - or not?
   //      sth like: Hash hash(key.getData());
@@ -107,7 +107,8 @@ PermElem FeistelNumPermutation::Permute(PermElem index) const {
 
 PermElem FeistelNumPermutation::GetSizeUsingParams(PermElem requested_size,
                                                    Key& /*key*/) {
-  if (requested_size < FNP_MIN_REQ_SIZE) return 0;
+  if (requested_size < FNP_MIN_REQ_SIZE)
+    return 0;
 
   uint32 mod = static_cast<uint32>(sqrt(static_cast<double>(requested_size)));
   return static_cast<std::size_t>(static_cast<uint64>(mod) *

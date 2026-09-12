@@ -27,31 +27,34 @@ public:
 
   ~FileManager() {}
 
-  inline static void CopyFile(const std::string &input, const std::string &output) {
-    std::ifstream  src(input, std::ios::binary);
-    std::ofstream  dst(output, std::ios::binary);
-    if(src.is_open() && dst.is_open())
+  inline static void CopyFile(const std::string &input,
+                              const std::string &output) {
+    std::ifstream src(input, std::ios::binary);
+    std::ofstream dst(output, std::ios::binary);
+    if (src.is_open() && dst.is_open())
       dst << src.rdbuf();
   }
 
   inline static std::string GetWinPath(const std::string &input) {
-	  std::string out = input;
-	  std::replace(out.begin(), out.end(), '/', '\\');
-	  return out;
+    std::string out = input;
+    std::replace(out.begin(), out.end(), '/', '\\');
+    return out;
   }
 
 #ifndef HAS_FILESYSTEM_LIBRARY
   //PSTODO change to filesystem
-  inline static void CopyDirectory(const std::string &src, const std::string &dst) {
+  inline static void CopyDirectory(const std::string &src,
+                                   const std::string &dst) {
     //TODO(Matus) rewrite to secure form
 #ifdef _WIN32
-    std::string cmd = "xcopy " + GetWinPath(src) + " " + GetWinPath(dst) + " /s /e /h /i";
+    std::string cmd =
+        "xcopy " + GetWinPath(src) + " " + GetWinPath(dst) + " /s /e /h /i";
 #else
     std::string cmd = "cp -rf " + src + " " + dst;
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str()) < 0)
+    if (system(cmd.c_str()) < 0)
       throw stego_disk::exception::ExecFailed{cmd};
   }
 
@@ -65,23 +68,25 @@ public:
 #endif
     std::cout << cmd << std::endl;
 
-    if(system(cmd.c_str()) < 0)
+    if (system(cmd.c_str()) < 0)
       throw stego_disk::exception::ExecFailed{cmd};
   }
-#else //HAS_FILESYSTEM_LIBRARY
-  inline static void CopyDirectory(const std::string &src, const std::string &dst) {
+#else  //HAS_FILESYSTEM_LIBRARY
+  inline static void CopyDirectory(const std::string &src,
+                                   const std::string &dst) {
     std::cout << "copy '" << src << "' to '" << dst << "'" << std::endl;
-	if (fs::exists(src))
-      fs::copy(src, dst, fs::copy_options::overwrite_existing|fs::copy_options::recursive);
+    if (fs::exists(src))
+      fs::copy(src, dst,
+               fs::copy_options::overwrite_existing |
+                   fs::copy_options::recursive);
   }
 
   inline static void RemoveDirectory(const std::string &path) {
     std::cout << "Remove '" << path << "'" << std::endl;
-	if (fs::exists(path))
+    if (fs::exists(path))
       fs::remove_all(path);
   }
 #endif //HAS_FILESYSTEM_LIBRARY
-
 };
 
 #endif // FILE_MANAGER_H

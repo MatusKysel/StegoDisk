@@ -18,16 +18,17 @@
 namespace stego_disk {
 
 AffinePermutation::AffinePermutation() {
-  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::Permutation: constructor called for: "
+            << GetNameInstance());
 }
 
 AffinePermutation::~AffinePermutation() {
-  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: "
+            << GetNameInstance());
 }
 
-PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key,
+PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size,
+                                               Key &key,
                                                bool overwrite_members) {
   if (key.GetSize() == 0)
     throw exception::EmptyArgument{"key"};
@@ -36,7 +37,7 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key
 
   uint64 a, b;
 
-  while(1) {
+  while (1) {
 
     prime = StegoMath::ClosestSmallerPrime(prime);
     if (prime < 1) {
@@ -57,17 +58,17 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key
                                   "nonzero multiple of 16");
 
     for (std::size_t i = 0; i < key.GetSize() / 2; i += 8) {
-      a ^= (uint64)*(uint64*)(&key.GetData()[i]);
+      a ^= (uint64) * (uint64 *)(&key.GetData()[i]);
     }
     for (std::size_t i = key.GetSize() / 2; i < key.GetSize(); i += 8) {
-      b ^= (uint64)*(uint64*)(&key.GetData()[i]);
+      b ^= (uint64) * (uint64 *)(&key.GetData()[i]);
     }
 
     a %= (prime / 2);
     b %= (prime / 2);
 
-    a += (prime/2);
-    b += (prime/2);
+    a += (prime / 2);
+    b += (prime / 2);
 
     if (StegoMath::Gcd(a, prime) == 1) {
       if (overwrite_members) {
@@ -82,18 +83,19 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key
 
 PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size,
                                                Key &key) {
-  if (requested_size > 0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
+  if (requested_size >
+      0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
     return 0;
 
   return GetSizeUsingParams(requested_size, key, false);
 }
 
 
-void AffinePermutation::Init(PermElem requested_size, Key &key)
-{
-  if (requested_size > 0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
+void AffinePermutation::Init(PermElem requested_size, Key &key) {
+  if (requested_size >
+      0xFFFFFFFF) // max size = 2^32 blocks (due to slow mulmod aritmethics for numbers > 2^32)
     throw std::invalid_argument("AffinePermutation: "
-                            "max requested size is (2^32)-1");
+                                "max requested size is (2^32)-1");
 
   initialized_ = false;
 
@@ -106,7 +108,7 @@ void AffinePermutation::Init(PermElem requested_size, Key &key)
 
 PermElem AffinePermutation::Permute(PermElem index) const {
   CommonPermuteInputCheck(index);
-  return ((((index) * key_param_a_) % size_) + key_param_b_) % size_;
+  return ((((index)*key_param_a_) % size_) + key_param_b_) % size_;
 }
 
 } // stego_disk

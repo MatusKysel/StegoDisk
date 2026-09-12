@@ -19,40 +19,37 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
-#define FMP_MIN_REQ_SIZE                        1024
-#define FMP_NUMROUNDS                           5
+#define FMP_MIN_REQ_SIZE 1024
+#define FMP_NUMROUNDS 5
 
 namespace stego_disk {
 
-FeistelMixPermutation::FeistelMixPermutation() :
-  left_bits_(0),
-  left_mod_(0),
-  right_mask_(0),
-  right_bits_(0) {
+FeistelMixPermutation::FeistelMixPermutation()
+    : left_bits_(0), left_mod_(0), right_mask_(0), right_bits_(0) {
 
-  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::Permutation: constructor called for: "
+            << GetNameInstance());
 }
 
 FeistelMixPermutation::~FeistelMixPermutation() {
-  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: "
+            << GetNameInstance());
 }
 
 
-void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
+void FeistelMixPermutation::Init(PermElem requested_size, Key& key) {
   if (key.GetSize() == 0)
     throw exception::EmptyArgument{"key"};
 
   if (requested_size < FMP_MIN_REQ_SIZE)
     throw std::invalid_argument("FeistelMixPermutation: "
-                             "requested_size < FMP_MIN_REQ_SIZE (=1024)");
+                                "requested_size < FMP_MIN_REQ_SIZE (=1024)");
 
   uint8 bit_len = StegoMath::Log2(requested_size);
 
   if (bit_len < 8)
     throw std::invalid_argument("FeistelMixPermutation: "
-                             "requested size is too small");
+                                "requested size is too small");
 
   initialized_ = false;
 
@@ -65,8 +62,8 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
 
   uint32 max_hash = static_cast<uint32>(right_mask_ + 1);
 
-  hash_tables_ = std::vector<std::vector<uint32> >(
-                   FMP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
+  hash_tables_ = std::vector<std::vector<uint32>>(
+      FMP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
 
   //TODO: hash could be initialized_ by key and then just append "i" in each iteration - or not?
   //      sth like: Hash hash(key.getData());
@@ -88,7 +85,8 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
       if (hash.GetStateSize() < 4)
         throw exception::HashSizeTooSmall{};
 
-      hash_tables_[t][i] = *((uint32*)hash.GetState().GetConstRawPointer()) % max_hash;
+      hash_tables_[t][i] =
+          *((uint32*)hash.GetState().GetConstRawPointer()) % max_hash;
     }
   }
   LOG_TRACE("FeistelMixPermutation::init: HT ready; left_mod_ = "
@@ -121,7 +119,8 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
 
 PermElem FeistelMixPermutation::GetSizeUsingParams(PermElem requested_size,
                                                    Key& /*key*/) {
-  if (requested_size < FMP_MIN_REQ_SIZE) return 0;
+  if (requested_size < FMP_MIN_REQ_SIZE)
+    return 0;
 
   uint8 bit_len = StegoMath::Log2(requested_size);
 

@@ -19,8 +19,8 @@ namespace stego_disk {
 
 CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
                                std::shared_ptr<Permutation> permutation,
-                               std::unique_ptr<Fitness> fitness) :
-  CarrierFile(file, encoder, permutation, std::move(fitness)) {
+                               std::unique_ptr<Fitness> fitness)
+    : CarrierFile(file, encoder, permutation, std::move(fitness)) {
 
   auto file_ptr = file.Open();
 
@@ -42,15 +42,17 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
     throw exception::ParseError{file_.GetFileName(), "Wrong size of file"};
   }
 
-  bmp_offset_ = *((uint32_t*)&bmp_header[10]); // should be = 54
+  bmp_offset_ = *((uint32_t*)&bmp_header[10]);               // should be = 54
   uint16_t bmp_bits_per_pixel = *((uint16_t*)&bmp_info[14]); // 24
-  uint32_t bmp_compression = *((uint32_t*)&bmp_info[16]); // should be 0
+  uint32_t bmp_compression = *((uint32_t*)&bmp_info[16]);    // should be 0
 
   if (bmp_compression != 0) {
-    throw exception::ParseError{file_.GetFileName(), "BMP file uses unsupported file compression"};
+    throw exception::ParseError{file_.GetFileName(),
+                                "BMP file uses unsupported file compression"};
   }
 
-  if (bmp_bits_per_pixel == 8) is_grayscale_ = true;
+  if (bmp_bits_per_pixel == 8)
+    is_grayscale_ = true;
 
   //bmp_size_ = *((uint32_t*)&bmp_info[20]); // byva = 0 pri vypnutej kompresii
 
@@ -58,7 +60,9 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
   height_ = abs(*((int32_t*)&bmp_info[8]));
 #pragma GCC diagnostic pop
 
-  bmp_size_ = static_cast<uint64_t>(((bmp_bits_per_pixel * width_ + 31) / 32) * 4) * height_;
+  bmp_size_ =
+      static_cast<uint64_t>(((bmp_bits_per_pixel * width_ + 31) / 32) * 4) *
+      height_;
 
   if ((bmp_size_ + 54) > bmp_file_size) {
     throw exception::IoError(file_.GetFileName());
@@ -67,10 +71,10 @@ CarrierFileBMP::CarrierFileBMP(File file, std::shared_ptr<Encoder> encoder,
 }
 
 
-
 void CarrierFileBMP::LoadFile() {
 
-  if (file_loaded_) return;
+  if (file_loaded_)
+    return;
 
   auto file_ptr = file_.Open();
 
@@ -79,9 +83,8 @@ void CarrierFileBMP::LoadFile() {
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
-                                              raw_capacity_ * 8,
-                                              file_ptr.Get()));
+  uint32 read_cnt = static_cast<uint32>(fread(
+      bitmap_buffer.GetRawPointer(), 1, raw_capacity_ * 8, file_ptr.Get()));
 
   if (read_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Unable to read file.");
@@ -91,10 +94,10 @@ void CarrierFileBMP::LoadFile() {
   uint64 usable_capacity = raw_capacity_;
   MemoryBuffer* usable_buffer = new MemoryBuffer();
 
-  if(fitness_ != nullptr) {
+  if (fitness_ != nullptr) {
     usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
   } else {
-    delete(usable_buffer);
+    delete (usable_buffer);
     usable_buffer = &bitmap_buffer;
   }
 
@@ -116,18 +119,18 @@ void CarrierFileBMP::LoadFile() {
 
   LOG_INFO("File " << file_.GetRelativePath() << " loaded");
 
-  if(fitness_ != nullptr)
-    delete(usable_buffer);
+  if (fitness_ != nullptr)
+    delete (usable_buffer);
 }
 
 
 void CarrierFileBMP::SaveFile() {
   auto file_ptr = file_.Open();
 
-  if(!file_loaded_)
+  if (!file_loaded_)
     throw exception::InvalidState{exception::Operation::save,
                                   exception::Component::file,
-								  exception::ComponentState::notLoaded};
+                                  exception::ComponentState::notLoaded};
 
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
@@ -135,22 +138,21 @@ void CarrierFileBMP::SaveFile() {
   MemoryBuffer bitmap_buffer(raw_capacity_ * 8);
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(fread(bitmap_buffer.GetRawPointer(), 1,
-                                              raw_capacity_ * 8,
-                                              file_ptr.Get()));
+  uint32 read_cnt = static_cast<uint32>(fread(
+      bitmap_buffer.GetRawPointer(), 1, raw_capacity_ * 8, file_ptr.Get()));
 
   if (read_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Unable to read file.");
-	throw exception::IoError{file_.GetFileName()};
+    throw exception::IoError{file_.GetFileName()};
   }
 
   uint64 usable_capacity = raw_capacity_;
   MemoryBuffer* usable_buffer = new MemoryBuffer();
 
-  if(fitness_ != nullptr) {
+  if (fitness_ != nullptr) {
     usable_capacity = fitness_->SelectBytes(bitmap_buffer, usable_buffer);
   } else {
-    delete(usable_buffer);
+    delete (usable_buffer);
     usable_buffer = &bitmap_buffer;
   }
 
@@ -170,29 +172,28 @@ void CarrierFileBMP::SaveFile() {
 
   ApplyBufferPermutedToLsb(usable_buffer->GetRawPointer(), bits_to_modify);
 
-  MemoryBuffer *output_buffer = new MemoryBuffer();
-  if(fitness_ != nullptr) {
+  MemoryBuffer* output_buffer = new MemoryBuffer();
+  if (fitness_ != nullptr) {
     fitness_->InsertBytes((*usable_buffer), output_buffer);
   } else {
-    delete(output_buffer);
+    delete (output_buffer);
     output_buffer = usable_buffer;
   }
 
   fseek(file_ptr.Get(), bmp_offset_, SEEK_SET);
-  uint32 write_cnt = static_cast<uint32>(fwrite(output_buffer->GetRawPointer(),
-                                                1, raw_capacity_ * 8,
-                                                file_ptr.Get()));
+  uint32 write_cnt = static_cast<uint32>(fwrite(
+      output_buffer->GetRawPointer(), 1, raw_capacity_ * 8, file_ptr.Get()));
 
   if (write_cnt != raw_capacity_ * 8) {
     LOG_ERROR("Writing content to file failed.");
-	throw exception::IoError{file_.GetFileName()};
+    throw exception::IoError{file_.GetFileName()};
   }
 
   LOG_INFO("File " << file_.GetRelativePath() << " saved");
 
-  if(fitness_ != nullptr) {
-    delete(output_buffer);
-    delete(usable_buffer);
+  if (fitness_ != nullptr) {
+    delete (output_buffer);
+    delete (usable_buffer);
   }
 }
 

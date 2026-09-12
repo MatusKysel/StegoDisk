@@ -34,7 +34,8 @@ std::shared_ptr<Permutation> PermutationFactory::GetDefaultPermutation() {
   return GetPermutation(kDefaultPermutation);
 }
 
-PermutationFactory::PermutationType PermutationFactory::GetDefaultPermutationType() {
+PermutationFactory::PermutationType
+PermutationFactory::GetDefaultPermutationType() {
   return kDefaultPermutation;
 }
 
@@ -70,10 +71,10 @@ vector<std::shared_ptr<Permutation>> PermutationFactory::GetPermutations() {
  * @param[in] permutationName Name of permutation to be created
  * @return On success instance of permutation, exception std::invalid_argument otherwise
  */
-std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
-    const string &permutation_name) {
+std::shared_ptr<Permutation>
+PermutationFactory::GetPermutation(const string &permutation_name) {
 
-  vector<std::shared_ptr<Permutation> > list;
+  vector<std::shared_ptr<Permutation>> list;
   std::shared_ptr<Permutation> permutation(nullptr);
   string str, name;
 
@@ -95,35 +96,36 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
   if (permutation)
     return permutation;
   throw std::invalid_argument("PermutationFactory::getPermutationByName: "
-                              "permutation with name '"
-                              + permutation_name + "' doesn't exist");
+                              "permutation with name '" +
+                              permutation_name + "' doesn't exist");
 }
 
 
-std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
-    const PermutationType permutation){
+std::shared_ptr<Permutation>
+PermutationFactory::GetPermutation(const PermutationType permutation) {
 
-  switch(permutation) {
-    case PermutationType::IDENTITY:
-      return std::make_shared<IdentityPermutation>();
-    case PermutationType::AFFINE:
-      return std::make_shared<AffinePermutation>();
-    case PermutationType::AFFINE64:
-      return std::make_shared<Affine64Permutation>();
-    case PermutationType::FEISTEL_NUM:
-      return std::make_shared<FeistelNumPermutation>();
-    case PermutationType::FEISTEL_MIX:
-      return std::make_shared<FeistelMixPermutation>();
-    default:
-      return nullptr;
+  switch (permutation) {
+  case PermutationType::IDENTITY:
+    return std::make_shared<IdentityPermutation>();
+  case PermutationType::AFFINE:
+    return std::make_shared<AffinePermutation>();
+  case PermutationType::AFFINE64:
+    return std::make_shared<Affine64Permutation>();
+  case PermutationType::FEISTEL_NUM:
+    return std::make_shared<FeistelNumPermutation>();
+  case PermutationType::FEISTEL_MIX:
+    return std::make_shared<FeistelMixPermutation>();
+  default:
+    return nullptr;
   }
 }
 
-PermutationFactory::PermutationType PermutationFactory::GetPermutationType(
-    const std::string &permutation) {
+PermutationFactory::PermutationType
+PermutationFactory::GetPermutationType(const std::string &permutation) {
 
   std::string l_perm(permutation.size(), '\0');
-  std::transform(permutation.begin(), permutation.end(), l_perm.begin(), ::tolower);
+  std::transform(permutation.begin(), permutation.end(), l_perm.begin(),
+                 ::tolower);
 
   if (l_perm == "identity") {
     return PermutationType::IDENTITY;
@@ -133,15 +135,15 @@ PermutationFactory::PermutationType PermutationFactory::GetPermutationType(
     return PermutationType::AFFINE64;
   } else if (l_perm == "num_feistel") {
     return PermutationType::FEISTEL_NUM;
-  } else if (l_perm == "mix_feistel"){
+  } else if (l_perm == "mix_feistel") {
     return PermutationType::FEISTEL_MIX;
   } else {
     return GetDefaultPermutationType();
   }
 }
 
-const std::string PermutationFactory::GetPermutationName(
-    const PermutationType permutation) {
+const std::string
+PermutationFactory::GetPermutationName(const PermutationType permutation) {
 
   if (permutation == PermutationType::IDENTITY) {
     return "identity";

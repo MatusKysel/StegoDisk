@@ -12,8 +12,8 @@
 
 namespace stego_disk {
 
-void HashImpl::Append(MemoryBuffer& state,
-                      const uint8* data, std::size_t length) {
+void HashImpl::Append(MemoryBuffer& state, const uint8* data,
+                      std::size_t length) {
   if (state_size_ != state.GetSize())
     throw std::length_error("HashImpl: input state size doesnt "
                             "match with current state size");

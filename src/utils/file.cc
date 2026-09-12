@@ -10,9 +10,9 @@
 #include "file.h"
 
 #if _WIN32
-#define PATH_SEPARATOR	'\\'
+#define PATH_SEPARATOR '\\'
 #elif defined(__unix__) || defined(__APPLE__)
-#define PATH_SEPARATOR	'/'
+#define PATH_SEPARATOR '/'
 #else
 #error Unsupported OS
 #endif
@@ -87,11 +87,13 @@ FilePtr File::Open() {
 }
 
 std::string File::GetExtension(bool convert_to_lowercase) const {
-  unsigned long ext_pos = static_cast<unsigned long>(
-                            relative_path_.find_last_of("."));
+  unsigned long ext_pos =
+      static_cast<unsigned long>(relative_path_.find_last_of("."));
 
-  if (ext_pos == string::npos) return "";
-  if ((relative_path_.length() - ext_pos) > 5) return "";
+  if (ext_pos == string::npos)
+    return "";
+  if ((relative_path_.length() - ext_pos) > 5)
+    return "";
 
   string ext = relative_path_.substr(ext_pos + 1);
   if (convert_to_lowercase)
@@ -117,15 +119,15 @@ FilePtr::FilePtr(const File& file) {
     ret = errno;
 #endif
   if (ret != 0) {
-    LOG_ERROR("FilePtr::FilePtr: cannot open file '" <<
-              file.GetAbsolutePath() << "': " << strerror(ret));
+    LOG_ERROR("FilePtr::FilePtr: cannot open file '" << file.GetAbsolutePath()
+                                                     << "': " << strerror(ret));
     throw exception::ErrorOpenFIle(file.GetAbsolutePath(), strerror(ret));
   }
 }
 
 FilePtr::~FilePtr() {
   if (file_handle_ != nullptr) {
-    if (fclose(file_handle_) != 0 ) {
+    if (fclose(file_handle_) != 0) {
       LOG_ERROR("FilePtr::FilePtr: cannot close file " << strerror(errno));
     }
     file_handle_ = nullptr;

@@ -22,10 +22,11 @@ namespace stego_disk {
 class KeccakHashImpl : public HashImpl {
 
 public:
-    KeccakHashImpl(std::size_t state_size = 32);
-    virtual ~KeccakHashImpl();
+  KeccakHashImpl(std::size_t state_size = 32);
+  virtual ~KeccakHashImpl();
 
-    virtual void Process(MemoryBuffer& state, const uint8* data, std::size_t length);
+  virtual void Process(MemoryBuffer& state, const uint8* data,
+                       std::size_t length);
 };
 
 } // stego_disk

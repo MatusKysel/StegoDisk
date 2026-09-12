@@ -40,13 +40,14 @@ MemoryBuffer::MemoryBuffer() : buffer_(nullptr), size_(0) {}
 
 
 MemoryBuffer::MemoryBuffer(std::size_t new_size) : size_(new_size) {
-  Init( new_size );
+  Init(new_size);
 }
 
 MemoryBuffer::MemoryBuffer(const uint8* data, std::size_t length) {
-  Init( length );
+  Init(length);
 
-  if (size_ == 0) return;
+  if (size_ == 0)
+    return;
 
   memcpy(buffer_, data, size_);
 }
@@ -55,9 +56,10 @@ MemoryBuffer::MemoryBuffer(const uint8* data, std::size_t length) {
  * copy constructor
  */
 MemoryBuffer::MemoryBuffer(const MemoryBuffer& other) {
-  Init( other.GetSize() );
+  Init(other.GetSize());
 
-  if (size_ == 0) return;
+  if (size_ == 0)
+    return;
 
   memcpy(buffer_, other.buffer_, size_);
 }
@@ -77,7 +79,8 @@ MemoryBuffer::MemoryBuffer(MemoryBuffer&& other) {
 // copy assignment
 MemoryBuffer& MemoryBuffer::operator=(const MemoryBuffer& other) {
   // self-assignment check expected
-  if ( this == &other ) return *this;
+  if (this == &other)
+    return *this;
 
   if (size_ != other.size_) {
     Destroy();
@@ -103,11 +106,14 @@ MemoryBuffer::~MemoryBuffer() {
 
 bool MemoryBuffer::operator==(const MemoryBuffer& other) {
 
-  if (size_ != other.GetSize()) return false;
+  if (size_ != other.GetSize())
+    return false;
 
-  if (size_ == 0) return true;
+  if (size_ == 0)
+    return true;
 
-  if ((other.buffer_ == nullptr) || (buffer_ == nullptr)) return false;
+  if ((other.buffer_ == nullptr) || (buffer_ == nullptr))
+    return false;
 
   return !(memcmp(buffer_, other.buffer_, size_));
 }
@@ -119,7 +125,8 @@ bool MemoryBuffer::operator!=(const MemoryBuffer& other) {
 
 void MemoryBuffer::Resize(std::size_t new_size) {
 
-  if (new_size == size_) return;
+  if (new_size == size_)
+    return;
 
   uint8* original_buffer = buffer_;
   std::size_t original_size = size_;
@@ -158,7 +165,8 @@ MemoryBuffer& MemoryBuffer::operator^=(const MemoryBuffer& other) {
     throw std::length_error("MemoryBuffer: size must be equal to use xor "
                             "operator");
 
-  for (size_t i = 0; i < size_; ++i) (*this)[i] ^= other[i];
+  for (size_t i = 0; i < size_; ++i)
+    (*this)[i] ^= other[i];
 
   return *this;
 }
@@ -192,7 +200,7 @@ void MemoryBuffer::Write(std::size_t offset, const uint8* data,
   // Compared without adding, so that offset + length cannot overflow and wrap
   // back under the size.
   if (length > size_ || offset > size_ - length)
-    throw  std::out_of_range("MemoryBuffer: write: offset + length > size");
+    throw std::out_of_range("MemoryBuffer: write: offset + length > size");
 
   memcpy(static_cast<void*>(buffer_ + offset), data, length);
 }
@@ -200,14 +208,16 @@ void MemoryBuffer::Write(std::size_t offset, const uint8* data,
 
 void MemoryBuffer::Clear() {
 
-  if ((buffer_ == nullptr) || (size_ == 0)) return;
+  if ((buffer_ == nullptr) || (size_ == 0))
+    return;
 
   memset(buffer_, 0, size_);
 }
 
 void MemoryBuffer::Randomize() {
 
-  if ((buffer_ == nullptr) || (size_ == 0)) return;
+  if ((buffer_ == nullptr) || (size_ == 0))
+    return;
 
   // Independent buffers may be randomized concurrently by carrier workers.
   static thread_local std::mt19937 gen(std::random_device{}());
@@ -223,14 +233,16 @@ void MemoryBuffer::Randomize() {
 
 void MemoryBuffer::Fill(uint8 value) {
 
-  if ((buffer_ == nullptr) || (size_ == 0)) return;
+  if ((buffer_ == nullptr) || (size_ == 0))
+    return;
 
   memset(buffer_, value, size_);
 }
 
 void MemoryBuffer::Destroy() {
 
-  if ( buffer_ == nullptr ) return;
+  if (buffer_ == nullptr)
+    return;
 
   Randomize();
   delete[] buffer_;

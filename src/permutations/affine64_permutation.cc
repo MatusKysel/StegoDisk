@@ -17,22 +17,21 @@
 namespace stego_disk {
 
 Affine64Permutation::Affine64Permutation() {
-  LOG_DEBUG("Permutation::Permutation: constructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::Permutation: constructor called for: "
+            << GetNameInstance());
 }
 
 Affine64Permutation::~Affine64Permutation() {
-  LOG_DEBUG("Permutation::~Permutation: destructor called for: " <<
-            GetNameInstance());
+  LOG_DEBUG("Permutation::~Permutation: destructor called for: "
+            << GetNameInstance());
 }
 
-void Affine64Permutation::Init(PermElem requested_size, Key &key)
-{
+void Affine64Permutation::Init(PermElem requested_size, Key &key) {
   initialized_ = false;
 
   if (GetSizeUsingParams(requested_size, key, true) == 0)
     throw std::invalid_argument("Affine64Permutation: "
-                             "requested size is too small");
+                                "requested size is too small");
 
   initialized_ = true;
 }
@@ -44,5 +43,3 @@ PermElem Affine64Permutation::Permute(PermElem index) const {
 }
 
 } // stego_disk
-
-

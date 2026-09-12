@@ -27,8 +27,8 @@ class Fitness {
 public:
   explicit Fitness(std::shared_ptr<CarrierFile> file) { file_ = file; }
 
-  Fitness(const Fitness&) = delete;
-  Fitness& operator=(const Fitness&) = delete;
+  Fitness(const Fitness &) = delete;
+  Fitness &operator=(const Fitness &) = delete;
 
   virtual ~Fitness() {}
 
@@ -38,7 +38,6 @@ public:
 
 protected:
   std::shared_ptr<CarrierFile> file_;
-
 };
 
 } // stego_disk

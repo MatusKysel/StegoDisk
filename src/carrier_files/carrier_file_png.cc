@@ -38,7 +38,8 @@ unsigned CompressWithZlib(unsigned char **out, size_t *outsize,
                           const LodePNGCompressSettings *) {
   const uLongf bound = compressBound(static_cast<uLong>(insize));
   *out = static_cast<unsigned char *>(malloc(bound));
-  if (*out == nullptr) return 83;  // lodepng: allocation failed
+  if (*out == nullptr)
+    return 83; // lodepng: allocation failed
 
   uLongf written = bound;
   if (compress2(*out, &written, in, static_cast<uLong>(insize),
@@ -67,12 +68,12 @@ void ConfigureEncoderForSpeed(LodePNGState *state) {
 #endif
 }
 
-}  // namespace
+} // namespace
 
 CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
                                std::shared_ptr<Permutation> permutation,
-                               std::unique_ptr<Fitness> fitness) :
-  CarrierFile(file, encoder, permutation, std::move(fitness)) {
+                               std::unique_ptr<Fitness> fitness)
+    : CarrierFile(file, encoder, permutation, std::move(fitness)) {
 
   auto file_ptr = file.Open();
 
@@ -83,12 +84,13 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
 
 
   if (read_cnt < 64) {
-	throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
+    throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
   }
 
   unsigned error = lodepng_inspect(&width_, &height_, &state_, png_header, 64);
-  if(error)
-	throw exception::ParseError{file_.GetFileName(), "Unable to read file state"};
+  if (error)
+    throw exception::ParseError{file_.GetFileName(),
+                                "Unable to read file state"};
 
   state_.info_raw.colortype = LCT_RGB;
   state_.info_raw.bitdepth = 8;
@@ -99,63 +101,64 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
 
 void CarrierFilePNG::LoadFile() {
 
-  if (file_loaded_) return;
+  if (file_loaded_)
+    return;
 
-    auto file_ptr = file_.Open();
+  auto file_ptr = file_.Open();
 
-    LOG_INFO("Loading file " << file_.GetRelativePath());
+  LOG_INFO("Loading file " << file_.GetRelativePath());
 
-    if (permutation_->GetSize() == 0) {
-      permutation_->Init(raw_capacity_ * 8, subkey_);
-    }
+  if (permutation_->GetSize() == 0) {
+    permutation_->Init(raw_capacity_ * 8, subkey_);
+  }
 
-    buffer_.Resize(raw_capacity_);
-    buffer_.Clear();
+  buffer_.Resize(raw_capacity_);
+  buffer_.Clear();
 
-    MemoryBuffer png_buffer(file_.GetSize());
+  MemoryBuffer png_buffer(file_.GetSize());
 
-    uint64 bits_to_modify = permutation_->GetSize();
+  uint64 bits_to_modify = permutation_->GetSize();
 
 
-    fseek(file_ptr.Get(), 0, SEEK_SET);
-    uint32 read_cnt = static_cast<uint32>(fread(png_buffer.GetRawPointer(), 1,
-                                                file_.GetSize(),
-                                                file_ptr.Get()));
+  fseek(file_ptr.Get(), 0, SEEK_SET);
+  uint32 read_cnt = static_cast<uint32>(
+      fread(png_buffer.GetRawPointer(), 1, file_.GetSize(), file_ptr.Get()));
 
-    if (read_cnt < file_.GetSize()) {
-      LOG_ERROR("Unable to read file.");
-	  throw exception::IoError{file_.GetFileName()};
-    }
+  if (read_cnt < file_.GetSize()) {
+    LOG_ERROR("Unable to read file.");
+    throw exception::IoError{file_.GetFileName()};
+  }
 
-    unsigned char* image;
-    unsigned width, height;
+  unsigned char *image;
+  unsigned width, height;
 
-    unsigned error = lodepng_decode(&image, &width, &height, &state_, png_buffer.GetConstRawPointer(), read_cnt);
+  unsigned error = lodepng_decode(&image, &width, &height, &state_,
+                                  png_buffer.GetConstRawPointer(), read_cnt);
 
-    if(error)
-	  throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
+  if (error)
+    throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
 
-    // copy LSB data to content buffer
+  // copy LSB data to content buffer
 
-    ExtractLsbToBufferPermuted(image, bits_to_modify);
+  ExtractLsbToBufferPermuted(image, bits_to_modify);
 
-    free(image);
+  free(image);
 
-    ExtractBufferUsingEncoder();
+  ExtractBufferUsingEncoder();
 
-    file_loaded_ = true;
+  file_loaded_ = true;
 
-    LOG_INFO("File " << file_.GetRelativePath() << " loaded");
+  LOG_INFO("File " << file_.GetRelativePath() << " loaded");
 }
 
 
 void CarrierFilePNG::SaveFile() {
   auto file_ptr = file_.Open();
 
-  if(!file_loaded_)
+  if (!file_loaded_)
     throw exception::InvalidState{exception::Operation::save,
                                   exception::Component::file,
-								  exception::ComponentState::notLoaded};
+                                  exception::ComponentState::notLoaded};
 
 
   LOG_INFO("Saving file " << file_.GetRelativePath());
@@ -172,22 +175,22 @@ void CarrierFilePNG::SaveFile() {
   uint64 bits_to_modify = permutation_->GetSize();
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  uint32 read_cnt = static_cast<uint32>(fread(png_buffer.GetRawPointer(), 1,
-                                              file_.GetSize(),
-                                              file_ptr.Get()));
+  uint32 read_cnt = static_cast<uint32>(
+      fread(png_buffer.GetRawPointer(), 1, file_.GetSize(), file_ptr.Get()));
 
   if (read_cnt < file_.GetSize()) {
     LOG_ERROR("Unable to read file.")
-	throw exception::IoError{file_.GetFileName()};
+    throw exception::IoError{file_.GetFileName()};
   }
   // copy LSB data to content buffer
 
-  unsigned char* image;
+  unsigned char *image;
   unsigned width, height;
 
-  unsigned error = lodepng_decode(&image, &width, &height, &state_, png_buffer.GetConstRawPointer(), read_cnt);
+  unsigned error = lodepng_decode(&image, &width, &height, &state_,
+                                  png_buffer.GetConstRawPointer(), read_cnt);
 
-  if(error)
+  if (error)
     throw exception::ParseError{file_.GetFileName(), "Unable to decode file"};
 
   // copy LSB data to content buffer
@@ -198,24 +201,24 @@ void CarrierFilePNG::SaveFile() {
 
   ApplyBufferPermutedToLsb(image, bits_to_modify);
 
-  unsigned char* image_out;
+  unsigned char *image_out;
   size_t size_out;
 
-  error = lodepng_encode(&image_out, &size_out, image, width_, height_, &state_);
+  error =
+      lodepng_encode(&image_out, &size_out, image, width_, height_, &state_);
 
-  if(error)
+  if (error)
     throw exception::ParseError{file_.GetFileName(), "Unable to encode file"};
 
   // write data
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  uint32 write_cnt = static_cast<uint32>(fwrite(image_out,
-                                                1, size_out,
-                                                file_ptr.Get()));
+  uint32 write_cnt =
+      static_cast<uint32>(fwrite(image_out, 1, size_out, file_ptr.Get()));
 
   if (write_cnt != size_out) {
     LOG_ERROR("Writing PNG file expanded");
-	throw exception::IoError{file_.GetFileName()};
+    throw exception::IoError{file_.GetFileName()};
   }
 
   free(image);

@@ -43,24 +43,24 @@ namespace stego_disk {
 
 #ifdef __APPLE__
 static const char *file_path = "/virtualdisc.dmg";
-const char* FuseService::virtual_file_name_ = "virtualdisc.dmg";
+const char *FuseService::virtual_file_name_ = "virtualdisc.dmg";
 #else
 static const char *file_path = "/virtualdisc.iso";
-const char* FuseService::virtual_file_name_ = "virtualdisc.iso";
+const char *FuseService::virtual_file_name_ = "virtualdisc.iso";
 #endif
 
 static struct fuse_operations stegofs_ops;
 
-static FuseContext* get_ctx() {
-  return static_cast<FuseContext*>(fuse_get_context()->private_data);
+static FuseContext *get_ctx() {
+  return static_cast<FuseContext *>(fuse_get_context()->private_data);
 }
 
 // =============================================================================
 //      FUSE CALLBACK METHODS
 // =============================================================================
 
-static int sfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t,
-                    struct fuse_file_info *) {
+static int sfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+                       off_t, struct fuse_file_info *) {
   if (strcmp(path, "/") != 0) /* We only recognize the root directory. */
     return -ENOENT;
 
@@ -147,15 +147,13 @@ static int sfs_read(const char *path, char *buf, size_t size, off_t offset,
 
   if (offset64 >= ctx->capacity) /* Trying to read past the end of file. */ {
     LOG_ERROR("fuse service: offset+size > capacity_... offset:"
-              << offset << ", size:" << size << ", cap:"
-              << ctx->capacity);
+              << offset << ", size:" << size << ", cap:" << ctx->capacity);
     return 0;
   }
 
   if (offset64 + size64 > ctx->capacity) /* Trim the read to the file size. */ {
     LOG_ERROR("fuse service: offset+size > capacity_... offset:"
-              << offset << ", size:" << size << ", cap:"
-              << ctx->capacity);
+              << offset << ", size:" << size << ", cap:" << ctx->capacity);
     size64 = ctx->capacity - offset64;
   }
 
@@ -178,15 +176,13 @@ static int sfs_write(const char *path, const char *buf, size_t size,
 
   if (offset64 >= ctx->capacity) /* Trying to read past the end of file. */ {
     LOG_ERROR("fuse service: offset > capacity_... offset:"
-              << offset << ", size:" << size << ", cap:"
-              << ctx->capacity);
+              << offset << ", size:" << size << ", cap:" << ctx->capacity);
     return 0;
   }
 
   if (offset64 + size64 > ctx->capacity) /* Trim the read to the file size. */ {
     LOG_ERROR("fuse service: offset+size > capacity_... offset:"
-              << offset << ", size:" << size << ", cap:"
-              << ctx->capacity);
+              << offset << ", size:" << size << ", cap:" << ctx->capacity);
     size64 = ctx->capacity - offset64;
   }
 
@@ -200,15 +196,15 @@ static int sfs_write(const char *path, const char *buf, size_t size,
   return static_cast<int>(size64);
 }
 
-static void* sfs_init(struct fuse_conn_info *) {
+static void *sfs_init(struct fuse_conn_info *) {
   return fuse_get_context()->private_data;
 }
 
-static void sfs_destroy(void*) {
+static void sfs_destroy(void *) {
   delete get_ctx();
 }
 
-static int sfs_flush(const char*, struct fuse_file_info*) {
+static int sfs_flush(const char *, struct fuse_file_info *) {
   FuseContext *ctx = get_ctx();
   if (ctx->writes) {
     try {
@@ -221,7 +217,7 @@ static int sfs_flush(const char*, struct fuse_file_info*) {
   return 0;
 }
 
-static int sfs_setxattr(const char*, const char*, const char*, size_t, int) {
+static int sfs_setxattr(const char *, const char *, const char *, size_t, int) {
   return 0;
 }
 
@@ -277,7 +273,7 @@ std::string FuseService::MountFuse() {
     return "";
 
   char temp[] = "/tmp/fuseXXXXXX";
-  char* p = mkdtemp(temp);
+  char *p = mkdtemp(temp);
 
   if (!p)
     return "";
@@ -305,13 +301,13 @@ int FuseService::MountFuse(const std::string &mount_point) {
     mnt_pt[sizeof(mnt_pt) - 1] = '\0';
 
     char *argv[10];
-    memset(argv, 0, 10 * sizeof(char*));
-    argv[0] = (char*)"fuse";
+    memset(argv, 0, 10 * sizeof(char *));
+    argv[0] = (char *)"fuse";
     argv[1] = mnt_pt;
-    argv[2] = (char*)"-f";
-    argv[3] = (char*)"-s";
-    argv[4] = (char*)"-o";
-    argv[5] = (char*)"allow_other";
+    argv[2] = (char *)"-f";
+    argv[3] = (char *)"-s";
+    argv[4] = (char *)"-o";
+    argv[5] = (char *)"allow_other";
     argv[6] = NULL;
 
     fuse_main(6, argv, &stegofs_ops, ctx);

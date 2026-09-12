@@ -35,7 +35,6 @@ public:
 
 private:
   MemoryBuffer data_;
-
 };
 } // stego_disk
 

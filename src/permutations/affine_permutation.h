@@ -25,6 +25,7 @@ public:
   virtual PermElem GetSizeUsingParams(PermElem requested_size, Key &key);
 
   const std::string GetNameInstance() const { return "Affine"; }
+
 protected:
   PermElem GetSizeUsingParams(PermElem requested_size, Key &key,
                               bool overwrite_members);

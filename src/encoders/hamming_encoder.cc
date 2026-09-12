@@ -19,7 +19,8 @@
 
 namespace stego_disk {
 
-const string HammingEncoder::kEncoderHammingCodeName = ENCODER_HAMMING_CODE_NAME_DEF;
+const string HammingEncoder::kEncoderHammingCodeName =
+    ENCODER_HAMMING_CODE_NAME_DEF;
 
 /**
  * @brief Get minimal value for parameter 'parity_bits'
@@ -100,10 +101,10 @@ void HammingEncoder::Init(uint32 parity_bits) {
       (parity_bits > kEncoderHammingParityBitsMax)) {
     string err = "HammingEncoder::init: 'parity_bits' is " +
                  std::to_string(static_cast<uint64>(parity_bits));
-    err += ", should be in <" + std::to_string(
-             static_cast<uint64>(kEncoderHammingParityBitsMin));
-    err += "," + std::to_string(
-             static_cast<uint64>(kEncoderHammingParityBitsMax));
+    err += ", should be in <" +
+           std::to_string(static_cast<uint64>(kEncoderHammingParityBitsMin));
+    err +=
+        "," + std::to_string(static_cast<uint64>(kEncoderHammingParityBitsMax));
     err += ">";
     throw std::out_of_range(err);
   }
@@ -129,11 +130,11 @@ void HammingEncoder::Init(uint32 parity_bits) {
   codeword_buffer_size_ = (total_bits_ - 1) / 8 + 1;
   codeword_block_size_ = codeword_buffer_size_ * codewords_in_block_;
 
-  LOG_DEBUG("HammingEncoder::init: parity bits: " << parity_bits_ << ", " <<
-            "total bits: " << total_bits_ << ", " <<
-            "dataBlockSize: " << data_block_size_ << ", " <<
-            "codewordsInBlock: " << codewords_in_block_ << ", " <<
-            "codeword buffer size: " << codeword_buffer_size_);
+  LOG_DEBUG("HammingEncoder::init: parity bits: "
+            << parity_bits_ << ", " << "total bits: " << total_bits_ << ", "
+            << "dataBlockSize: " << data_block_size_ << ", "
+            << "codewordsInBlock: " << codewords_in_block_ << ", "
+            << "codeword buffer size: " << codeword_buffer_size_);
 }
 
 /**
@@ -174,8 +175,11 @@ HammingEncoder::HammingEncoder() {
  * @return Instance of the Hamming encoder initialized with parameter 'parity_bits'
  */
 HammingEncoder::HammingEncoder(uint32 parity_bits) {
-  try { Init(parity_bits); }
-  catch (const std::out_of_range &) { throw; }
+  try {
+    Init(parity_bits);
+  } catch (const std::out_of_range &) {
+    throw;
+  }
 }
 
 /**
@@ -211,18 +215,25 @@ void HammingEncoder::SetArgByName(const string &param, const string &val) {
     int parity_bits;
 
     is_valid_param = true;
-    try { parity_bits = stoi(val); }
-    catch (const std::invalid_argument& ) { throw; }
-    catch (const std::out_of_range& ) { throw; }
+    try {
+      parity_bits = stoi(val);
+    } catch (const std::invalid_argument &) {
+      throw;
+    } catch (const std::out_of_range &) {
+      throw;
+    }
 
     if (parity_bits < 0)
-      throw std::invalid_argument("HammingEncoder::setArgByName: "
-                              "'parity_bits' should be positive, is "
-                              + std::to_string(
-                                static_cast<uint64>(parity_bits)));
+      throw std::invalid_argument(
+          "HammingEncoder::setArgByName: "
+          "'parity_bits' should be positive, is " +
+          std::to_string(static_cast<uint64>(parity_bits)));
 
-    try { Init(static_cast<uint32>(parity_bits)); }
-    catch (const std::out_of_range &) { throw; }
+    try {
+      Init(static_cast<uint32>(parity_bits));
+    } catch (const std::out_of_range &) {
+      throw;
+    }
   }
 
   // other parameters..
@@ -230,7 +241,8 @@ void HammingEncoder::SetArgByName(const string &param, const string &val) {
   // if is not valid parameter
   if (is_valid_param == false)
     throw std::invalid_argument("HammingEncoder::setArgByName: "
-                                "unknown class parameter '" + param + "'");
+                                "unknown class parameter '" +
+                                param + "'");
 }
 
 /**
@@ -273,9 +285,9 @@ int HammingEncoder::Embed(uint8 *codeword, const uint8 *data) {
   uint64 h;
   int bit_offset = 0;
 
-  if ( !codeword )
+  if (!codeword)
     throw exception::NullptrArgument{"codeword"};
-  if ( !data )
+  if (!data)
     throw exception::NullptrArgument{"data"};
 
   for (uint32 i = 0; i < codewords_in_block_; ++i) {
@@ -283,8 +295,8 @@ int HammingEncoder::Embed(uint8 *codeword, const uint8 *data) {
     h ^= ReadBitsFromBuffer(data, bit_offset, parity_bits_); // h = h xor m
 
     if (h != 0) {
-      SwapBitInCodeword(&codeword[i*codeword_buffer_size_],
-          static_cast<int>(h));
+      SwapBitInCodeword(&codeword[i * codeword_buffer_size_],
+                        static_cast<int>(h));
     }
 
     bit_offset += parity_bits_;
@@ -307,9 +319,9 @@ int HammingEncoder::Embed(uint8 *codeword, const uint8 *data) {
  * @return Exception std::invalid_argument, if 'codeword' or 'data' are NULL pointer
  */
 int HammingEncoder::Extract(const uint8 *codeword, uint8 *data) {
-  if ( !codeword )
+  if (!codeword)
     throw exception::NullptrArgument{"codeword"};
-  if ( !data )
+  if (!data)
     throw exception::NullptrArgument{"data"};
 
   memset(data, 0, data_block_size_);
@@ -428,7 +440,8 @@ uint64 HammingEncoder::ComputeH(const uint8 *buffer) {
   for (uint32 i = 0; i < codeword_buffer_size_; ++i) {
     for (int j = 7; j >= 0; --j) {
       if (tmp_hline <= static_cast<uint64>(total_bits_)) {
-        if ((buffer[i] >> j) & 0x01) result ^= tmp_hline;
+        if ((buffer[i] >> j) & 0x01)
+          result ^= tmp_hline;
         ++tmp_hline;
       }
     }
@@ -448,7 +461,7 @@ uint64 HammingEncoder::ComputeH(const uint8 *buffer) {
  *
  * @return Nothing
  */
-void HammingEncoder::SwapBitInCodeword(uint8 *buffer, int bit_in){
+void HammingEncoder::SwapBitInCodeword(uint8 *buffer, int bit_in) {
   if (!bit_in)
     return;
   buffer[(bit_in - 1) / 8] ^= 1 << (7 - ((bit_in - 1) % 8));

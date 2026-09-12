@@ -34,8 +34,7 @@ private:
   void ComputeCapacity();
 
 public:
-  CarrierFileJPEG(File file,
-                  std::shared_ptr<Encoder> encoder,
+  CarrierFileJPEG(File file, std::shared_ptr<Encoder> encoder,
                   std::shared_ptr<Permutation> permutation,
                   std::unique_ptr<Fitness> fitness);
 
@@ -43,7 +42,6 @@ public:
   void SaveFile();
 
   int GetHistogram();
-
 };
 
 } // stego_disk

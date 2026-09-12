@@ -29,10 +29,9 @@ public:
 
 private:
   bool CheckSubboxValidity(const std::array<unsigned char, 4> &subbox) const;
-  bool CheckValidity(const std::array<unsigned char, 9>& box) const;
+  bool CheckValidity(const std::array<unsigned char, 9> &box) const;
 
   std::forward_list<uint64> selected_bits_;
-
 };
 
 } // stego_disk

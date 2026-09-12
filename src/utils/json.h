@@ -42,15 +42,16 @@
 #include "utils/json_object.h"
 
 namespace json {
-template <typename Iter>
-class input {
+template <typename Iter> class input {
 protected:
   Iter cur_, end_;
   int last_ch_;
   bool ungot_;
   int line_;
+
 public:
-  input(const Iter& first, const Iter& last) : cur_(first), end_(last), last_ch_(-1), ungot_(false), line_(1) {}
+  input(const Iter& first, const Iter& last)
+      : cur_(first), end_(last), last_ch_(-1), ungot_(false), line_(1) {}
   int getc() {
     if (ungot_) {
       ungot_ = false;
@@ -76,7 +77,7 @@ public:
   void skip_ws() {
     while (1) {
       int ch = getc();
-      if (! (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')) {
+      if (!(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')) {
         ungetc();
         break;
       }
@@ -91,8 +92,7 @@ public:
     return true;
   }
   bool match(const std::string& pattern) {
-    for (std::string::const_iterator pi(pattern.begin());
-         pi != pattern.end();
+    for (std::string::const_iterator pi(pattern.begin()); pi != pattern.end();
          ++pi) {
       if (getc() != *pi) {
         ungetc();
@@ -103,8 +103,7 @@ public:
   }
 };
 
-template<typename Iter>
-inline int _parse_quadhex(input<Iter> &in) {
+template <typename Iter> inline int _parse_quadhex(input<Iter>& in) {
   int uni_ch = 0, hex;
   for (int i = 0; i < 4; i++) {
     if ((hex = in.getc()) == -1) {
@@ -125,7 +124,7 @@ inline int _parse_quadhex(input<Iter> &in) {
   return uni_ch;
 }
 
-template<typename String, typename Iter>
+template <typename String, typename Iter>
 inline bool _parse_codepoint(String& out, input<Iter>& in) {
   int uni_ch;
   if ((uni_ch = _parse_quadhex(in)) == -1) {
@@ -142,7 +141,7 @@ inline bool _parse_codepoint(String& out, input<Iter>& in) {
       return false;
     }
     int second = _parse_quadhex(in);
-    if (! (0xdc00 <= second && second <= 0xdfff)) {
+    if (!(0xdc00 <= second && second <= 0xdfff)) {
       return false;
     }
     uni_ch = ((uni_ch - 0xd800) << 10) | ((second - 0xdc00) & 0x3ff);
@@ -167,7 +166,7 @@ inline bool _parse_codepoint(String& out, input<Iter>& in) {
   return true;
 }
 
-template<typename String, typename Iter>
+template <typename String, typename Iter>
 inline bool _parse_string(String& out, input<Iter>& in) {
   while (1) {
     int ch = in.getc();
@@ -181,7 +180,10 @@ inline bool _parse_string(String& out, input<Iter>& in) {
         return false;
       }
       switch (ch) {
-#define MAP(sym, val) case sym: out.push_back(val); break
+#define MAP(sym, val)                                                          \
+  case sym:                                                                    \
+    out.push_back(val);                                                        \
+    break
         MAP('"', '\"');
         MAP('\\', '\\');
         MAP('/', '/');
@@ -191,13 +193,13 @@ inline bool _parse_string(String& out, input<Iter>& in) {
         MAP('r', '\r');
         MAP('t', '\t');
 #undef MAP
-        case 'u':
-          if (! _parse_codepoint(out, in)) {
-            return false;
-          }
-          break;
-        default:
+      case 'u':
+        if (!_parse_codepoint(out, in)) {
           return false;
+        }
+        break;
+      default:
+        return false;
       }
     } else {
       out.push_back(ch);
@@ -208,7 +210,7 @@ inline bool _parse_string(String& out, input<Iter>& in) {
 
 template <typename Context, typename Iter>
 inline bool _parse_array(Context& ctx, input<Iter>& in) {
-  if (! ctx.parse_array_start()) {
+  if (!ctx.parse_array_start()) {
     return false;
   }
   size_t idx = 0;
@@ -216,7 +218,7 @@ inline bool _parse_array(Context& ctx, input<Iter>& in) {
     return ctx.parse_array_stop(idx);
   }
   do {
-    if (! ctx.parse_array_item(in, idx)) {
+    if (!ctx.parse_array_item(in, idx)) {
       return false;
     }
     idx++;
@@ -226,7 +228,7 @@ inline bool _parse_array(Context& ctx, input<Iter>& in) {
 
 template <typename Context, typename Iter>
 inline bool _parse_object(Context& ctx, input<Iter>& in) {
-  if (! ctx.parse_object_start()) {
+  if (!ctx.parse_object_start()) {
     return false;
   }
   if (in.expect('}')) {
@@ -234,12 +236,10 @@ inline bool _parse_object(Context& ctx, input<Iter>& in) {
   }
   do {
     std::string key;
-    if (! in.expect('"')
-        || ! _parse_string(key, in)
-        || ! in.expect(':')) {
+    if (!in.expect('"') || !_parse_string(key, in) || !in.expect(':')) {
       return false;
     }
-    if (! ctx.parse_object_item(in, key)) {
+    if (!ctx.parse_object_item(in, key)) {
       return false;
     }
   } while (in.expect(','));
@@ -251,8 +251,8 @@ inline bool _parse_number(double& out, input<Iter>& in) {
   std::string num_str;
   while (1) {
     int ch = in.getc();
-    if (('0' <= ch && ch <= '9') || ch == '+' || ch == '-' || ch == '.'
-        || ch == 'e' || ch == 'E') {
+    if (('0' <= ch && ch <= '9') || ch == '+' || ch == '-' || ch == '.' ||
+        ch == 'e' || ch == 'E') {
       num_str.push_back(ch);
     } else {
       in.ungetc();
@@ -269,34 +269,35 @@ inline bool _parse(Context& ctx, input<Iter>& in) {
   in.skip_ws();
   int ch = in.getc();
   switch (ch) {
-#define IS(ch, text, op) case ch: \
-  if (in.match(text) && op) { \
-  return true; \
-  } else { \
-  return false; \
-  }
+#define IS(ch, text, op)                                                       \
+  case ch:                                                                     \
+    if (in.match(text) && op) {                                                \
+      return true;                                                             \
+    } else {                                                                   \
+      return false;                                                            \
+    }
     IS('n', "ull", ctx.set_null());
     IS('f', "alse", ctx.set_bool(false));
     IS('t', "rue", ctx.set_bool(true));
 #undef IS
-    case '"':
-      return ctx.parse_string(in);
-    case '[':
-      return _parse_array(ctx, in);
-    case '{':
-      return _parse_object(ctx, in);
-    default:
-      if (('0' <= ch && ch <= '9') || ch == '-') {
-        in.ungetc();
-        double f;
-        if (_parse_number(f, in)) {
-          ctx.set_number(f);
-          return true;
-        } else {
-          return false;
-        }
+  case '"':
+    return ctx.parse_string(in);
+  case '[':
+    return _parse_array(ctx, in);
+  case '{':
+    return _parse_object(ctx, in);
+  default:
+    if (('0' <= ch && ch <= '9') || ch == '-') {
+      in.ungetc();
+      double f;
+      if (_parse_number(f, in)) {
+        ctx.set_number(f);
+        return true;
+      } else {
+        return false;
       }
-      break;
+    }
+    break;
   }
   in.ungetc();
   return false;
@@ -314,7 +315,8 @@ public:
   }
   bool parse_array_stop(size_t) { return false; }
   bool parse_object_start() { return false; }
-  template <typename Iter> bool parse_object_item(input<Iter>&, const std::string&) {
+  template <typename Iter>
+  bool parse_object_item(input<Iter>&, const std::string&) {
     return false;
   }
 };
@@ -322,6 +324,7 @@ public:
 class default_parse_context {
 protected:
   JsonObject* out_;
+
 public:
   default_parse_context(JsonObject* out) : out_(out) {}
   bool set_null() {
@@ -336,8 +339,7 @@ public:
     *out_ = JsonObject(f);
     return true;
   }
-  template<typename Iter>
-  bool parse_string(input<Iter>& in) {
+  template <typename Iter> bool parse_string(input<Iter>& in) {
     *out_ = JsonObject(JsonObject::STRING);
     return _parse_string(out_->ToString(), in);
   }
@@ -345,9 +347,8 @@ public:
     *out_ = JsonObject(JsonObject::ARRAY);
     return true;
   }
-  template <typename Iter>
-  bool parse_array_item(input<Iter>& in, size_t) {
-    std::vector<JsonObject> &a = out_->ToArray();
+  template <typename Iter> bool parse_array_item(input<Iter>& in, size_t) {
+    std::vector<JsonObject>& a = out_->ToArray();
     a.push_back(JsonObject());
     default_parse_context ctx(&a.back());
     return _parse(ctx, in);
@@ -360,10 +361,11 @@ public:
   template <typename Iter>
   bool parse_object_item(input<Iter>& in, const std::string& key) {
     //    object& o = out_->get<object>();
-    std::map<std::string, JsonObject> &o = out_->ToObject();
+    std::map<std::string, JsonObject>& o = out_->ToObject();
     default_parse_context ctx(&o[key]);
     return _parse(ctx, in);
   }
+
 private:
   default_parse_context(const default_parse_context&);
   default_parse_context& operator=(const default_parse_context&);
@@ -374,19 +376,18 @@ public:
   struct dummy_str {
     void push_back(int) {}
   };
+
 public:
   null_parse_context() {}
   bool set_null() { return true; }
   bool set_bool(bool) { return true; }
   bool set_number(double) { return true; }
-  template <typename Iter>
-  bool parse_string(input<Iter>& in) {
+  template <typename Iter> bool parse_string(input<Iter>& in) {
     dummy_str s;
     return _parse_string(s, in);
   }
   bool parse_array_start() { return true; }
-  template <typename Iter>
-  bool parse_array_item(input<Iter>& in, size_t) {
+  template <typename Iter> bool parse_array_item(input<Iter>& in, size_t) {
     return _parse(*this, in);
   }
   bool parse_array_stop(size_t) { return true; }
@@ -395,15 +396,17 @@ public:
   bool parse_object_item(input<Iter>& in, const std::string&) {
     return _parse(*this, in);
   }
+
 private:
   null_parse_context(const null_parse_context&);
   null_parse_context& operator=(const null_parse_context&);
 };
 
 template <typename Context, typename Iter>
-inline Iter _parse(Context& ctx, const Iter& first, const Iter& last, std::string* err) {
+inline Iter _parse(Context& ctx, const Iter& first, const Iter& last,
+                   std::string* err) {
   input<Iter> in(first, last);
-  if (! _parse(ctx, in) && err != NULL) {
+  if (!_parse(ctx, in) && err != NULL) {
     char buf[64];
     SNPRINTF(buf, sizeof(buf), "syntax error at line %d near: ", in.line());
     *err = buf;
@@ -420,7 +423,8 @@ inline Iter _parse(Context& ctx, const Iter& first, const Iter& last, std::strin
 }
 
 template <typename Iter>
-inline static Iter parse(JsonObject& out, const Iter& first, const Iter& last, std::string* err) {
+inline static Iter parse(JsonObject& out, const Iter& first, const Iter& last,
+                         std::string* err) {
   default_parse_context ctx(&out);
   return _parse(ctx, first, last, err);
 }
@@ -432,7 +436,7 @@ inline static std::string parse(JsonObject& out, std::istream& is) {
   return err;
 }
 
-inline static std::string Parse(const std::string &json, JsonObject *root) {
+inline static std::string Parse(const std::string& json, JsonObject* root) {
   std::string err;
 
   parse(*root, json.begin(), json.end(), &err);

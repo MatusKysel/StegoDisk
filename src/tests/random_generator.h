@@ -18,14 +18,22 @@
 #include <iostream>
 
 class RandomGenerator {
- public:
-  RandomGenerator() : random_file_("/dev/urandom", std::ios_base::binary | std::ios_base::in), generator_(device_()), distribution_(0, 256) {
-    if (random_file_.is_open()) std::cout << "Will seed random binary strings from /dev/urandom" << std::endl;
-    else std::cout << "Failed to open /dev/urandom, will use rand() to generate random binary strings" << std::endl;
+public:
+  RandomGenerator()
+      : random_file_("/dev/urandom", std::ios_base::binary | std::ios_base::in),
+        generator_(device_()), distribution_(0, 256) {
+    if (random_file_.is_open())
+      std::cout << "Will seed random binary strings from /dev/urandom"
+                << std::endl;
+    else
+      std::cout << "Failed to open /dev/urandom, will use rand() to generate "
+                   "random binary strings"
+                << std::endl;
   }
 
   ~RandomGenerator() {
-    if (random_file_.is_open()) random_file_.close();
+    if (random_file_.is_open())
+      random_file_.close();
   }
 
   inline static RandomGenerator &Instance() {
@@ -40,7 +48,8 @@ class RandomGenerator {
 
     size_t bytes_read = Instance().random_file_.gcount();
 
-    if (bytes_read != size) string->resize(bytes_read);
+    if (bytes_read != size)
+      string->resize(bytes_read);
   }
 
   static char RandomChar() {
@@ -48,7 +57,8 @@ class RandomGenerator {
   }
 
   inline static bool RandomOpen() { return Instance().random_file_.is_open(); }
- private:
+
+private:
   std::fstream random_file_;
   std::random_device device_;
   std::mt19937 generator_;
