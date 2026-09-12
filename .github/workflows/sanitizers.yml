@@ -41,7 +41,7 @@ jobs:
       - name: Install sanitizer toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-18 llvm-18 libclang-rt-18-dev libtbb-dev
+          sudo apt-get install -y clang-18 llvm-18 libclang-rt-18-dev libtbb-dev zlib1g-dev
           python -m pip install "cmake==$CMAKE_VERSION" ninja
 
       - name: Configure ASan and UBSan build
