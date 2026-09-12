@@ -137,9 +137,7 @@ void CarrierFilePNG::LoadFile() {
 
     // copy LSB data to content buffer
 
-    for (uint64 i = 0; i < bits_to_modify; ++i) {
-      if (image[i] & 0x01) SetBitInBufferPermuted(i);
-    }
+    ExtractLsbToBufferPermuted(image, bits_to_modify);
 
     free(image);
 
@@ -194,15 +192,11 @@ void CarrierFilePNG::SaveFile() {
 
   // copy LSB data to content buffer
 
-  for (uint64 i = 0; i < bits_to_modify; ++i) {
-    if (image[i] & 0x01) SetBitInBufferPermuted(i);
-  }
+  ExtractLsbToBufferPermuted(image, bits_to_modify);
 
   EmbedBufferUsingEncoder();
 
-  for (uint64 i = 0; i < bits_to_modify ; ++i) {
-    image[i] = (image[i] & 0xFE) | GetBitInBufferPermuted(i);
-  }
+  ApplyBufferPermutedToLsb(image, bits_to_modify);
 
   unsigned char* image_out;
   size_t size_out;

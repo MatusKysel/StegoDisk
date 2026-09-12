@@ -107,9 +107,8 @@ void CarrierFileBMP::LoadFile() {
 
   uint64 bits_to_modify = permutation_->GetSize();
 
-  for (uint64 i = 0; i < bits_to_modify; ++i) {
-    if ((*usable_buffer)[i] & 0x01) SetBitInBufferPermuted(i);
-  }
+  ExtractLsbToBufferPermuted(usable_buffer->GetConstRawPointer(),
+                             bits_to_modify);
 
   ExtractBufferUsingEncoder();
 
@@ -164,15 +163,12 @@ void CarrierFileBMP::SaveFile() {
 
   uint64 bits_to_modify = permutation_->GetSize();
 
-  for (uint64 i = 0; i < bits_to_modify; ++i) {
-    if ((*usable_buffer)[i] & 0x01) SetBitInBufferPermuted(i);
-  }
+  ExtractLsbToBufferPermuted(usable_buffer->GetConstRawPointer(),
+                             bits_to_modify);
 
   EmbedBufferUsingEncoder();
 
-  for (uint64 i = 0; i < bits_to_modify ; ++i) {
-    (*usable_buffer)[i] = ((*usable_buffer)[i] & 0xFE) | GetBitInBufferPermuted(i);
-  }
+  ApplyBufferPermutedToLsb(usable_buffer->GetRawPointer(), bits_to_modify);
 
   MemoryBuffer *output_buffer = new MemoryBuffer();
   if(fitness_ != nullptr) {
