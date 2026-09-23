@@ -155,6 +155,17 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 
 ################ FUSE ##################
 if(WITH_FUSE)
+    # macOS support has bit-rotted and is not built by CI, so it fails here
+    # with an explanation rather than a page of compiler errors. Porting it
+    # needs three things: the include is <osxfuse/fuse.h>, a path that went
+    # away when osxfuse became macFUSE; stat uses st_atimespec rather than
+    # st_atim; and setxattr takes an extra position argument.
+    if(APPLE)
+      message(FATAL_ERROR
+        "WITH_FUSE is not supported on macOS: the FUSE backend has not been "
+        "ported to macFUSE. Build with -DWITH_FUSE=OFF, or see src/fuse for "
+        "what needs porting.")
+    endif()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(FUSE REQUIRED fuse)
     include_directories(${FUSE_INCLUDE_DIRS})
